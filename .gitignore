@@ -1,0 +1,25 @@
+﻿# 환경변수 / API Key
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# 주최 측 원본 데이터
+data/raw/*.xlsx

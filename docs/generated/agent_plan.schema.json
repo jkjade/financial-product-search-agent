@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "ToolInvocation": {
+      "additionalProperties": false,
+      "properties": {
+        "call_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Call Id",
+          "type": "string"
+        },
+        "name": {
+          "enum": [
+            "search_products",
+            "aggregate_products",
+            "rank_products",
+            "compare_products",
+            "get_product"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "call_id",
+        "name"
+      ],
+      "title": "ToolInvocation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "intent": {
+      "enum": [
+        "search",
+        "aggregate",
+        "rank",
+        "compare",
+        "detail",
+        "clarify",
+        "unsupported"
+      ],
+      "title": "Intent",
+      "type": "string"
+    },
+    "tool_calls": {
+      "items": {
+        "$ref": "#/$defs/ToolInvocation"
+      },
+      "maxItems": 6,
+      "title": "Tool Calls",
+      "type": "array"
+    },
+    "missing_conditions": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Missing Conditions",
+      "type": "array"
+    },
+    "clarification_question": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Clarification Question"
+    }
+  },
+  "required": [
+    "intent"
+  ],
+  "title": "AgentPlan",
+  "type": "object"
+}

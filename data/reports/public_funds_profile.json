@@ -1,0 +1,790 @@
+{
+  "dataset_key": "public_funds",
+  "table_id": "PRFD01N001",
+  "target_table": "core.public_funds",
+  "source_file": "PRFD01N001_datarows.xlsx",
+  "source_sha256": "140d1ef0cec918d0b3f7c52c107cb123395594eb089b0cd70bb305709b0f44eb",
+  "schema_file": "PRFD01N001_schema.xlsx",
+  "schema_sha256": "eedb7e517312234b2825a6752adb2b5f11053f0f4fb93b70e83e87b56ee134e9",
+  "data_base_date": "2026-07-11",
+  "expected_rows": 95619,
+  "rows_processed": 95619,
+  "rows_match_expected": true,
+  "partial_run": false,
+  "missing_product_ids": 0,
+  "missing_product_names": 0,
+  "duplicate_product_ids": null,
+  "duplicate_product_ids_note": "상품 ID는 클래스·판매채널 등으로 원본에서 반복될 수 있어 전처리 오류 기준으로 사용하지 않습니다.",
+  "started_at": "2026-08-07T13:31:31.998235+00:00",
+  "finished_at": "2026-08-07T13:32:28.965954+00:00",
+  "columns": {
+    "bmrk_eng_nm": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": 388,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 113,
+      "samples": [
+        "채권종합 3M~1Y",
+        "MSCI ACWI CR 75% + KIS Bond Index 01Y 25%",
+        "KOSPI200 25% + KAP Bond Index 01Y 75%",
+        "MSCI ACWI",
+        "S&P 500(KRW) 95% + CALL 5%"
+      ]
+    },
+    "bmrk_nm": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": 391,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 113,
+      "samples": [
+        "종합채권 3개월~1년",
+        "MSCI ACWI CR 75% + KIS채권종합01Y 25%",
+        "KOSPI200 25% + 종합채권01Y 75%",
+        "MSCI ACWI",
+        "S&P 500(KRW) 95% + CALL 5%"
+      ]
+    },
+    "curr_cd": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 3,
+      "samples": [
+        "KRW",
+        "USD"
+      ]
+    },
+    "exchdg_yn": {
+      "canonical_type": "text",
+      "missing": 29761,
+      "non_null": 65858,
+      "invalid": 0,
+      "distinct_count": 3,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 8,
+      "samples": [
+        "Y",
+        "N",
+        "00080008"
+      ]
+    },
+    "fd_estb_ctry_cd": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 3,
+      "samples": [
+        "000",
+        "410"
+      ]
+    },
+    "fd_ivst_rgn_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 7,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 7,
+      "samples": [
+        "국내",
+        "글로벌",
+        "아시아",
+        "남미/북미",
+        "이머징/브릭스"
+      ]
+    },
+    "fd_mm18_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 32411,
+      "non_null": 63208,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-3593.02",
+      "max": "1399.77",
+      "max_length": 8,
+      "samples": [
+        "47.08",
+        "28.54",
+        "2.54",
+        "244.51",
+        "10.07"
+      ]
+    },
+    "fd_mm1_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 26429,
+      "non_null": 69190,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-63.11",
+      "max": "15.65",
+      "max_length": 6,
+      "samples": [
+        "1.18",
+        "1.16",
+        "1.86",
+        "-13.60",
+        "5.23"
+      ]
+    },
+    "fd_mm3_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 27076,
+      "non_null": 68543,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-88.46",
+      "max": "144.21",
+      "max_length": 6,
+      "samples": [
+        "16.29",
+        "12.78",
+        "-16.82",
+        "55.81",
+        "2.00"
+      ]
+    },
+    "fd_mm6_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 28450,
+      "non_null": 67169,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-84.16",
+      "max": "369.68",
+      "max_length": 6,
+      "samples": [
+        "25.97",
+        "11.72",
+        "-23.75",
+        "109.25",
+        "-0.07"
+      ]
+    },
+    "fd_nast_suma": {
+      "canonical_type": "numeric",
+      "missing": 12538,
+      "non_null": 83081,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "0.0000",
+      "max": "28359162282520.0000",
+      "max_length": 19,
+      "samples": [
+        "77291400582.0000",
+        "71147860091.0000",
+        "600482482202.0000",
+        "199588906898.0000",
+        "7230493681.0000"
+      ]
+    },
+    "fd_set_pcd": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": 3,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 2,
+      "samples": [
+        "20",
+        "10",
+        "00"
+      ]
+    },
+    "fd_wk1_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 26167,
+      "non_null": 69452,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-60.92",
+      "max": "26.59",
+      "max_length": 6,
+      "samples": [
+        "2.55",
+        "-0.82",
+        "2.04",
+        "0.13",
+        "-2.64"
+      ]
+    },
+    "fd_yr1_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 31193,
+      "non_null": 64426,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-92.57",
+      "max": "975.10",
+      "max_length": 6,
+      "samples": [
+        "38.17",
+        "33.73",
+        "-22.85",
+        "196.29",
+        "19.84"
+      ]
+    },
+    "fd_yr2_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 37490,
+      "non_null": 58129,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-3675.44",
+      "max": "973.95",
+      "max_length": 8,
+      "samples": [
+        "43.25",
+        "48.23",
+        "0.15",
+        "207.29",
+        "9.71"
+      ]
+    },
+    "fd_yr3_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 39806,
+      "non_null": 55813,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-4381.56",
+      "max": "1142.57",
+      "max_length": 8,
+      "samples": [
+        "60.31",
+        "95.24",
+        "-5.11",
+        "225.63",
+        "23.66"
+      ]
+    },
+    "fd_yr5_ern_r": {
+      "canonical_type": "numeric",
+      "missing": 44782,
+      "non_null": 50837,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": "-4254.75",
+      "max": "611.55",
+      "max_length": 8,
+      "samples": [
+        "49.37",
+        "127.97",
+        "-48.61",
+        "162.68",
+        "15.02"
+      ]
+    },
+    "frc_bpr_itm_yn": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 1,
+      "samples": [
+        "0",
+        "1"
+      ]
+    },
+    "fss_itm_no": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "0010173C9824",
+        "000000000000",
+        "0011644C0164",
+        "0010173C7109",
+        "0010214C2103"
+      ]
+    },
+    "hdge_fd_yn": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 1,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 1,
+      "samples": [
+        "0"
+      ]
+    },
+    "int_dvd_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 2,
+      "samples": [
+        "배당",
+        "이자"
+      ]
+    },
+    "itm_abrv_nm": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 35,
+      "samples": [
+        "삼성1.5년매칭형증권투자제1호[채권]C-P",
+        "알리안츠멀티파재F",
+        "한국밸류10년투자배당투자(채권혼합)AE",
+        "KTB글로벌테마주식C",
+        "삼성미국S&P500인덱스증권자UH[주식]_Cpe(퇴직연금)"
+      ]
+    },
+    "itm_eabrv_nm": {
+      "canonical_type": "text",
+      "missing": 95447,
+      "non_null": 172,
+      "invalid": 0,
+      "distinct_count": 14,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 20,
+      "samples": [
+        "MIRAE G2INNOVATOR_C1",
+        "MIRAE G2 INNOVATOR F",
+        "DWS DeutschEquity C3",
+        "KB China A-share Sec",
+        "Dream auto plus"
+      ]
+    },
+    "itm_eng_nm": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 100,
+      "samples": [
+        "삼성1.5년매칭형증권투자신탁제1호[채권]_C-P",
+        "알리안츠다이나믹멀티에셋증권투자신탁[주식혼합_파생재간접형] Class C(F)",
+        "한국밸류10년투자 배당증권투자신탁(채권혼합)종류A-E",
+        "2014.6.30 소규모펀드 임의해지",
+        "삼성미국S&P500인덱스증권자투자신탁UH[주식] Cpe(퇴직)"
+      ]
+    },
+    "itm_nm": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 71,
+      "samples": [
+        "삼성1.5년매칭형증권투자신탁제1호[채권]_C-P",
+        "알리안츠다이나믹멀티에셋증권투자신탁[주식혼합_파생재간접형] Class C(F)",
+        "한국밸류10년투자 배당증권투자신탁(채권혼합)종류A-E",
+        "KTB글로벌테마셀렉션증권투자신탁[주식-재간접형]_C",
+        "삼성미국S&P500인덱스증권자투자신탁UH[주식] Cpe(퇴직)"
+      ]
+    },
+    "itm_no": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "KR5114420158",
+        "KR5138490078",
+        "KR5174430032",
+        "KR5152651012",
+        "KR5114450497"
+      ]
+    },
+    "kofia_fd_ccd": {
+      "canonical_type": "text",
+      "missing": 94,
+      "non_null": 95525,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 20,
+      "samples": [
+        "11111A327360131ZZZZ5",
+        "00000000000000000000",
+        "141112120010122ZZZZ5",
+        "12123612060107101202",
+        "1913361203602ZZZZZZ3"
+      ]
+    },
+    "ksd_itm_no": {
+      "canonical_type": "text",
+      "missing": 266,
+      "non_null": 95353,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "KRZ502532813",
+        "KRZ502024037",
+        "KRZ501944872",
+        "KRZ500366082",
+        "KRZ50203521G"
+      ]
+    },
+    "mtco_itm_no": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 10,
+      "samples": [
+        "01MN900",
+        "0060901",
+        "0010200",
+        "0019004",
+        "01MA700"
+      ]
+    },
+    "ofsfd_yn": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": 1,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 1,
+      "samples": [
+        "0"
+      ]
+    },
+    "or_attr_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 11,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 4,
+      "samples": [
+        "채권형",
+        "재간접",
+        "채권혼합",
+        "주식형",
+        "혼합자산"
+      ]
+    },
+    "or_co_xtn_itt_cd": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 67,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 8,
+      "samples": [
+        "00040010",
+        "00040023",
+        "00080021",
+        "00080013",
+        "00080005"
+      ]
+    },
+    "ovrs_fd_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 3,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 5,
+      "samples": [
+        "국내",
+        "해외",
+        "국내외혼합"
+      ]
+    },
+    "pers_corp_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 3,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 4,
+      "samples": [
+        "개인",
+        "해당없음",
+        "법인"
+      ]
+    },
+    "pfiv_sale_cntl_tcd": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 3,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 2,
+      "samples": [
+        "00",
+        "01",
+        "02"
+      ]
+    },
+    "prfd_attr_cd": {
+      "canonical_type": "text",
+      "missing": 0,
+      "non_null": 95619,
+      "invalid": 0,
+      "distinct_count": 228,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 4,
+      "samples": [
+        "F103",
+        "V102",
+        "M111",
+        "C103",
+        "V101"
+      ]
+    },
+    "prvo_fd_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "해당없음",
+        "일반사모(2015년전)"
+      ]
+    },
+    "prvo_pbff_desc": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 2,
+      "samples": [
+        "공모",
+        "사모"
+      ]
+    },
+    "rptt_ksd_itm_no": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "0302001MN900",
+        "032110060901",
+        "033910010200",
+        "032400019004",
+        "0302001MA700"
+      ]
+    },
+    "sale_yn": {
+      "canonical_type": "text",
+      "missing": 1,
+      "non_null": 95618,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 4,
+      "samples": [
+        "판매완료",
+        "판매중"
+      ]
+    },
+    "std_itm_no": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": null,
+      "distinct_count_capped": true,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "K55105DY4714",
+        "K55228B78547",
+        "KR5236AY2947",
+        "KR5306702543",
+        "K55105BU1120"
+      ]
+    },
+    "thco_sale_yn": {
+      "canonical_type": "text",
+      "missing": 4024,
+      "non_null": 91595,
+      "invalid": 0,
+      "distinct_count": 2,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 12,
+      "samples": [
+        "Y",
+        "KRZ50226929C"
+      ]
+    },
+    "trusc_xtn_itt_cd": {
+      "canonical_type": "text",
+      "missing": 66,
+      "non_null": 95553,
+      "invalid": 0,
+      "distinct_count": 18,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 8,
+      "samples": [
+        "00020054",
+        "00020088",
+        "00020004",
+        "00020081",
+        "00050004"
+      ]
+    },
+    "zrin_fd_ivst_risk_gcd": {
+      "canonical_type": "text",
+      "missing": 18416,
+      "non_null": 77203,
+      "invalid": 18416,
+      "distinct_count": 7,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 8,
+      "samples": [
+        "4",
+        "3",
+        "2",
+        "6",
+        "1"
+      ]
+    },
+    "zrin_fd_ivst_risk_grd_nm": {
+      "canonical_type": "text",
+      "missing": 18416,
+      "non_null": 77203,
+      "invalid": 0,
+      "distinct_count": 9,
+      "distinct_count_capped": false,
+      "min": null,
+      "max": null,
+      "max_length": 8,
+      "samples": [
+        "보통 위험",
+        "다소 높은 위험",
+        "높은 위험",
+        "매우 낮은 위험",
+        "매우 높은 위험"
+      ]
+    }
+  }
+}

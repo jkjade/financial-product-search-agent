@@ -1,0 +1,1058 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "search_products",
+      "description": "조건에 맞는 금융상품을 검색하고 다중 정렬·페이지 처리·근거를 반환합니다.",
+      "parameters": {
+        "$defs": {
+          "FilterClause": {
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "enum": [
+                  "product_type",
+                  "source_table",
+                  "product_id",
+                  "product_code",
+                  "product_name",
+                  "short_name",
+                  "issuer_or_manager",
+                  "asset_class",
+                  "investment_region",
+                  "currency",
+                  "risk_code",
+                  "risk_name",
+                  "base_index",
+                  "sale_available",
+                  "fee_rate",
+                  "other_fee_rate",
+                  "return_1d",
+                  "return_1w",
+                  "return_1m",
+                  "return_3m",
+                  "return_6m",
+                  "return_1y",
+                  "return_2y",
+                  "return_3y",
+                  "return_5y",
+                  "return_ytd",
+                  "yield_rate",
+                  "size_amount",
+                  "price",
+                  "data_base_date",
+                  "product_info_update_date",
+                  "market_data_update_date",
+                  "weekly_data_update_date",
+                  "price_base_date",
+                  "size_base_date",
+                  "return_base_date",
+                  "credit_rating_base_date",
+                  "issue_date",
+                  "listing_date",
+                  "trade_end_date",
+                  "maturity_date"
+                ],
+                "title": "Field",
+                "type": "string"
+              },
+              "operator": {
+                "enum": [
+                  "eq",
+                  "ne",
+                  "contains",
+                  "starts_with",
+                  "in",
+                  "not_in",
+                  "gt",
+                  "gte",
+                  "lt",
+                  "lte",
+                  "between",
+                  "is_null",
+                  "not_null"
+                ],
+                "title": "Operator",
+                "type": "string"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Value"
+              },
+              "values": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "maxItems": 100,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Values"
+              }
+            },
+            "required": [
+              "field",
+              "operator"
+            ],
+            "title": "FilterClause",
+            "type": "object"
+          },
+          "SortClause": {
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "enum": [
+                  "product_type",
+                  "source_table",
+                  "product_id",
+                  "product_code",
+                  "product_name",
+                  "short_name",
+                  "issuer_or_manager",
+                  "asset_class",
+                  "investment_region",
+                  "currency",
+                  "risk_code",
+                  "risk_name",
+                  "base_index",
+                  "sale_available",
+                  "fee_rate",
+                  "other_fee_rate",
+                  "return_1d",
+                  "return_1w",
+                  "return_1m",
+                  "return_3m",
+                  "return_6m",
+                  "return_1y",
+                  "return_2y",
+                  "return_3y",
+                  "return_5y",
+                  "return_ytd",
+                  "yield_rate",
+                  "size_amount",
+                  "price",
+                  "data_base_date",
+                  "product_info_update_date",
+                  "market_data_update_date",
+                  "weekly_data_update_date",
+                  "price_base_date",
+                  "size_base_date",
+                  "return_base_date",
+                  "credit_rating_base_date",
+                  "issue_date",
+                  "listing_date",
+                  "trade_end_date",
+                  "maturity_date"
+                ],
+                "title": "Field",
+                "type": "string"
+              },
+              "order": {
+                "default": "desc",
+                "enum": [
+                  "asc",
+                  "desc"
+                ],
+                "title": "Order",
+                "type": "string"
+              },
+              "nulls": {
+                "default": "last",
+                "enum": [
+                  "first",
+                  "last"
+                ],
+                "title": "Nulls",
+                "type": "string"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "title": "SortClause",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "q": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Q"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/$defs/FilterClause"
+            },
+            "maxItems": 30,
+            "title": "Filters",
+            "type": "array"
+          },
+          "sort": {
+            "items": {
+              "$ref": "#/$defs/SortClause"
+            },
+            "maxItems": 5,
+            "title": "Sort",
+            "type": "array"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 200,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "maximum": 100000,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "ProductQueryRequest",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "aggregate_products",
+      "description": "필터 결과를 그룹화하고 count/count_distinct/sum/avg/min/max 집계를 계산합니다.",
+      "parameters": {
+        "$defs": {
+          "AggregateMetric": {
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "enum": [
+                  "count",
+                  "count_distinct",
+                  "sum",
+                  "avg",
+                  "min",
+                  "max"
+                ],
+                "title": "Operation",
+                "type": "string"
+              },
+              "field": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "product_type",
+                      "source_table",
+                      "product_id",
+                      "product_code",
+                      "product_name",
+                      "short_name",
+                      "issuer_or_manager",
+                      "asset_class",
+                      "investment_region",
+                      "currency",
+                      "risk_code",
+                      "risk_name",
+                      "base_index",
+                      "sale_available",
+                      "fee_rate",
+                      "other_fee_rate",
+                      "return_1d",
+                      "return_1w",
+                      "return_1m",
+                      "return_3m",
+                      "return_6m",
+                      "return_1y",
+                      "return_2y",
+                      "return_3y",
+                      "return_5y",
+                      "return_ytd",
+                      "yield_rate",
+                      "size_amount",
+                      "price",
+                      "data_base_date",
+                      "product_info_update_date",
+                      "market_data_update_date",
+                      "weekly_data_update_date",
+                      "price_base_date",
+                      "size_base_date",
+                      "return_base_date",
+                      "credit_rating_base_date",
+                      "issue_date",
+                      "listing_date",
+                      "trade_end_date",
+                      "maturity_date"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Field"
+              },
+              "alias": {
+                "pattern": "^[a-z][a-z0-9_]{0,62}$",
+                "title": "Alias",
+                "type": "string"
+              }
+            },
+            "required": [
+              "operation",
+              "alias"
+            ],
+            "title": "AggregateMetric",
+            "type": "object"
+          },
+          "AggregateOrder": {
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "pattern": "^[a-z][a-z0-9_]{0,62}$",
+                "title": "Field",
+                "type": "string"
+              },
+              "order": {
+                "default": "desc",
+                "enum": [
+                  "asc",
+                  "desc"
+                ],
+                "title": "Order",
+                "type": "string"
+              },
+              "nulls": {
+                "default": "last",
+                "enum": [
+                  "first",
+                  "last"
+                ],
+                "title": "Nulls",
+                "type": "string"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "title": "AggregateOrder",
+            "type": "object"
+          },
+          "FilterClause": {
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "enum": [
+                  "product_type",
+                  "source_table",
+                  "product_id",
+                  "product_code",
+                  "product_name",
+                  "short_name",
+                  "issuer_or_manager",
+                  "asset_class",
+                  "investment_region",
+                  "currency",
+                  "risk_code",
+                  "risk_name",
+                  "base_index",
+                  "sale_available",
+                  "fee_rate",
+                  "other_fee_rate",
+                  "return_1d",
+                  "return_1w",
+                  "return_1m",
+                  "return_3m",
+                  "return_6m",
+                  "return_1y",
+                  "return_2y",
+                  "return_3y",
+                  "return_5y",
+                  "return_ytd",
+                  "yield_rate",
+                  "size_amount",
+                  "price",
+                  "data_base_date",
+                  "product_info_update_date",
+                  "market_data_update_date",
+                  "weekly_data_update_date",
+                  "price_base_date",
+                  "size_base_date",
+                  "return_base_date",
+                  "credit_rating_base_date",
+                  "issue_date",
+                  "listing_date",
+                  "trade_end_date",
+                  "maturity_date"
+                ],
+                "title": "Field",
+                "type": "string"
+              },
+              "operator": {
+                "enum": [
+                  "eq",
+                  "ne",
+                  "contains",
+                  "starts_with",
+                  "in",
+                  "not_in",
+                  "gt",
+                  "gte",
+                  "lt",
+                  "lte",
+                  "between",
+                  "is_null",
+                  "not_null"
+                ],
+                "title": "Operator",
+                "type": "string"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Value"
+              },
+              "values": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "maxItems": 100,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Values"
+              }
+            },
+            "required": [
+              "field",
+              "operator"
+            ],
+            "title": "FilterClause",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "q": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Q"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/$defs/FilterClause"
+            },
+            "maxItems": 30,
+            "title": "Filters",
+            "type": "array"
+          },
+          "group_by": {
+            "items": {
+              "enum": [
+                "product_type",
+                "source_table",
+                "product_id",
+                "product_code",
+                "issuer_or_manager",
+                "asset_class",
+                "investment_region",
+                "currency",
+                "risk_code",
+                "risk_name",
+                "base_index",
+                "sale_available",
+                "data_base_date"
+              ],
+              "type": "string"
+            },
+            "maxItems": 4,
+            "title": "Group By",
+            "type": "array"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/$defs/AggregateMetric"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Metrics",
+            "type": "array"
+          },
+          "order_by": {
+            "items": {
+              "$ref": "#/$defs/AggregateOrder"
+            },
+            "maxItems": 5,
+            "title": "Order By",
+            "type": "array"
+          },
+          "limit": {
+            "default": 100,
+            "maximum": 1000,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "maximum": 100000,
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "ProductAggregateRequest",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "rank_products",
+      "description": "필터 결과에 row_number/rank/dense_rank 순위를 계산하며 그룹별 Top-N을 지원합니다.",
+      "parameters": {
+        "$defs": {
+          "FilterClause": {
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "enum": [
+                  "product_type",
+                  "source_table",
+                  "product_id",
+                  "product_code",
+                  "product_name",
+                  "short_name",
+                  "issuer_or_manager",
+                  "asset_class",
+                  "investment_region",
+                  "currency",
+                  "risk_code",
+                  "risk_name",
+                  "base_index",
+                  "sale_available",
+                  "fee_rate",
+                  "other_fee_rate",
+                  "return_1d",
+                  "return_1w",
+                  "return_1m",
+                  "return_3m",
+                  "return_6m",
+                  "return_1y",
+                  "return_2y",
+                  "return_3y",
+                  "return_5y",
+                  "return_ytd",
+                  "yield_rate",
+                  "size_amount",
+                  "price",
+                  "data_base_date",
+                  "product_info_update_date",
+                  "market_data_update_date",
+                  "weekly_data_update_date",
+                  "price_base_date",
+                  "size_base_date",
+                  "return_base_date",
+                  "credit_rating_base_date",
+                  "issue_date",
+                  "listing_date",
+                  "trade_end_date",
+                  "maturity_date"
+                ],
+                "title": "Field",
+                "type": "string"
+              },
+              "operator": {
+                "enum": [
+                  "eq",
+                  "ne",
+                  "contains",
+                  "starts_with",
+                  "in",
+                  "not_in",
+                  "gt",
+                  "gte",
+                  "lt",
+                  "lte",
+                  "between",
+                  "is_null",
+                  "not_null"
+                ],
+                "title": "Operator",
+                "type": "string"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Value"
+              },
+              "values": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "maxItems": 100,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Values"
+              }
+            },
+            "required": [
+              "field",
+              "operator"
+            ],
+            "title": "FilterClause",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "q": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Q"
+          },
+          "filters": {
+            "items": {
+              "$ref": "#/$defs/FilterClause"
+            },
+            "maxItems": 30,
+            "title": "Filters",
+            "type": "array"
+          },
+          "metric": {
+            "enum": [
+              "fee_rate",
+              "other_fee_rate",
+              "return_1d",
+              "return_1w",
+              "return_1m",
+              "return_3m",
+              "return_6m",
+              "return_1y",
+              "return_2y",
+              "return_3y",
+              "return_5y",
+              "return_ytd",
+              "yield_rate",
+              "size_amount",
+              "price"
+            ],
+            "title": "Metric",
+            "type": "string"
+          },
+          "order": {
+            "default": "desc",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "title": "Order",
+            "type": "string"
+          },
+          "method": {
+            "default": "dense_rank",
+            "enum": [
+              "row_number",
+              "rank",
+              "dense_rank"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "partition_by": {
+            "items": {
+              "enum": [
+                "product_type",
+                "source_table",
+                "product_id",
+                "product_code",
+                "issuer_or_manager",
+                "asset_class",
+                "investment_region",
+                "currency",
+                "risk_code",
+                "risk_name",
+                "base_index",
+                "sale_available",
+                "data_base_date"
+              ],
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Partition By",
+            "type": "array"
+          },
+          "top_n": {
+            "default": 10,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Top N",
+            "type": "integer"
+          },
+          "result_limit": {
+            "default": 500,
+            "maximum": 2000,
+            "minimum": 1,
+            "title": "Result Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "metric"
+        ],
+        "title": "ProductRankRequest",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "compare_products",
+      "description": "원본 행 또는 상품 ID로 선택한 상품을 같은 필드로 정렬하고 지표별 순위를 반환합니다.",
+      "parameters": {
+        "$defs": {
+          "ComparisonMetric": {
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "enum": [
+                  "fee_rate",
+                  "other_fee_rate",
+                  "return_1d",
+                  "return_1w",
+                  "return_1m",
+                  "return_3m",
+                  "return_6m",
+                  "return_1y",
+                  "return_2y",
+                  "return_3y",
+                  "return_5y",
+                  "return_ytd",
+                  "yield_rate",
+                  "size_amount",
+                  "price"
+                ],
+                "title": "Field",
+                "type": "string"
+              },
+              "order": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Order"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "title": "ComparisonMetric",
+            "type": "object"
+          },
+          "ProductSelector": {
+            "additionalProperties": false,
+            "properties": {
+              "source_table": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "PRBD01N001",
+                      "PREF01N001",
+                      "PREF02N001",
+                      "PRFD01N001"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Table"
+              },
+              "source_row_number": {
+                "anyOf": [
+                  {
+                    "minimum": 2,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Source Row Number"
+              },
+              "product_type": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "DOMESTIC_BOND",
+                      "DOMESTIC_ETF",
+                      "OVERSEAS_ETF",
+                      "PUBLIC_FUND"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Product Type"
+              },
+              "product_id": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Product Id"
+              }
+            },
+            "title": "ProductSelector",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "products": {
+            "items": {
+              "$ref": "#/$defs/ProductSelector"
+            },
+            "maxItems": 20,
+            "minItems": 2,
+            "title": "Products",
+            "type": "array"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/$defs/ComparisonMetric"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Metrics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "products"
+        ],
+        "title": "ProductCompareRequest",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_product",
+      "description": "원본 테이블과 엑셀 행 번호로 상품 상세 및 근거를 조회합니다.",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "source_table": {
+            "enum": [
+              "PRBD01N001",
+              "PREF01N001",
+              "PREF02N001",
+              "PRFD01N001"
+            ],
+            "title": "Source Table",
+            "type": "string"
+          },
+          "source_row_number": {
+            "minimum": 2,
+            "title": "Source Row Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source_table",
+          "source_row_number"
+        ],
+        "title": "GetProductRequest",
+        "type": "object"
+      }
+    }
+  }
+]

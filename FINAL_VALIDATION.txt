@@ -1,0 +1,27 @@
+금융상품 Agent Phase 2.5 Final v2.5.1 — 제작 환경 검증 결과
+
+- Python compileall: PASS
+- pytest: 44 passed
+- 기존 Phase 1/2 테스트: PASS
+- Ontology TTL/term map/business rules 테스트: PASS
+- Answer Validation 테스트: PASS
+- Phase 2.5 Tool JSON Schema 생성: PASS
+- pgvector/Knowledge Graph SQL 정적 계약 테스트: PASS
+- HyperCLOVA X adapter import/contract: PASS
+
+실제 Docker/PostgreSQL 전체 적재 및 semantic graph 구축은 대상 Windows Docker host에서
+scripts/bootstrap.ps1이 자동으로 수행하고 scripts/check-all.ps1이 검증합니다.
+
+정상 완료 문구:
+전체 검증 결과: 모두 정상
+1·2차와 온톨로지·지식그래프·Federated 검색·Answer Validation까지 모두 통과했습니다.
+
+HyperCLOVA X 실제 네트워크 호출은 인증키가 있어야 검증할 수 있습니다.
+ETF 구성종목 외부 historical data는 제공 원본에 없으므로 실제 출처·기준일 검증 후 별도 적재해야 합니다.
+
+
+v2.5.1 수정 사항
+- 사용자 Windows Docker v2.5.0 검증 로그에서 /app/ontology 및 /app/docker-compose.yml 미포함 문제 확인
+- Dockerfile에 ontology, docker-compose.yml, Dockerfile 런타임 패키징 추가
+- 해당 누락을 재발 방지하는 컨테이너 패키징 회귀 테스트 추가
+- 로컬 정적/단위 테스트 통과 후 배포본 생성

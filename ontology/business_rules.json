@@ -1,0 +1,36 @@
+{
+  "dataset_snapshot_date": "2026-07-11",
+  "answer_generation_model_rule": "HyperCLOVA X only",
+  "single_turn": true,
+  "unsupported_answer_text": "제공된 데이터의 2026-07-11 기준으로 확인할 수 없습니다.",
+  "evidence_required": true,
+  "external_evidence_cutoff": "2026-07-11",
+  "never_infer_missing_values": true,
+  "prohibited_answer_patterns": [
+    "무조건 좋",
+    "무조건 오르",
+    "반드시 오르",
+    "수익을 보장",
+    "수익 보장",
+    "매수하셔야",
+    "매수 추천",
+    "꼭 사",
+    "확실히 상승",
+    "무조건 오를",
+    "반드시 상승",
+    "반드시 오를"
+  ],
+  "ytd_rule": {
+    "label": "YTD",
+    "period_start": "2026-01-01",
+    "period_end": "2026-07-11",
+    "note": "평가 기준일을 고정하여 해석한다. 데이터에 YTD 값이 없으면 계산 근거 없이는 생성하지 않는다."
+  },
+  "routing_policy": {
+    "structured_numeric_filtering": "RDB",
+    "aggregation_and_ranking": "RDB",
+    "entity_relation_traversal": "GRAPH",
+    "external_unstructured_evidence": "VECTOR_OR_LEXICAL",
+    "term_normalization": "ONTOLOGY"
+  }
+}

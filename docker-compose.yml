@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-financial_agent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-financial-agent-local-only}
+      POSTGRES_DB: ${POSTGRES_DB:-financial_products}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-financial_agent} -d ${POSTGRES_DB:-financial_products}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      PYTHONPATH: /app
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./external_data:/app/external_data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import json,urllib.request; assert json.load(urllib.request.urlopen('http://localhost:8000/health', timeout=5))['status']=='ok'",
+        ]
+      interval: 10s
+      timeout: 7s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  etl:
+    build:
+      context: .
+    command: ["python", "-m", "src.cli", "pipeline", "--load-db"]
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      PYTHONPATH: /app
+    volumes:
+      - ./data:/app/data
+      - ./external_data:/app/external_data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["tools"]
+
+volumes:
+  postgres_data:

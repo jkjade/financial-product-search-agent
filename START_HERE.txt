@@ -1,0 +1,14 @@
+금융상품 Agent Phase 2.5 FINAL v2.5.1
+
+1) Docker Desktop 실행
+2) 이 프로젝트를 새 폴더에 압축 해제
+3) PowerShell에서 프로젝트 폴더로 이동
+4) 실행:
+   powershell -ExecutionPolicy Bypass -File ".\scripts\bootstrap.ps1"
+5) 마지막에 아래 문구 확인:
+   전체 검증 결과: 모두 정상
+   1·2차와 온톨로지·지식그래프·Federated 검색·Answer Validation까지 모두 통과했습니다.
+6) API 문서: http://localhost:8000/docs
+
+3차 HyperCLOVA X 연동 시 .env의 HCX_API_KEY만 입력한 후 /agent/health를 확인하세요.
+ETF 구성종목은 제공 원본에 없으므로 2026-07-11 이전 기준 외부 자료를 external_data 형식으로 추가해야 합니다.

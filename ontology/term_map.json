@@ -1,0 +1,278 @@
+{
+  "version": "1.0",
+  "product_types": [
+    {
+      "canonical": "DOMESTIC_BOND",
+      "aliases": [
+        "국내채권",
+        "국내 채권",
+        "채권",
+        "bond"
+      ]
+    },
+    {
+      "canonical": "DOMESTIC_ETF",
+      "aliases": [
+        "국내etf",
+        "국내 etf",
+        "한국 etf",
+        "domestic etf"
+      ]
+    },
+    {
+      "canonical": "OVERSEAS_ETF",
+      "aliases": [
+        "해외etf",
+        "해외 etf",
+        "미국 etf",
+        "overseas etf",
+        "foreign etf"
+      ]
+    },
+    {
+      "canonical": "PUBLIC_FUND",
+      "aliases": [
+        "공모펀드",
+        "공모 펀드",
+        "펀드",
+        "public fund"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "canonical": "issuer_or_manager",
+      "aliases": [
+        "운용사",
+        "자산운용사",
+        "발행사",
+        "issuer",
+        "asset manager",
+        "manager"
+      ]
+    },
+    {
+      "canonical": "asset_class",
+      "aliases": [
+        "자산군",
+        "자산 유형",
+        "asset class"
+      ]
+    },
+    {
+      "canonical": "investment_region",
+      "aliases": [
+        "투자지역",
+        "지역",
+        "국가",
+        "investment region",
+        "region"
+      ]
+    },
+    {
+      "canonical": "currency",
+      "aliases": [
+        "통화",
+        "표시통화",
+        "currency"
+      ]
+    },
+    {
+      "canonical": "risk_name",
+      "aliases": [
+        "위험등급",
+        "위험 등급",
+        "신용등급",
+        "신용 등급",
+        "risk grade",
+        "credit rating"
+      ]
+    },
+    {
+      "canonical": "base_index",
+      "aliases": [
+        "기초지수",
+        "벤치마크",
+        "추종지수",
+        "index",
+        "benchmark"
+      ]
+    },
+    {
+      "canonical": "fee_rate",
+      "aliases": [
+        "보수",
+        "보수율",
+        "운용보수",
+        "fee",
+        "expense ratio"
+      ]
+    },
+    {
+      "canonical": "return_1y",
+      "aliases": [
+        "1년수익률",
+        "1년 수익률",
+        "1y return",
+        "one year return"
+      ]
+    },
+    {
+      "canonical": "return_ytd",
+      "aliases": [
+        "ytd",
+        "연초대비",
+        "연초 대비",
+        "연초 이후 수익률"
+      ]
+    },
+    {
+      "canonical": "yield_rate",
+      "aliases": [
+        "채권수익률",
+        "채권 수익률",
+        "매수수익률",
+        "yield"
+      ]
+    },
+    {
+      "canonical": "size_amount",
+      "aliases": [
+        "aum",
+        "순자산",
+        "순자산총액",
+        "규모",
+        "자산규모",
+        "size"
+      ]
+    },
+    {
+      "canonical": "price",
+      "aliases": [
+        "가격",
+        "종가",
+        "평가가격",
+        "price"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "canonical": "managedBy",
+      "aliases": [
+        "운용하는",
+        "운용사",
+        "발행한",
+        "managed by",
+        "issued by"
+      ]
+    },
+    {
+      "canonical": "manages",
+      "aliases": [
+        "운용 상품",
+        "운용하는 상품",
+        "manages"
+      ]
+    },
+    {
+      "canonical": "hasAssetClass",
+      "aliases": [
+        "자산군",
+        "투자자산",
+        "has asset class"
+      ]
+    },
+    {
+      "canonical": "investsInRegion",
+      "aliases": [
+        "투자지역",
+        "투자하는 지역",
+        "invests in"
+      ]
+    },
+    {
+      "canonical": "denominatedIn",
+      "aliases": [
+        "통화",
+        "표시통화",
+        "denominated in"
+      ]
+    },
+    {
+      "canonical": "hasRiskGrade",
+      "aliases": [
+        "위험등급",
+        "신용등급",
+        "has risk grade"
+      ]
+    },
+    {
+      "canonical": "tracksIndex",
+      "aliases": [
+        "추종",
+        "기초지수",
+        "벤치마크",
+        "tracks index"
+      ]
+    },
+    {
+      "canonical": "holdsSecurity",
+      "aliases": [
+        "구성종목",
+        "편입종목",
+        "보유종목",
+        "holds",
+        "contains security"
+      ]
+    },
+    {
+      "canonical": "heldBy",
+      "aliases": [
+        "편입한 etf",
+        "포함하는 etf",
+        "held by"
+      ]
+    }
+  ],
+  "ranking_semantics": [
+    {
+      "aliases": [
+        "보수가 낮은",
+        "보수 낮은",
+        "저보수"
+      ],
+      "field": "fee_rate",
+      "order": "asc"
+    },
+    {
+      "aliases": [
+        "aum 큰",
+        "aum가 큰",
+        "규모가 큰",
+        "순자산이 큰",
+        "aum가 크",
+        "규모가 크",
+        "순자산이 크"
+      ],
+      "field": "size_amount",
+      "order": "desc"
+    },
+    {
+      "aliases": [
+        "수익률 높은",
+        "1년 수익률 높은"
+      ],
+      "field": "return_1y",
+      "order": "desc"
+    },
+    {
+      "aliases": [
+        "수익률 낮은",
+        "1년 수익률 낮은"
+      ],
+      "field": "return_1y",
+      "order": "asc"
+    }
+  ]
+}

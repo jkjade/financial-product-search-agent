@@ -1,0 +1,2029 @@
+[
+  {
+    "key": "domestic_bonds",
+    "table_id": "PRBD01N001",
+    "product_type": "DOMESTIC_BOND",
+    "table": "domestic_bonds",
+    "expected_rows": 42394,
+    "date_columns": [
+      "isu_dt",
+      "mat_dt",
+      "pd_std_info_update",
+      "crd_grd_dt"
+    ],
+    "numeric_overrides": [],
+    "id_column": "pd_no",
+    "name_column": "pd_nm",
+    "common_mapping": {
+      "product_id": "pd_no",
+      "product_name": "pd_nm",
+      "short_name": "pd_abrv_nm",
+      "issuer_or_manager": "pd_pbcm",
+      "asset_class": "std_pd_mcls_nm",
+      "investment_region": "pd_ctry_cd",
+      "currency": "curr_cd",
+      "risk_code": "pd_risk_gcd",
+      "risk_name": "pd_evco_crd_grd|crd_grd",
+      "yield_rate": "buy_yield|applied_yield",
+      "size_amount": "isu_bal_amt",
+      "price": "eval_price",
+      "maturity_date": "mat_dt",
+      "description": "std_pd_mcls_nm|std_pd_scls_nm|bd_knd"
+    },
+    "data_file": "data/raw/PRBD01N001_datarows.xlsx",
+    "schema_file": "data/raw/PRBD01N001_schema.xlsx",
+    "data_base_date": "2026-07-11",
+    "columns": [
+      {
+        "name": "pd_no",
+        "source_name": "PD_NO",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_exg_mkt",
+        "source_name": "PD_EXG_MKT",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_nm",
+        "source_name": "PD_NM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_abrv_nm",
+        "source_name": "PD_ABRV_NM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_eng_nm",
+        "source_name": "PD_ENG_NM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_abrv_eng_nm",
+        "source_name": "PD_ABRV_ENG_NM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_ctry_cd",
+        "source_name": "PD_CTRY_CD",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_pbcm",
+        "source_name": "PD_PBCM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "std_pd_mcls_nm",
+        "source_name": "STD_PD_MCLS_NM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "std_pd_scls_nm",
+        "source_name": "STD_PD_SCLS_NM",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "bd_knd",
+        "source_name": "BD_KND",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "curr_cd",
+        "source_name": "CURR_CD",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "isu_bal_amt",
+        "source_name": "ISU_BAL_AMT",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "isu_dt",
+        "source_name": "ISU_DT",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "mat_dt",
+        "source_name": "MAT_DT",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "srfc_irt",
+        "source_name": "SRFC_IRT",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_evco_crd_grd",
+        "source_name": "PD_EVCO_CRD_GRD",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_risk_gcd",
+        "source_name": "PD_RISK_GCD",
+        "key": "",
+        "source_type": "bigint",
+        "korean_name": "",
+        "example": "",
+        "type": "integer"
+      },
+      {
+        "name": "pd_std_info_update",
+        "source_name": "PD_STD_INFO_UPDATE",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "buy_yield",
+        "source_name": "BUY_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "corp_pretax_yield",
+        "source_name": "CORP_PRETAX_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "corp_after_tax_yield",
+        "source_name": "CORP_AFTER_TAX_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "after_tax_yield",
+        "source_name": "AFTER_TAX_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "pref_tax_yield",
+        "source_name": "PREF_TAX_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "avg_annual_tax_yield",
+        "source_name": "AVG_ANNUAL_TAX_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "depo_equiv_yield_154",
+        "source_name": "DEPO_EQUIV_YIELD_154",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "buyable_quantity",
+        "source_name": "BUYABLE_QUANTITY",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "remaining_days",
+        "source_name": "REMAINING_DAYS",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "dur",
+        "source_name": "DUR",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "cov",
+        "source_name": "COV",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "ndy_dur",
+        "source_name": "NDY_DUR",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "ndy_cov",
+        "source_name": "NDY_COV",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "eval_price",
+        "source_name": "EVAL_PRICE",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "applied_yield",
+        "source_name": "APPLIED_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "dirty",
+        "source_name": "DIRTY",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "ndy_eval_price",
+        "source_name": "NDY_EVAL_PRICE",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "ndy_applied_yield",
+        "source_name": "NDY_APPLIED_YIELD",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "ndy_dirty",
+        "source_name": "NDY_DIRTY",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "crd_grd",
+        "source_name": "CRD_GRD",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "crd_grd_dt",
+        "source_name": "CRD_GRD_DT",
+        "key": "",
+        "source_type": "double precision",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      }
+    ]
+  },
+  {
+    "key": "domestic_etfs",
+    "table_id": "PREF01N001",
+    "product_type": "DOMESTIC_ETF",
+    "table": "domestic_etfs",
+    "expected_rows": 1734,
+    "date_columns": [
+      "cu_upt_dt",
+      "du_upt_dt",
+      "pd_lste_dt",
+      "pd_lstg_dt",
+      "wu_upt_dt"
+    ],
+    "numeric_overrides": [
+      "cu_charge_etc_rt",
+      "cu_charge_rt",
+      "cu_lev_fector"
+    ],
+    "id_column": "pd_itm_no",
+    "name_column": "pd_nm",
+    "common_mapping": {
+      "product_id": "pd_itm_no",
+      "product_code": "pd_itm_no_ma",
+      "product_name": "pd_nm",
+      "short_name": "pd_abrv_nm",
+      "issuer_or_manager": "cu_fund_mgmt_co",
+      "asset_class": "wu_inv_ast_type",
+      "investment_region": "wu_inv_rgn",
+      "currency": "pd_curr_nm|pd_curr_cd",
+      "risk_code": "pd_risk_cd",
+      "risk_name": "pd_risk_nm",
+      "fee_rate": "cu_charge_rt",
+      "other_fee_rate": "cu_charge_etc_rt",
+      "return_1d": "du_er_1d",
+      "return_1m": "du_er_1m",
+      "return_3m": "du_er_3m",
+      "return_6m": "du_er_6m",
+      "return_1y": "du_er_1y",
+      "return_ytd": "du_er_ytd",
+      "size_amount": "pd_net_tamt|du_last_aum",
+      "price": "du_clpr|ru_mkt_price",
+      "description": "cu_strtegy|pd_sect_nm",
+      "base_index": "cu_base_index"
+    },
+    "data_file": "data/raw/PREF01N001_datarows.xlsx",
+    "schema_file": "data/raw/PREF01N001_schema.xlsx",
+    "data_base_date": "2026-07-11",
+    "columns": [
+      {
+        "name": "cu_base_index",
+        "source_name": "cu_base_index",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "기초지수",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_charge_etc_rt",
+        "source_name": "cu_charge_etc_rt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "기타비용요율",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "cu_charge_rt",
+        "source_name": "cu_charge_rt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "총보수요율",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "cu_fund_mgmt_co",
+        "source_name": "cu_fund_mgmt_co",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "운용사",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_lev_fector",
+        "source_name": "cu_lev_fector",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "배수",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "cu_strtegy",
+        "source_name": "cu_strtegy",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "운용전략",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_upt_dt",
+        "source_name": "cu_upt_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "변동갱신일자",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "du_bpr",
+        "source_name": "du_bpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "기준가",
+        "example": "9915.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_chas_errt",
+        "source_name": "du_chas_errt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "추적오차율",
+        "example": "0.26",
+        "type": "numeric"
+      },
+      {
+        "name": "du_clpr",
+        "source_name": "du_clpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "종가",
+        "example": "9915.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_diff_rt",
+        "source_name": "du_diff_rt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "괴리율",
+        "example": "1.44",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_1d",
+        "source_name": "du_er_1d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "수익률_1D",
+        "example": "-0.44",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_1m",
+        "source_name": "du_er_1m",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "수익률_1M",
+        "example": "0.58",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_1y",
+        "source_name": "du_er_1y",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "수익률_1Y",
+        "example": "17.10",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_3m",
+        "source_name": "du_er_3m",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "수익률_3M",
+        "example": "-0.03",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_6m",
+        "source_name": "du_er_6m",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "수익률_6M",
+        "example": "9.41",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_ytd",
+        "source_name": "du_er_ytd",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "수익률_YTD",
+        "example": "2.88",
+        "type": "numeric"
+      },
+      {
+        "name": "du_hpr",
+        "source_name": "du_hpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "고가",
+        "example": "9979.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_last_aum",
+        "source_name": "du_last_aum",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "최종AUM",
+        "example": "60720672000.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_last_nav",
+        "source_name": "du_last_nav",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "최종NAV",
+        "example": "9873.28",
+        "type": "numeric"
+      },
+      {
+        "name": "du_lpr",
+        "source_name": "du_lpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "시가",
+        "example": "9905.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_nav_rnf_amt",
+        "source_name": "du_nav_rnf_amt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "전일NAV등락금액",
+        "example": "-161.91",
+        "type": "numeric"
+      },
+      {
+        "name": "du_nav_yday",
+        "source_name": "du_nav_yday",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "전일NAV",
+        "example": "10035.19",
+        "type": "numeric"
+      },
+      {
+        "name": "du_upt_dt",
+        "source_name": "du_upt_dt",
+        "key": "",
+        "source_type": "timestamp without time zone",
+        "korean_name": "일간갱신일자",
+        "example": "20260225",
+        "type": "date"
+      },
+      {
+        "name": "du_val_1d",
+        "source_name": "du_val_1d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "일거래대금",
+        "example": "810630570.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_val_1m",
+        "source_name": "du_val_1m",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "일거래대금평균_1M",
+        "example": "847009967.75",
+        "type": "numeric"
+      },
+      {
+        "name": "du_val_5d",
+        "source_name": "du_val_5d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "일거래대금평균_5D",
+        "example": "683306859.40",
+        "type": "numeric"
+      },
+      {
+        "name": "du_vol_1d",
+        "source_name": "du_vol_1d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "일거래량",
+        "example": "81758.00",
+        "type": "numeric"
+      },
+      {
+        "name": "du_vol_avg_1m",
+        "source_name": "du_vol_avg_1m",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "거래량평균_1M",
+        "example": "87324.85",
+        "type": "numeric"
+      },
+      {
+        "name": "du_vol_avg_5d",
+        "source_name": "du_vol_avg_5d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "거래량평균_5D",
+        "example": "69132.40",
+        "type": "numeric"
+      },
+      {
+        "name": "nru_mkt_diff_rt",
+        "source_name": "nru_mkt_diff_rt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "괴리율",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "nru_mkt_inav",
+        "source_name": "nru_mkt_inav",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "장중 iNAV",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_abrv_nm",
+        "source_name": "pd_abrv_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품약어명",
+        "example": "TIGER 엔비디아미국채커버드콜밸런스(합성)",
+        "type": "text"
+      },
+      {
+        "name": "pd_circ_net_tamt",
+        "source_name": "pd_circ_net_tamt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "유통순자산총액",
+        "example": "61869000000.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_circ_stk_cnt",
+        "source_name": "pd_circ_stk_cnt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "유통주식수",
+        "example": "6150000.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_curr_cd",
+        "source_name": "pd_curr_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품통화코드",
+        "example": "CURR_CD_KRW",
+        "type": "text"
+      },
+      {
+        "name": "pd_curr_nm",
+        "source_name": "pd_curr_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품통화명",
+        "example": "한국원화",
+        "type": "text"
+      },
+      {
+        "name": "pd_divd_amt_pshr",
+        "source_name": "pd_divd_amt_pshr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "주당 배당금",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_dvid_cycl",
+        "source_name": "pd_dvid_cycl",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "당주기",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_dvid_yield",
+        "source_name": "pd_dvid_yield",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "배당수익률",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_exg_mkt_cd",
+        "source_name": "pd_exg_mkt_cd",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "거래소코드",
+        "example": "EXG_MKT_NO_001",
+        "type": "text"
+      },
+      {
+        "name": "pd_exg_mkt_nm",
+        "source_name": "pd_exg_mkt_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "거래소명",
+        "example": "유가증권",
+        "type": "text"
+      },
+      {
+        "name": "pd_grp_no",
+        "source_name": "pd_grp_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품군종류",
+        "example": "ETF",
+        "type": "text"
+      },
+      {
+        "name": "pd_itm_no",
+        "source_name": "pd_itm_no",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "상품번호",
+        "example": "KR70000D0009",
+        "type": "text"
+      },
+      {
+        "name": "pd_itm_no_ma",
+        "source_name": "pd_itm_no_ma",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "상품번호_미래에셋",
+        "example": "A0000D0",
+        "type": "text"
+      },
+      {
+        "name": "pd_lst_price",
+        "source_name": "pd_lst_price",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "상품액면가",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_lst_stk_cnt",
+        "source_name": "pd_lst_stk_cnt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "상품상장주식수",
+        "example": "6200000.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_lste_dt",
+        "source_name": "pd_lste_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품거래종료일자",
+        "example": "99991231",
+        "type": "date"
+      },
+      {
+        "name": "pd_lstg_dt",
+        "source_name": "pd_lstg_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품거래가능일자",
+        "example": "20241217",
+        "type": "date"
+      },
+      {
+        "name": "pd_mkt_id",
+        "source_name": "pd_mkt_id",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품거래시장코드",
+        "example": "STK",
+        "type": "text"
+      },
+      {
+        "name": "pd_mkt_nm",
+        "source_name": "pd_mkt_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품거래시장",
+        "example": "유가증권",
+        "type": "text"
+      },
+      {
+        "name": "pd_nav_pshr",
+        "source_name": "pd_nav_pshr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "주당 순자산가치",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_net_ast_pshr",
+        "source_name": "pd_net_ast_pshr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "주당 순자산",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_net_prft_pshr",
+        "source_name": "pd_net_prft_pshr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "주당 순이익",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_net_rt_ast_pshr",
+        "source_name": "pd_net_rt_ast_pshr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "주당 순자산비율",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_net_tamt",
+        "source_name": "pd_net_tamt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "순자산총액",
+        "example": "61716390155.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_nm",
+        "source_name": "pd_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품명",
+        "example": "미래에셋 TIGER NVDA-UST커버드콜증권상장지수투자신탁(채권혼합-파생재간접형)(합성)",
+        "type": "text"
+      },
+      {
+        "name": "pd_pen_risk_nm",
+        "source_name": "pd_pen_risk_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "연금거래위험구분",
+        "example": "안전자산",
+        "type": "text"
+      },
+      {
+        "name": "pd_pen_tr_yn",
+        "source_name": "pd_pen_tr_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "연금거래가능여부",
+        "example": "Y",
+        "type": "text"
+      },
+      {
+        "name": "pd_risk_cd",
+        "source_name": "pd_risk_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품등급코드",
+        "example": "PD_RISK_GCD_13",
+        "type": "text"
+      },
+      {
+        "name": "pd_risk_nm",
+        "source_name": "pd_risk_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품등급명",
+        "example": "다소높은위험(3등급)",
+        "type": "text"
+      },
+      {
+        "name": "pd_sale_yn",
+        "source_name": "pd_sale_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품판매여부",
+        "example": "1",
+        "type": "text"
+      },
+      {
+        "name": "pd_sect_cd",
+        "source_name": "pd_sect_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "ETF 섹터코드",
+        "example": "2",
+        "type": "text"
+      },
+      {
+        "name": "pd_sect_nm",
+        "source_name": "pd_sect_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "ETF 섹터명",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_spac_yn",
+        "source_name": "pd_spac_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "SPAC 여부",
+        "example": "N",
+        "type": "text"
+      },
+      {
+        "name": "pd_stk_cnt",
+        "source_name": "pd_stk_cnt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "상장주식수",
+        "example": "6150000.00",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_tr_yn",
+        "source_name": "pd_tr_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "상품거래정지혀부",
+        "example": "0",
+        "type": "text"
+      },
+      {
+        "name": "ru_mkt_price",
+        "source_name": "ru_mkt_price",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "현재가",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "ru_mkt_volume",
+        "source_name": "ru_mkt_volume",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "거래량",
+        "example": "0.00",
+        "type": "numeric"
+      },
+      {
+        "name": "wu_core_yn",
+        "source_name": "wu_core_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "핵심ETF여부",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "wu_inv_ast_type",
+        "source_name": "wu_inv_ast_type",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "투자자산군",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "wu_inv_rgn",
+        "source_name": "wu_inv_rgn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "투자지역",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "wu_upt_dt",
+        "source_name": "wu_upt_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "주간갱신일자",
+        "example": "",
+        "type": "date"
+      }
+    ]
+  },
+  {
+    "key": "overseas_etfs",
+    "table_id": "PREF02N001",
+    "product_type": "OVERSEAS_ETF",
+    "table": "overseas_etfs",
+    "expected_rows": 5646,
+    "date_columns": [
+      "cu_upt_dt",
+      "du_clpr_base_dt",
+      "du_nav_base_dt",
+      "du_upt_dt",
+      "pd_lstg_dt",
+      "wu_upt_dt"
+    ],
+    "numeric_overrides": [],
+    "id_column": "pd_itm_no",
+    "name_column": "pd_nm",
+    "common_mapping": {
+      "product_id": "pd_itm_no",
+      "product_code": "pd_itm_no_ma|pd_isin_cd",
+      "product_name": "pd_nm",
+      "short_name": "pd_abrv_nm",
+      "issuer_or_manager": "cu_fund_mgmt_co",
+      "asset_class": "wu_inv_ast_type",
+      "investment_region": "wu_inv_rgn",
+      "currency": "pd_trd_ccy|pd_curr_cd",
+      "fee_rate": "cu_charge_rt",
+      "return_1d": "du_er_1d",
+      "size_amount": "du_last_aum",
+      "price": "du_clpr|ru_mkt_price",
+      "description": "cu_strtegy",
+      "base_index": "cu_base_index"
+    },
+    "data_file": "data/raw/PREF02N001_datarows.xlsx",
+    "schema_file": "data/raw/PREF02N001_schema.xlsx",
+    "data_base_date": "2026-07-11",
+    "columns": [
+      {
+        "name": "cu_base_index",
+        "source_name": "cu_base_index",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_charge_rt",
+        "source_name": "cu_charge_rt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "cu_etn_yn",
+        "source_name": "cu_etn_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_fund_mgmt_co",
+        "source_name": "cu_fund_mgmt_co",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_index_repl_mthd",
+        "source_name": "cu_index_repl_mthd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_index_tracking_yn",
+        "source_name": "cu_index_tracking_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_inverse_short_yn",
+        "source_name": "cu_inverse_short_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_lev_fector",
+        "source_name": "cu_lev_fector",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "cu_strtegy",
+        "source_name": "cu_strtegy",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "cu_upt_dt",
+        "source_name": "cu_upt_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "du_base_dt_match_yn",
+        "source_name": "du_base_dt_match_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "du_bpr",
+        "source_name": "du_bpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_clpr",
+        "source_name": "du_clpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_clpr_base_dt",
+        "source_name": "du_clpr_base_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "du_clpr_src",
+        "source_name": "du_clpr_src",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "du_diff_rt",
+        "source_name": "du_diff_rt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_er_1d",
+        "source_name": "du_er_1d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_hpr",
+        "source_name": "du_hpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_last_aum",
+        "source_name": "du_last_aum",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_last_nav",
+        "source_name": "du_last_nav",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_lpr",
+        "source_name": "du_lpr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_nav_base_dt",
+        "source_name": "du_nav_base_dt",
+        "key": "",
+        "source_type": "timestamp without time zone",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "du_opr",
+        "source_name": "du_opr",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_upt_dt",
+        "source_name": "du_upt_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "du_val_1d",
+        "source_name": "du_val_1d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "du_vol_1d",
+        "source_name": "du_vol_1d",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_abrv_nm",
+        "source_name": "pd_abrv_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_curr_cd",
+        "source_name": "pd_curr_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_exg_mkt_cd",
+        "source_name": "pd_exg_mkt_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_grp_no",
+        "source_name": "pd_grp_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_isin_cd",
+        "source_name": "pd_isin_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_itm_no",
+        "source_name": "pd_itm_no",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_itm_no_ma",
+        "source_name": "pd_itm_no_ma",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_lipper_id",
+        "source_name": "pd_lipper_id",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_lstg_dt",
+        "source_name": "pd_lstg_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      },
+      {
+        "name": "pd_lst_price",
+        "source_name": "pd_lst_price",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_lst_stk_cnt",
+        "source_name": "pd_lst_stk_cnt",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "pd_mkt_id",
+        "source_name": "pd_mkt_id",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_nm",
+        "source_name": "pd_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_sale_yn",
+        "source_name": "pd_sale_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_trd_ccy",
+        "source_name": "pd_trd_ccy",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_tr_yn",
+        "source_name": "pd_tr_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "pd_us_cik",
+        "source_name": "pd_us_cik",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "ru_mkt_price",
+        "source_name": "ru_mkt_price",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "ru_mkt_volume",
+        "source_name": "ru_mkt_volume",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "",
+        "example": "",
+        "type": "numeric"
+      },
+      {
+        "name": "wu_core_yn",
+        "source_name": "wu_core_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "wu_inv_ast_type",
+        "source_name": "wu_inv_ast_type",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "wu_inv_rgn",
+        "source_name": "wu_inv_rgn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "text"
+      },
+      {
+        "name": "wu_upt_dt",
+        "source_name": "wu_upt_dt",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "",
+        "example": "",
+        "type": "date"
+      }
+    ]
+  },
+  {
+    "key": "public_funds",
+    "table_id": "PRFD01N001",
+    "product_type": "PUBLIC_FUND",
+    "table": "public_funds",
+    "expected_rows": 95619,
+    "date_columns": [],
+    "numeric_overrides": [],
+    "id_column": "itm_no",
+    "name_column": "itm_nm",
+    "common_mapping": {
+      "product_id": "itm_no",
+      "product_code": "std_itm_no|ksd_itm_no",
+      "product_name": "itm_nm",
+      "short_name": "itm_abrv_nm",
+      "asset_class": "or_attr_desc",
+      "investment_region": "fd_ivst_rgn_desc|ovrs_fd_desc",
+      "currency": "curr_cd",
+      "risk_code": "zrin_fd_ivst_risk_gcd",
+      "risk_name": "zrin_fd_ivst_risk_grd_nm",
+      "return_1w": "fd_wk1_ern_r",
+      "return_1m": "fd_mm1_ern_r",
+      "return_3m": "fd_mm3_ern_r",
+      "return_6m": "fd_mm6_ern_r",
+      "return_1y": "fd_yr1_ern_r",
+      "return_2y": "fd_yr2_ern_r",
+      "return_3y": "fd_yr3_ern_r",
+      "return_5y": "fd_yr5_ern_r",
+      "size_amount": "fd_nast_suma",
+      "description": "or_attr_desc|prvo_pbff_desc|pers_corp_desc",
+      "base_index": "bmrk_nm|bmrk_eng_nm"
+    },
+    "data_file": "data/raw/PRFD01N001_datarows.xlsx",
+    "schema_file": "data/raw/PRFD01N001_schema.xlsx",
+    "data_base_date": "2026-07-11",
+    "columns": [
+      {
+        "name": "bmrk_eng_nm",
+        "source_name": "bmrk_eng_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "벤치마크영문명",
+        "example": "CALL",
+        "type": "text"
+      },
+      {
+        "name": "bmrk_nm",
+        "source_name": "bmrk_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "벤치마크명",
+        "example": "CALL",
+        "type": "text"
+      },
+      {
+        "name": "curr_cd",
+        "source_name": "curr_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "통화코드",
+        "example": "KRW",
+        "type": "text"
+      },
+      {
+        "name": "exchdg_yn",
+        "source_name": "exchdg_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "환헤지여부",
+        "example": "N",
+        "type": "text"
+      },
+      {
+        "name": "fd_estb_ctry_cd",
+        "source_name": "fd_estb_ctry_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "펀드설립국가코드",
+        "example": "000",
+        "type": "text"
+      },
+      {
+        "name": "fd_ivst_rgn_desc",
+        "source_name": "fd_ivst_rgn_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "펀드투자지역구분코드 설명",
+        "example": "국내",
+        "type": "text"
+      },
+      {
+        "name": "fd_mm18_ern_r",
+        "source_name": "fd_mm18_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 18개월수익률",
+        "example": "4.85",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_mm1_ern_r",
+        "source_name": "fd_mm1_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 1개월수익률",
+        "example": "0.26",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_mm3_ern_r",
+        "source_name": "fd_mm3_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 3개월수익률",
+        "example": "0.78",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_mm6_ern_r",
+        "source_name": "fd_mm6_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 6개월수익률",
+        "example": "1.46",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_nast_suma",
+        "source_name": "fd_nast_suma",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 순자산",
+        "example": "2390679722503.0000",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_set_pcd",
+        "source_name": "fd_set_pcd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "펀드설정유형코드",
+        "example": "10",
+        "type": "text"
+      },
+      {
+        "name": "fd_wk1_ern_r",
+        "source_name": "fd_wk1_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 1주일수익률",
+        "example": "0.09",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_yr1_ern_r",
+        "source_name": "fd_yr1_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 1년수익률",
+        "example": "2.93",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_yr2_ern_r",
+        "source_name": "fd_yr2_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 2년수익률",
+        "example": "6.93",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_yr3_ern_r",
+        "source_name": "fd_yr3_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 3년수익률",
+        "example": "13.57",
+        "type": "numeric"
+      },
+      {
+        "name": "fd_yr5_ern_r",
+        "source_name": "fd_yr5_ern_r",
+        "key": "",
+        "source_type": "numeric",
+        "korean_name": "펀드 5년수익률",
+        "example": "18.87",
+        "type": "numeric"
+      },
+      {
+        "name": "frc_bpr_itm_yn",
+        "source_name": "frc_bpr_itm_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "외화기준가종목여부",
+        "example": "0",
+        "type": "text"
+      },
+      {
+        "name": "fss_itm_no",
+        "source_name": "fss_itm_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "금융감독원종목번호",
+        "example": "0010173C4558",
+        "type": "text"
+      },
+      {
+        "name": "hdge_fd_yn",
+        "source_name": "hdge_fd_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "헤지펀드여부",
+        "example": "0",
+        "type": "text"
+      },
+      {
+        "name": "int_dvd_desc",
+        "source_name": "int_dvd_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "이자배당구분코드 설명",
+        "example": "배당",
+        "type": "text"
+      },
+      {
+        "name": "itm_abrv_nm",
+        "source_name": "itm_abrv_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "종목약어명",
+        "example": "삼성 베스트 MMF 법인 제1호",
+        "type": "text"
+      },
+      {
+        "name": "itm_eabrv_nm",
+        "source_name": "itm_eabrv_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "종목영문약어명",
+        "example": "KB China A-share Sec",
+        "type": "text"
+      },
+      {
+        "name": "itm_eng_nm",
+        "source_name": "itm_eng_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "종목영문명",
+        "example": "삼성 베스트 MMF 법인 제1호",
+        "type": "text"
+      },
+      {
+        "name": "itm_nm",
+        "source_name": "itm_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "종목명",
+        "example": "삼성 베스트 MMF 법인 제1호",
+        "type": "text"
+      },
+      {
+        "name": "itm_no",
+        "source_name": "itm_no",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "종목번호",
+        "example": "KR5014410050",
+        "type": "text"
+      },
+      {
+        "name": "kofia_fd_ccd",
+        "source_name": "kofia_fd_ccd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "금융투자협회펀드분류코드",
+        "example": "1EE11Z1200101ZZZZZZ6",
+        "type": "text"
+      },
+      {
+        "name": "ksd_itm_no",
+        "source_name": "ksd_itm_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "예탁원종목번호",
+        "example": "KRZ500626190",
+        "type": "text"
+      },
+      {
+        "name": "mtco_itm_no",
+        "source_name": "mtco_itm_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "운용사종목번호",
+        "example": "0109913",
+        "type": "text"
+      },
+      {
+        "name": "ofsfd_yn",
+        "source_name": "ofsfd_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "역외펀드여부",
+        "example": "0",
+        "type": "text"
+      },
+      {
+        "name": "or_attr_desc",
+        "source_name": "or_attr_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "운용속성구분코드 설명",
+        "example": "MMF",
+        "type": "text"
+      },
+      {
+        "name": "or_co_xtn_itt_cd",
+        "source_name": "or_co_xtn_itt_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "운용회사대외기관코드",
+        "example": "00040010",
+        "type": "text"
+      },
+      {
+        "name": "ovrs_fd_desc",
+        "source_name": "ovrs_fd_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "해외펀드구분코드 설명",
+        "example": "국내",
+        "type": "text"
+      },
+      {
+        "name": "pers_corp_desc",
+        "source_name": "pers_corp_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "개인법인구분코드 설명",
+        "example": "법인",
+        "type": "text"
+      },
+      {
+        "name": "pfiv_sale_cntl_tcd",
+        "source_name": "pfiv_sale_cntl_tcd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "전문투자자판매제어구분코드",
+        "example": "00",
+        "type": "text"
+      },
+      {
+        "name": "prfd_attr_cd",
+        "source_name": "prfd_attr_cd",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "펀드별속성코드",
+        "example": "V101",
+        "type": "text"
+      },
+      {
+        "name": "prvo_fd_desc",
+        "source_name": "prvo_fd_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "사모펀드구분코드 설명",
+        "example": "해당없음",
+        "type": "text"
+      },
+      {
+        "name": "prvo_pbff_desc",
+        "source_name": "prvo_pbff_desc",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "사모/공모구분코드 설명",
+        "example": "공모",
+        "type": "text"
+      },
+      {
+        "name": "rptt_ksd_itm_no",
+        "source_name": "rptt_ksd_itm_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "대표예탁원종목번호",
+        "example": "030200109913",
+        "type": "text"
+      },
+      {
+        "name": "sale_yn",
+        "source_name": "sale_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "판매여부",
+        "example": "판매중",
+        "type": "text"
+      },
+      {
+        "name": "std_itm_no",
+        "source_name": "std_itm_no",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "표준종목번호",
+        "example": "KR5214272621",
+        "type": "text"
+      },
+      {
+        "name": "thco_sale_yn",
+        "source_name": "thco_sale_yn",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "당사판매여부",
+        "example": "Y",
+        "type": "text"
+      },
+      {
+        "name": "trusc_xtn_itt_cd",
+        "source_name": "trusc_xtn_itt_cd",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "수탁회사대외기관코드",
+        "example": "00050004",
+        "type": "text"
+      },
+      {
+        "name": "zrin_fd_ivst_risk_gcd",
+        "source_name": "zrin_fd_ivst_risk_gcd",
+        "key": "PK",
+        "source_type": "text",
+        "korean_name": "제로인펀드투자위험등급코드",
+        "example": "6",
+        "type": "text"
+      },
+      {
+        "name": "zrin_fd_ivst_risk_grd_nm",
+        "source_name": "zrin_fd_ivst_risk_grd_nm",
+        "key": "",
+        "source_type": "text",
+        "korean_name": "제로인펀드투자위험등급명",
+        "example": "매우 낮은 위험",
+        "type": "text"
+      }
+    ]
+  }
+]

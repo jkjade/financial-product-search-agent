@@ -1,0 +1,208 @@
+﻿dataset,table_id,column,source_column,canonical_type,source_type,key,korean_name,example
+domestic_bonds,PRBD01N001,pd_no,PD_NO,text,text,,,
+domestic_bonds,PRBD01N001,pd_exg_mkt,PD_EXG_MKT,text,text,,,
+domestic_bonds,PRBD01N001,pd_nm,PD_NM,text,text,,,
+domestic_bonds,PRBD01N001,pd_abrv_nm,PD_ABRV_NM,text,text,,,
+domestic_bonds,PRBD01N001,pd_eng_nm,PD_ENG_NM,text,text,,,
+domestic_bonds,PRBD01N001,pd_abrv_eng_nm,PD_ABRV_ENG_NM,text,text,,,
+domestic_bonds,PRBD01N001,pd_ctry_cd,PD_CTRY_CD,text,text,,,
+domestic_bonds,PRBD01N001,pd_pbcm,PD_PBCM,text,text,,,
+domestic_bonds,PRBD01N001,std_pd_mcls_nm,STD_PD_MCLS_NM,text,text,,,
+domestic_bonds,PRBD01N001,std_pd_scls_nm,STD_PD_SCLS_NM,text,text,,,
+domestic_bonds,PRBD01N001,bd_knd,BD_KND,text,text,,,
+domestic_bonds,PRBD01N001,curr_cd,CURR_CD,text,text,,,
+domestic_bonds,PRBD01N001,isu_bal_amt,ISU_BAL_AMT,numeric,double precision,,,
+domestic_bonds,PRBD01N001,isu_dt,ISU_DT,date,double precision,,,
+domestic_bonds,PRBD01N001,mat_dt,MAT_DT,date,double precision,,,
+domestic_bonds,PRBD01N001,srfc_irt,SRFC_IRT,numeric,double precision,,,
+domestic_bonds,PRBD01N001,pd_evco_crd_grd,PD_EVCO_CRD_GRD,text,text,,,
+domestic_bonds,PRBD01N001,pd_risk_gcd,PD_RISK_GCD,integer,bigint,,,
+domestic_bonds,PRBD01N001,pd_std_info_update,PD_STD_INFO_UPDATE,date,double precision,,,
+domestic_bonds,PRBD01N001,buy_yield,BUY_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,corp_pretax_yield,CORP_PRETAX_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,corp_after_tax_yield,CORP_AFTER_TAX_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,after_tax_yield,AFTER_TAX_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,pref_tax_yield,PREF_TAX_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,avg_annual_tax_yield,AVG_ANNUAL_TAX_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,depo_equiv_yield_154,DEPO_EQUIV_YIELD_154,numeric,double precision,,,
+domestic_bonds,PRBD01N001,buyable_quantity,BUYABLE_QUANTITY,numeric,double precision,,,
+domestic_bonds,PRBD01N001,remaining_days,REMAINING_DAYS,numeric,double precision,,,
+domestic_bonds,PRBD01N001,dur,DUR,numeric,double precision,,,
+domestic_bonds,PRBD01N001,cov,COV,numeric,double precision,,,
+domestic_bonds,PRBD01N001,ndy_dur,NDY_DUR,numeric,double precision,,,
+domestic_bonds,PRBD01N001,ndy_cov,NDY_COV,numeric,double precision,,,
+domestic_bonds,PRBD01N001,eval_price,EVAL_PRICE,numeric,double precision,,,
+domestic_bonds,PRBD01N001,applied_yield,APPLIED_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,dirty,DIRTY,numeric,double precision,,,
+domestic_bonds,PRBD01N001,ndy_eval_price,NDY_EVAL_PRICE,numeric,double precision,,,
+domestic_bonds,PRBD01N001,ndy_applied_yield,NDY_APPLIED_YIELD,numeric,double precision,,,
+domestic_bonds,PRBD01N001,ndy_dirty,NDY_DIRTY,numeric,double precision,,,
+domestic_bonds,PRBD01N001,crd_grd,CRD_GRD,text,text,,,
+domestic_bonds,PRBD01N001,crd_grd_dt,CRD_GRD_DT,date,double precision,,,
+domestic_etfs,PREF01N001,cu_base_index,cu_base_index,text,text,,기초지수,
+domestic_etfs,PREF01N001,cu_charge_etc_rt,cu_charge_etc_rt,numeric,text,,기타비용요율,
+domestic_etfs,PREF01N001,cu_charge_rt,cu_charge_rt,numeric,text,,총보수요율,
+domestic_etfs,PREF01N001,cu_fund_mgmt_co,cu_fund_mgmt_co,text,text,,운용사,
+domestic_etfs,PREF01N001,cu_lev_fector,cu_lev_fector,numeric,text,,배수,
+domestic_etfs,PREF01N001,cu_strtegy,cu_strtegy,text,text,,운용전략,
+domestic_etfs,PREF01N001,cu_upt_dt,cu_upt_dt,date,text,,변동갱신일자,
+domestic_etfs,PREF01N001,du_bpr,du_bpr,numeric,numeric,,기준가,9915.00
+domestic_etfs,PREF01N001,du_chas_errt,du_chas_errt,numeric,numeric,,추적오차율,0.26
+domestic_etfs,PREF01N001,du_clpr,du_clpr,numeric,numeric,,종가,9915.00
+domestic_etfs,PREF01N001,du_diff_rt,du_diff_rt,numeric,numeric,,괴리율,1.44
+domestic_etfs,PREF01N001,du_er_1d,du_er_1d,numeric,numeric,,수익률_1D,-0.44
+domestic_etfs,PREF01N001,du_er_1m,du_er_1m,numeric,numeric,,수익률_1M,0.58
+domestic_etfs,PREF01N001,du_er_1y,du_er_1y,numeric,numeric,,수익률_1Y,17.10
+domestic_etfs,PREF01N001,du_er_3m,du_er_3m,numeric,numeric,,수익률_3M,-0.03
+domestic_etfs,PREF01N001,du_er_6m,du_er_6m,numeric,numeric,,수익률_6M,9.41
+domestic_etfs,PREF01N001,du_er_ytd,du_er_ytd,numeric,numeric,,수익률_YTD,2.88
+domestic_etfs,PREF01N001,du_hpr,du_hpr,numeric,numeric,,고가,9979.00
+domestic_etfs,PREF01N001,du_last_aum,du_last_aum,numeric,numeric,,최종AUM,60720672000.00
+domestic_etfs,PREF01N001,du_last_nav,du_last_nav,numeric,numeric,,최종NAV,9873.28
+domestic_etfs,PREF01N001,du_lpr,du_lpr,numeric,numeric,,시가,9905.00
+domestic_etfs,PREF01N001,du_nav_rnf_amt,du_nav_rnf_amt,numeric,numeric,,전일NAV등락금액,-161.91
+domestic_etfs,PREF01N001,du_nav_yday,du_nav_yday,numeric,numeric,,전일NAV,10035.19
+domestic_etfs,PREF01N001,du_upt_dt,du_upt_dt,date,timestamp without time zone,,일간갱신일자,20260225
+domestic_etfs,PREF01N001,du_val_1d,du_val_1d,numeric,numeric,,일거래대금,810630570.00
+domestic_etfs,PREF01N001,du_val_1m,du_val_1m,numeric,numeric,,일거래대금평균_1M,847009967.75
+domestic_etfs,PREF01N001,du_val_5d,du_val_5d,numeric,numeric,,일거래대금평균_5D,683306859.40
+domestic_etfs,PREF01N001,du_vol_1d,du_vol_1d,numeric,numeric,,일거래량,81758.00
+domestic_etfs,PREF01N001,du_vol_avg_1m,du_vol_avg_1m,numeric,numeric,,거래량평균_1M,87324.85
+domestic_etfs,PREF01N001,du_vol_avg_5d,du_vol_avg_5d,numeric,numeric,,거래량평균_5D,69132.40
+domestic_etfs,PREF01N001,nru_mkt_diff_rt,nru_mkt_diff_rt,numeric,numeric,,괴리율,0.00
+domestic_etfs,PREF01N001,nru_mkt_inav,nru_mkt_inav,numeric,numeric,,장중 iNAV,0.00
+domestic_etfs,PREF01N001,pd_abrv_nm,pd_abrv_nm,text,text,,상품약어명,TIGER 엔비디아미국채커버드콜밸런스(합성)
+domestic_etfs,PREF01N001,pd_circ_net_tamt,pd_circ_net_tamt,numeric,numeric,,유통순자산총액,61869000000.00
+domestic_etfs,PREF01N001,pd_circ_stk_cnt,pd_circ_stk_cnt,numeric,numeric,,유통주식수,6150000.00
+domestic_etfs,PREF01N001,pd_curr_cd,pd_curr_cd,text,text,,상품통화코드,CURR_CD_KRW
+domestic_etfs,PREF01N001,pd_curr_nm,pd_curr_nm,text,text,,상품통화명,한국원화
+domestic_etfs,PREF01N001,pd_divd_amt_pshr,pd_divd_amt_pshr,numeric,numeric,,주당 배당금,0.00
+domestic_etfs,PREF01N001,pd_dvid_cycl,pd_dvid_cycl,text,text,,당주기,
+domestic_etfs,PREF01N001,pd_dvid_yield,pd_dvid_yield,numeric,numeric,,배당수익률,0.00
+domestic_etfs,PREF01N001,pd_exg_mkt_cd,pd_exg_mkt_cd,text,text,PK,거래소코드,EXG_MKT_NO_001
+domestic_etfs,PREF01N001,pd_exg_mkt_nm,pd_exg_mkt_nm,text,text,,거래소명,유가증권
+domestic_etfs,PREF01N001,pd_grp_no,pd_grp_no,text,text,,상품군종류,ETF
+domestic_etfs,PREF01N001,pd_itm_no,pd_itm_no,text,text,PK,상품번호,KR70000D0009
+domestic_etfs,PREF01N001,pd_itm_no_ma,pd_itm_no_ma,text,text,PK,상품번호_미래에셋,A0000D0
+domestic_etfs,PREF01N001,pd_lst_price,pd_lst_price,numeric,numeric,,상품액면가,0.00
+domestic_etfs,PREF01N001,pd_lst_stk_cnt,pd_lst_stk_cnt,numeric,numeric,,상품상장주식수,6200000.00
+domestic_etfs,PREF01N001,pd_lste_dt,pd_lste_dt,date,text,,상품거래종료일자,99991231
+domestic_etfs,PREF01N001,pd_lstg_dt,pd_lstg_dt,date,text,,상품거래가능일자,20241217
+domestic_etfs,PREF01N001,pd_mkt_id,pd_mkt_id,text,text,,상품거래시장코드,STK
+domestic_etfs,PREF01N001,pd_mkt_nm,pd_mkt_nm,text,text,,상품거래시장,유가증권
+domestic_etfs,PREF01N001,pd_nav_pshr,pd_nav_pshr,numeric,numeric,,주당 순자산가치,0.00
+domestic_etfs,PREF01N001,pd_net_ast_pshr,pd_net_ast_pshr,numeric,numeric,,주당 순자산,0.00
+domestic_etfs,PREF01N001,pd_net_prft_pshr,pd_net_prft_pshr,numeric,numeric,,주당 순이익,0.00
+domestic_etfs,PREF01N001,pd_net_rt_ast_pshr,pd_net_rt_ast_pshr,numeric,numeric,,주당 순자산비율,0.00
+domestic_etfs,PREF01N001,pd_net_tamt,pd_net_tamt,numeric,numeric,,순자산총액,61716390155.00
+domestic_etfs,PREF01N001,pd_nm,pd_nm,text,text,,상품명,미래에셋 TIGER NVDA-UST커버드콜증권상장지수투자신탁(채권혼합-파생재간접형)(합성)
+domestic_etfs,PREF01N001,pd_pen_risk_nm,pd_pen_risk_nm,text,text,,연금거래위험구분,안전자산
+domestic_etfs,PREF01N001,pd_pen_tr_yn,pd_pen_tr_yn,text,text,,연금거래가능여부,Y
+domestic_etfs,PREF01N001,pd_risk_cd,pd_risk_cd,text,text,,상품등급코드,PD_RISK_GCD_13
+domestic_etfs,PREF01N001,pd_risk_nm,pd_risk_nm,text,text,,상품등급명,다소높은위험(3등급)
+domestic_etfs,PREF01N001,pd_sale_yn,pd_sale_yn,text,text,,상품판매여부,1
+domestic_etfs,PREF01N001,pd_sect_cd,pd_sect_cd,text,text,,ETF 섹터코드,2
+domestic_etfs,PREF01N001,pd_sect_nm,pd_sect_nm,text,text,,ETF 섹터명,
+domestic_etfs,PREF01N001,pd_spac_yn,pd_spac_yn,text,text,,SPAC 여부,N
+domestic_etfs,PREF01N001,pd_stk_cnt,pd_stk_cnt,numeric,numeric,,상장주식수,6150000.00
+domestic_etfs,PREF01N001,pd_tr_yn,pd_tr_yn,text,text,,상품거래정지혀부,0
+domestic_etfs,PREF01N001,ru_mkt_price,ru_mkt_price,numeric,numeric,,현재가,0.00
+domestic_etfs,PREF01N001,ru_mkt_volume,ru_mkt_volume,numeric,numeric,,거래량,0.00
+domestic_etfs,PREF01N001,wu_core_yn,wu_core_yn,text,text,,핵심ETF여부,
+domestic_etfs,PREF01N001,wu_inv_ast_type,wu_inv_ast_type,text,text,,투자자산군,
+domestic_etfs,PREF01N001,wu_inv_rgn,wu_inv_rgn,text,text,,투자지역,
+domestic_etfs,PREF01N001,wu_upt_dt,wu_upt_dt,date,text,,주간갱신일자,
+overseas_etfs,PREF02N001,cu_base_index,cu_base_index,text,text,,,
+overseas_etfs,PREF02N001,cu_charge_rt,cu_charge_rt,numeric,numeric,,,
+overseas_etfs,PREF02N001,cu_etn_yn,cu_etn_yn,text,text,,,
+overseas_etfs,PREF02N001,cu_fund_mgmt_co,cu_fund_mgmt_co,text,text,,,
+overseas_etfs,PREF02N001,cu_index_repl_mthd,cu_index_repl_mthd,text,text,,,
+overseas_etfs,PREF02N001,cu_index_tracking_yn,cu_index_tracking_yn,text,text,,,
+overseas_etfs,PREF02N001,cu_inverse_short_yn,cu_inverse_short_yn,text,text,,,
+overseas_etfs,PREF02N001,cu_lev_fector,cu_lev_fector,numeric,numeric,,,
+overseas_etfs,PREF02N001,cu_strtegy,cu_strtegy,text,text,,,
+overseas_etfs,PREF02N001,cu_upt_dt,cu_upt_dt,date,text,,,
+overseas_etfs,PREF02N001,du_base_dt_match_yn,du_base_dt_match_yn,text,text,,,
+overseas_etfs,PREF02N001,du_bpr,du_bpr,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_clpr,du_clpr,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_clpr_base_dt,du_clpr_base_dt,date,text,,,
+overseas_etfs,PREF02N001,du_clpr_src,du_clpr_src,text,text,,,
+overseas_etfs,PREF02N001,du_diff_rt,du_diff_rt,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_er_1d,du_er_1d,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_hpr,du_hpr,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_last_aum,du_last_aum,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_last_nav,du_last_nav,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_lpr,du_lpr,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_nav_base_dt,du_nav_base_dt,date,timestamp without time zone,,,
+overseas_etfs,PREF02N001,du_opr,du_opr,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_upt_dt,du_upt_dt,date,text,,,
+overseas_etfs,PREF02N001,du_val_1d,du_val_1d,numeric,numeric,,,
+overseas_etfs,PREF02N001,du_vol_1d,du_vol_1d,numeric,numeric,,,
+overseas_etfs,PREF02N001,pd_abrv_nm,pd_abrv_nm,text,text,,,
+overseas_etfs,PREF02N001,pd_curr_cd,pd_curr_cd,text,text,,,
+overseas_etfs,PREF02N001,pd_exg_mkt_cd,pd_exg_mkt_cd,text,text,,,
+overseas_etfs,PREF02N001,pd_grp_no,pd_grp_no,text,text,,,
+overseas_etfs,PREF02N001,pd_isin_cd,pd_isin_cd,text,text,,,
+overseas_etfs,PREF02N001,pd_itm_no,pd_itm_no,text,text,PK,,
+overseas_etfs,PREF02N001,pd_itm_no_ma,pd_itm_no_ma,text,text,,,
+overseas_etfs,PREF02N001,pd_lipper_id,pd_lipper_id,text,text,,,
+overseas_etfs,PREF02N001,pd_lstg_dt,pd_lstg_dt,date,text,,,
+overseas_etfs,PREF02N001,pd_lst_price,pd_lst_price,numeric,numeric,,,
+overseas_etfs,PREF02N001,pd_lst_stk_cnt,pd_lst_stk_cnt,numeric,numeric,,,
+overseas_etfs,PREF02N001,pd_mkt_id,pd_mkt_id,text,text,,,
+overseas_etfs,PREF02N001,pd_nm,pd_nm,text,text,,,
+overseas_etfs,PREF02N001,pd_sale_yn,pd_sale_yn,text,text,,,
+overseas_etfs,PREF02N001,pd_trd_ccy,pd_trd_ccy,text,text,,,
+overseas_etfs,PREF02N001,pd_tr_yn,pd_tr_yn,text,text,,,
+overseas_etfs,PREF02N001,pd_us_cik,pd_us_cik,text,text,,,
+overseas_etfs,PREF02N001,ru_mkt_price,ru_mkt_price,numeric,numeric,,,
+overseas_etfs,PREF02N001,ru_mkt_volume,ru_mkt_volume,numeric,numeric,,,
+overseas_etfs,PREF02N001,wu_core_yn,wu_core_yn,text,text,,,
+overseas_etfs,PREF02N001,wu_inv_ast_type,wu_inv_ast_type,text,text,,,
+overseas_etfs,PREF02N001,wu_inv_rgn,wu_inv_rgn,text,text,,,
+overseas_etfs,PREF02N001,wu_upt_dt,wu_upt_dt,date,text,,,
+public_funds,PRFD01N001,bmrk_eng_nm,bmrk_eng_nm,text,text,,벤치마크영문명,CALL
+public_funds,PRFD01N001,bmrk_nm,bmrk_nm,text,text,,벤치마크명,CALL
+public_funds,PRFD01N001,curr_cd,curr_cd,text,text,,통화코드,KRW
+public_funds,PRFD01N001,exchdg_yn,exchdg_yn,text,text,,환헤지여부,N
+public_funds,PRFD01N001,fd_estb_ctry_cd,fd_estb_ctry_cd,text,text,,펀드설립국가코드,000
+public_funds,PRFD01N001,fd_ivst_rgn_desc,fd_ivst_rgn_desc,text,text,,펀드투자지역구분코드 설명,국내
+public_funds,PRFD01N001,fd_mm18_ern_r,fd_mm18_ern_r,numeric,numeric,,펀드 18개월수익률,4.85
+public_funds,PRFD01N001,fd_mm1_ern_r,fd_mm1_ern_r,numeric,numeric,,펀드 1개월수익률,0.26
+public_funds,PRFD01N001,fd_mm3_ern_r,fd_mm3_ern_r,numeric,numeric,,펀드 3개월수익률,0.78
+public_funds,PRFD01N001,fd_mm6_ern_r,fd_mm6_ern_r,numeric,numeric,,펀드 6개월수익률,1.46
+public_funds,PRFD01N001,fd_nast_suma,fd_nast_suma,numeric,numeric,,펀드 순자산,2390679722503.0000
+public_funds,PRFD01N001,fd_set_pcd,fd_set_pcd,text,text,,펀드설정유형코드,10
+public_funds,PRFD01N001,fd_wk1_ern_r,fd_wk1_ern_r,numeric,numeric,,펀드 1주일수익률,0.09
+public_funds,PRFD01N001,fd_yr1_ern_r,fd_yr1_ern_r,numeric,numeric,,펀드 1년수익률,2.93
+public_funds,PRFD01N001,fd_yr2_ern_r,fd_yr2_ern_r,numeric,numeric,,펀드 2년수익률,6.93
+public_funds,PRFD01N001,fd_yr3_ern_r,fd_yr3_ern_r,numeric,numeric,,펀드 3년수익률,13.57
+public_funds,PRFD01N001,fd_yr5_ern_r,fd_yr5_ern_r,numeric,numeric,,펀드 5년수익률,18.87
+public_funds,PRFD01N001,frc_bpr_itm_yn,frc_bpr_itm_yn,text,text,,외화기준가종목여부,0
+public_funds,PRFD01N001,fss_itm_no,fss_itm_no,text,text,,금융감독원종목번호,0010173C4558
+public_funds,PRFD01N001,hdge_fd_yn,hdge_fd_yn,text,text,,헤지펀드여부,0
+public_funds,PRFD01N001,int_dvd_desc,int_dvd_desc,text,text,,이자배당구분코드 설명,배당
+public_funds,PRFD01N001,itm_abrv_nm,itm_abrv_nm,text,text,,종목약어명,삼성 베스트 MMF 법인 제1호
+public_funds,PRFD01N001,itm_eabrv_nm,itm_eabrv_nm,text,text,,종목영문약어명,KB China A-share Sec
+public_funds,PRFD01N001,itm_eng_nm,itm_eng_nm,text,text,,종목영문명,삼성 베스트 MMF 법인 제1호
+public_funds,PRFD01N001,itm_nm,itm_nm,text,text,,종목명,삼성 베스트 MMF 법인 제1호
+public_funds,PRFD01N001,itm_no,itm_no,text,text,PK,종목번호,KR5014410050
+public_funds,PRFD01N001,kofia_fd_ccd,kofia_fd_ccd,text,text,,금융투자협회펀드분류코드,1EE11Z1200101ZZZZZZ6
+public_funds,PRFD01N001,ksd_itm_no,ksd_itm_no,text,text,,예탁원종목번호,KRZ500626190
+public_funds,PRFD01N001,mtco_itm_no,mtco_itm_no,text,text,,운용사종목번호,0109913
+public_funds,PRFD01N001,ofsfd_yn,ofsfd_yn,text,text,,역외펀드여부,0
+public_funds,PRFD01N001,or_attr_desc,or_attr_desc,text,text,,운용속성구분코드 설명,MMF
+public_funds,PRFD01N001,or_co_xtn_itt_cd,or_co_xtn_itt_cd,text,text,,운용회사대외기관코드,00040010
+public_funds,PRFD01N001,ovrs_fd_desc,ovrs_fd_desc,text,text,,해외펀드구분코드 설명,국내
+public_funds,PRFD01N001,pers_corp_desc,pers_corp_desc,text,text,,개인법인구분코드 설명,법인
+public_funds,PRFD01N001,pfiv_sale_cntl_tcd,pfiv_sale_cntl_tcd,text,text,,전문투자자판매제어구분코드,00
+public_funds,PRFD01N001,prfd_attr_cd,prfd_attr_cd,text,text,PK,펀드별속성코드,V101
+public_funds,PRFD01N001,prvo_fd_desc,prvo_fd_desc,text,text,,사모펀드구분코드 설명,해당없음
+public_funds,PRFD01N001,prvo_pbff_desc,prvo_pbff_desc,text,text,,사모/공모구분코드 설명,공모
+public_funds,PRFD01N001,rptt_ksd_itm_no,rptt_ksd_itm_no,text,text,,대표예탁원종목번호,030200109913
+public_funds,PRFD01N001,sale_yn,sale_yn,text,text,,판매여부,판매중
+public_funds,PRFD01N001,std_itm_no,std_itm_no,text,text,,표준종목번호,KR5214272621
+public_funds,PRFD01N001,thco_sale_yn,thco_sale_yn,text,text,,당사판매여부,Y
+public_funds,PRFD01N001,trusc_xtn_itt_cd,trusc_xtn_itt_cd,text,text,,수탁회사대외기관코드,00050004
+public_funds,PRFD01N001,zrin_fd_ivst_risk_gcd,zrin_fd_ivst_risk_gcd,text,text,PK,제로인펀드투자위험등급코드,6
+public_funds,PRFD01N001,zrin_fd_ivst_risk_grd_nm,zrin_fd_ivst_risk_grd_nm,text,text,,제로인펀드투자위험등급명,매우 낮은 위험

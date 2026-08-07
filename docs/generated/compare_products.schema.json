@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "ComparisonMetric": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "enum": [
+            "fee_rate",
+            "other_fee_rate",
+            "return_1d",
+            "return_1w",
+            "return_1m",
+            "return_3m",
+            "return_6m",
+            "return_1y",
+            "return_2y",
+            "return_3y",
+            "return_5y",
+            "return_ytd",
+            "yield_rate",
+            "size_amount",
+            "price"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "order": {
+          "anyOf": [
+            {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Order"
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "title": "ComparisonMetric",
+      "type": "object"
+    },
+    "ProductSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "source_table": {
+          "anyOf": [
+            {
+              "enum": [
+                "PRBD01N001",
+                "PREF01N001",
+                "PREF02N001",
+                "PRFD01N001"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Table"
+        },
+        "source_row_number": {
+          "anyOf": [
+            {
+              "minimum": 2,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Row Number"
+        },
+        "product_type": {
+          "anyOf": [
+            {
+              "enum": [
+                "DOMESTIC_BOND",
+                "DOMESTIC_ETF",
+                "OVERSEAS_ETF",
+                "PUBLIC_FUND"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Type"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        }
+      },
+      "title": "ProductSelector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "products": {
+      "items": {
+        "$ref": "#/$defs/ProductSelector"
+      },
+      "maxItems": 20,
+      "minItems": 2,
+      "title": "Products",
+      "type": "array"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/ComparisonMetric"
+      },
+      "maxItems": 12,
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    }
+  },
+  "required": [
+    "products"
+  ],
+  "title": "ProductCompareRequest",
+  "type": "object"
+}

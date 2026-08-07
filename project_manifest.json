@@ -1,0 +1,106 @@
+{
+  "project": "financial-product-agent",
+  "version": "2.5.1",
+  "release": "phase2.5-final-phase3-immediate-handoff-dockerfix",
+  "data_base_date": "2026-07-11",
+  "expected_total_rows": 145393,
+  "phase_1": {
+    "status": "complete",
+    "scope": [
+      "source/schema/checksum validation",
+      "preprocessing",
+      "PostgreSQL atomic loading",
+      "unified product catalog",
+      "B-tree/trigram indexes",
+      "provenance/reference dates"
+    ]
+  },
+  "phase_2": {
+    "status": "complete",
+    "scope": [
+      "condition matching",
+      "compound filters",
+      "multi-sort",
+      "count/count_distinct/sum/avg/min/max",
+      "multi-dimensional group by",
+      "row_number/rank/dense_rank",
+      "partitioned top-N",
+      "product comparison",
+      "cross-product queries"
+    ]
+  },
+  "phase_2_5": {
+    "status": "complete",
+    "scope": [
+      "ontology TTL and term grounding",
+      "knowledge graph entities/relations",
+      "inverse graph relations",
+      "PostgreSQL pgvector external evidence store",
+      "federated RDB/graph/semantic retrieval",
+      "external ETF holdings import contract",
+      "2026-07-11 external evidence cutoff constraints",
+      "answer validation and evidence extraction"
+    ]
+  },
+  "phase_3_handoff": {
+    "status": "ready_for_credentials_and_live_model_validation",
+    "included": [
+      "HyperCLOVA X-only function-calling adapter",
+      "9 function tool schemas",
+      "agent plan schema",
+      "deterministic plan executor",
+      "evaluation /answer endpoint",
+      "grounding validator"
+    ],
+    "requires_external_input": [
+      "HCX credentials",
+      "historical ETF holdings/external documents when those facts are needed",
+      "live prompt accuracy and latency tuning"
+    ]
+  },
+  "security_and_grounding": [
+    "strict Pydantic extra=forbid",
+    "allowlisted SQL identifiers/operators",
+    "parameter-bound SQL values",
+    "no secrets in repository",
+    "no non-HyperCLOVA final-answer fallback",
+    "no-evidence answers are converted to 확인할 수 없음",
+    "external facts after 2026-07-11 are rejected by DB constraints"
+  ],
+  "datasets": [
+    {
+      "table_id": "PRBD01N001",
+      "product_type": "DOMESTIC_BOND",
+      "expected_rows": 42394,
+      "columns": 40
+    },
+    {
+      "table_id": "PREF01N001",
+      "product_type": "DOMESTIC_ETF",
+      "expected_rows": 1734,
+      "columns": 73
+    },
+    {
+      "table_id": "PREF02N001",
+      "product_type": "OVERSEAS_ETF",
+      "expected_rows": 5646,
+      "columns": 49
+    },
+    {
+      "table_id": "PRFD01N001",
+      "product_type": "PUBLIC_FUND",
+      "expected_rows": 95619,
+      "columns": 45
+    }
+  ],
+  "local_static_validation": {
+    "python_compileall": "passed",
+    "pytest": {
+      "status": "passed",
+      "tests": 44
+    },
+    "source_schema_checksum_validation": "covered by existing tests and target bootstrap",
+    "tool_schema_generation": "passed"
+  },
+  "docker_validation": "Run scripts/bootstrap.ps1 on the target Docker host; Docker runtime semantic assets are packaged and checked by regression tests."
+}
