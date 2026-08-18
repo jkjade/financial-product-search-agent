@@ -468,6 +468,61 @@ def answer(
         raise HTTPException(status_code=500, detail=f"Agent execution failed: {exc}") from exc
 
     finalized = finalize_grounded_answer(result["answer"], result["tool_results"])
+
+    retrieved_context = json.dumps(
+        {"tool_results": result["tool_results"], "evidence": finalized["evidence"]},
+        ensure_ascii=False,
+        default=str,
+    )
+    think_trace = json.dumps(
+        {
+            "execution_summary": result["execution_summary"],
+            "grounded": finalized["grounded"],
+            "requires_clarification": finalized["requires_clarification"],
+            "validation": finalized["validation"],
+            "data_base_date": _snapshot_date(),
+            "model": result["model"],
+        },
+        ensure_ascii=False,
+        default=str,
+    )
+    return {
+        "question_id": question_id,
+        "question": question,
+        "retrieved_context": retrieved_context,
+        "think_trace": think_trace,
+        "answer": finalized["answer"],
+    }
+
+
+@app.get("/pre_answer")
+def pre_answer(
+    question_id: str = Query(min_length=1, max_length=100),
+    question: str = Query(min_length=1, max_length=2000),
+) -> dict[str, Any]:
+    settings = HCXSettings.from_env()
+    if settings is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "HyperCLOVA X credentials are not configured. Set HCX_API_KEY and confirm "
+                "HCX_BASE_URL/HCX_MODEL in .env before phase-3 integration testing."
+            ),
+        )
+
+    client = HCXAgentClient(settings)
+
+    def local_tool_executor(name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        return _execute_tool_call(ToolCallRequest(name=name, arguments=arguments))
+
+    try:
+        result = client.answer(question, local_tool_executor)
+    except httpx.HTTPError as exc:  # type: ignore[name-defined]
+        raise HTTPException(status_code=502, detail=f"HyperCLOVA X API request failed: {exc}") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Agent execution failed: {exc}") from exc
+
+    finalized = finalize_grounded_answer(result["answer"], result["tool_results"])
     retrieved_context = json.dumps(result["tool_results"], ensure_ascii=False, default=str)
     execution_summary = json.dumps(result["execution_summary"], ensure_ascii=False, default=str)
     return {
