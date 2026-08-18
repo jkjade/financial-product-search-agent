@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from src.agent.hcx_client import HCXSettings
+from src.agent.prompts import SYSTEM_PROMPT
 from src.agent.tool_registry import TOOL_MODELS, openai_tool_catalog
 
 
@@ -44,3 +45,18 @@ def test_phase3_entrypoints_exist():
         '"/answer"',
     ):
         assert route in source
+
+
+def test_system_prompt_documents_correct_filter_and_metric_argument_shape():
+    # Regression guard: HCX-005 was observed calling aggregate_products/rank_products
+    # with malformed filters[]/metrics[] arguments (missing `operator`, using a
+    # nonexistent `function` key instead of `operation`/`alias`). The system prompt
+    # must keep teaching the correct shape so this doesn't silently regress.
+    assert "operator" in SYSTEM_PROMPT
+    assert "operation" in SYSTEM_PROMPT
+    assert "alias" in SYSTEM_PROMPT
+    assert '"function"' not in SYSTEM_PROMPT
+    # HCX-005 was also observed inventing Korean-text aliases (e.g. "공모펀드_개수"),
+    # which fail AggregateMetric.alias's ASCII snake_case pattern. Keep the prompt
+    # explicit that alias must stay ASCII lowercase even when explaining in Korean.
+    assert "alias는 반드시 영문 소문자 ASCII" in SYSTEM_PROMPT
