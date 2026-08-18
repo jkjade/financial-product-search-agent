@@ -1,3 +1,6 @@
+# fin-089
+AI Festival 2026 - 미래셋터
+
 # 금융상품 Agent
 
 미래에셋증권 AI Festival 금융상품 Agent 프로젝트입니다.
