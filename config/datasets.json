@@ -29,7 +29,8 @@
         "size_amount": "isu_bal_amt",
         "price": "eval_price",
         "maturity_date": "mat_dt",
-        "description": "std_pd_mcls_nm|std_pd_scls_nm|bd_knd"
+        "description": "std_pd_mcls_nm|std_pd_scls_nm|bd_knd",
+        "bond_kind": "bd_knd"
       },
       "data_file": "data/raw/PRBD01N001_datarows.xlsx",
       "schema_file": "data/raw/PRBD01N001_schema.xlsx",

@@ -37,7 +37,7 @@ TOOL_DESCRIPTIONS = {
     "aggregate_products": "필터 결과를 그룹화하고 count/count_distinct/sum/avg/min/max 집계를 계산합니다.",
     "rank_products": "필터 결과에 row_number/rank/dense_rank 순위를 계산하며 그룹별 Top-N을 지원합니다.",
     "compare_products": "원본 행 또는 상품 ID로 선택한 상품을 같은 필드로 정렬하고 지표별 순위를 반환합니다.",
-    "get_product": "원본 테이블과 엑셀 행 번호로 상품 상세 및 근거를 조회합니다.",
+    "get_product": "원본 테이블과 엑셀 행 번호로 상품 상세 및 근거를 조회합니다. source_table/source_row_number를 모르면 절대 추측하지 말고 먼저 search_products로 알아내세요.",
     "resolve_ontology": "자연어 금융 용어를 온톨로지의 상품군·필드·관계명으로 표준화합니다. 값 자체를 추측하지 않습니다.",
     "graph_lookup": "상품-운용사-자산군-지역-위험등급-지수 관계를 지식 그래프에서 양방향 탐색합니다.",
     "semantic_search": "2026-07-11 이전 기준으로 적재된 외부 비정형 근거 문서를 의미/텍스트 검색합니다.",

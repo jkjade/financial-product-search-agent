@@ -154,6 +154,19 @@
         "평가가격",
         "price"
       ]
+    },
+    {
+      "canonical": "bond_kind",
+      "aliases": [
+        "채권종류",
+        "채권 종류",
+        "채권유형",
+        "채권 유형",
+        "채권분류",
+        "채권 분류",
+        "bond kind",
+        "bond type"
+      ]
     }
   ],
   "relations": [

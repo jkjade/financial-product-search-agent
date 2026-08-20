@@ -32,7 +32,8 @@ SELECT_FIELDS = """
     return_1y, return_2y, return_3y, return_5y, return_ytd,
     yield_rate, size_amount, price, maturity_date,
     sale_available, trade_status_raw, base_index, description,
-    quality_flags, reference_date_note, reference_dates
+    quality_flags, reference_date_note, reference_dates, bond_kind,
+    coupon_rate, corp_pretax_yield, corp_aftertax_yield, indiv_aftertax_yield, preferential_tax_yield, avg_annual_yield, deposit_equivalent_yield, remaining_days, duration, convexity, next_day_duration, next_day_convexity, dirty_price, next_day_eval_price, next_day_yield_rate, next_day_dirty_price, bond_mid_class, leverage_factor, base_price, day_high, day_low, last_nav, premium_discount_rate, trading_value_1d, trading_volume_1d, exchange_code, product_group_code, par_value, listed_share_count, market_code, realtime_volume, is_core_etf, etf_strategy, tracking_error, nav_change_amount, prev_day_nav, trading_value_avg_1m, trading_value_avg_5d, trading_volume_avg_1m, trading_volume_avg_5d, intraday_premium_discount_rate, intraday_inav, circulating_net_asset_amount, circulating_share_count, dividend_per_share, dividend_cycle, dividend_yield, exchange_name, market_name, nav_per_share, net_asset_per_share, net_profit_per_share, net_asset_ratio_per_share, pension_risk_class, is_pension_tradable, etf_sector_code, etf_sector, is_spac, total_share_count, is_etn, index_replication_method, is_index_tracking, is_inverse, base_date_matched, close_price_source, day_open, lipper_id, us_cik, is_currency_hedged, fund_establish_country, return_18m, fund_setup_type_code, is_foreign_base_price, fss_product_code, is_hedge_fund, interest_dividend_type, kofia_classification_code, manager_product_code, is_offshore_fund, manager_external_org_code, professional_sale_control_code, fund_attribute_code, private_fund_type, public_private_type, individual_corp_type, representative_ksd_code, trustee_external_org_code
 """
 
 
