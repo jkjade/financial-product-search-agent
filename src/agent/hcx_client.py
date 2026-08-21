@@ -112,7 +112,14 @@ class HCXAgentClient:
                 except Exception as exc:  # validation errors are returned to the model for correction
                     result = {"error": type(exc).__name__, "detail": str(exc)}
                     status = "error"
-                tool_results.append({"name": name, "arguments": arguments, "result": result})
+                tool_results.append(
+                    {   
+                        "round": round_index,
+                        "tool": name, 
+                        "arguments": arguments,
+                        "result": result
+                    }
+                )
                 execution_summary.append(
                     {
                         "round": round_index,

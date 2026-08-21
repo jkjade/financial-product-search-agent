@@ -469,23 +469,19 @@ def answer(
 
     finalized = finalize_grounded_answer(result["answer"], result["tool_results"])
 
-    retrieved_context = json.dumps(
-        {"tool_results": result["tool_results"], "evidence": finalized["evidence"]},
-        ensure_ascii=False,
-        default=str,
-    )
+    retrieved_context = json.dumps(finalized["evidence"], ensure_ascii=False, default=str)
+
+    rounds: dict[int, list[dict[str, Any]]] = {}
+    for tool_result in result["tool_results"]:
+        rounds.setdefault(tool_result["round"], []).append(
+            {"name": tool_result["tool"], "arguments": tool_result["arguments"]}
+        )
     think_trace = json.dumps(
-        {
-            "execution_summary": result["execution_summary"],
-            "grounded": finalized["grounded"],
-            "requires_clarification": finalized["requires_clarification"],
-            "validation": finalized["validation"],
-            "data_base_date": _snapshot_date(),
-            "model": result["model"],
-        },
+        [{"round": round_number, "tools": tools} for round_number, tools in sorted(rounds.items())],
         ensure_ascii=False,
         default=str,
     )
+
     return {
         "question_id": question_id,
         "question": question,

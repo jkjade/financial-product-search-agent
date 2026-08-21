@@ -29,7 +29,7 @@ def _nonempty_result(result: dict[str, Any]) -> bool:
 
 def has_grounded_facts(tool_results: list[dict[str, Any]]) -> bool:
     for call in tool_results:
-        if call.get("name") == "resolve_ontology":
+        if call.get("tool") == "resolve_ontology":
             continue
         result = call.get("result")
         if isinstance(result, dict) and _nonempty_result(result):
