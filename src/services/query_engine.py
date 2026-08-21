@@ -17,7 +17,7 @@ from ..api.models import (
     ProductSearchRequest,
     SortClause,
 )
-from ..query.fields import DEFAULT_COMPARISON_DIRECTIONS, FIELD_SPECS, LEGACY_SORT_ALIASES
+from ..query.fields import FIELD_SPECS, LEGACY_SORT_ALIASES
 from ..query.sql_builder import compile_filters, compile_order, metric_expression, quote_alias
 
 SELECT_FIELDS = """
@@ -322,7 +322,7 @@ def compare_products(
     metric_rankings: dict[str, list[dict[str, Any]]] = {}
     for metric in request.metrics:
         field = str(metric.field)
-        direction = metric.order or DEFAULT_COMPARISON_DIRECTIONS[field]
+        direction = metric.order or FIELD_SPECS[field].default_direction
         numeric_values: list[tuple[int, Decimal]] = []
         for index, item in enumerate(selected):
             value = item.get(field)
