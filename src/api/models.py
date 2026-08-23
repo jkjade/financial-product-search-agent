@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
-from enum import StrEnum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -16,42 +15,45 @@ from ..query.fields import (
     NUMERIC_FIELDS_SET,
     TEXT_FIELDS_SET,
 )
+from ..agent.vocab import (
+    AGGREGATE_OPERATION_LABELS,
+    FILTER_OPERATOR_LABELS,
+    GRAPH_DIRECTION_LABELS,
+    GRAPH_PREDICATE_LABELS,
+    NULL_ORDER_LABELS,
+    PRODUCT_TYPE_LABELS,
+    RANK_METHOD_LABELS,
+    SORT_ORDER_LABELS,
+    SOURCE_TABLE_LABELS,
+    AggregateOperation,
+    FilterOperator,
+    GraphDirection,
+    GraphPredicate,
+    NullOrder,
+    ProductType,
+    RankMethod,
+    SortOrder,
+    SourceTable,
+    labels_to_description,
+)
 
 
-def _field_enum(name: str, members: tuple[str, ...]) -> type[StrEnum]:
-    return StrEnum(name, {value.upper(): value for value in members})
+def _field_literal(members: tuple[str, ...]) -> Any:
+    """fields.py의 튜플로부터 Literal을 동적 생성.
 
-ProductType = Literal[
-    "DOMESTIC_BOND",
-    "DOMESTIC_ETF",
-    "OVERSEAS_ETF",
-    "PUBLIC_FUND",
-]
-SourceTable = Literal["PRBD01N001", "PREF01N001", "PREF02N001", "PRFD01N001"]
-SortOrder = Literal["asc", "desc"]
-NullOrder = Literal["first", "last"]
-FilterOperator = Literal[
-    "eq",
-    "ne",
-    "contains",
-    "starts_with",
-    "in",
-    "not_in",
-    "gt",
-    "gte",
-    "lt",
-    "lte",
-    "between",
-    "is_null",
-    "not_null",
-]
-FilterField = _field_enum("FilterField", FILTER_FIELDS)
+    StrEnum + $ref 방식은 HCX에 보내는 스키마 크기를 줄여주지만, 실측(A/B 테스트)
+    결과 필드명 하나가 프로퍼티 자리에 그대로 나열되는 대신 `$ref` 포인터 뒤에
+    숨어버려서 모델이 유효 필드 목록을 무시하고 엉뚱한 이름(예: fee_rate 대신
+    expense_ratio)을 지어내는 사례가 확인됐다. Literal은 인라인 enum으로 그대로
+    나가므로 이 회귀가 없다 (정확도가 페이로드 크기보다 우선이라는 판단으로 복귀).
+    """
+    return Literal[members]
+
+FilterField = _field_literal(FILTER_FIELDS)
 SortField = FilterField
-GroupField = _field_enum("GroupField", GROUP_FIELDS)
-NumericField = _field_enum("NumericField", NUMERIC_FIELDS)
+GroupField = _field_literal(GROUP_FIELDS)
+NumericField = _field_literal(NUMERIC_FIELDS)
 AggregateField = FilterField
-AggregateOperation = Literal["count", "count_distinct", "sum", "avg", "min", "max"]
-RankMethod = Literal["row_number", "rank", "dense_rank"]
 ToolName = Literal[
     "search_products",
     "aggregate_products",
@@ -104,7 +106,7 @@ def _coerce_filter_value(field: str, value: ScalarValue) -> ScalarValue:
 
 class FilterClause(StrictModel):
     field: FilterField
-    operator: FilterOperator
+    operator: FilterOperator = Field(description=labels_to_description(FILTER_OPERATOR_LABELS))
     value: ScalarValue | None = None
     values: list[ScalarValue] | None = Field(default=None, max_length=100)
 
@@ -145,8 +147,12 @@ class FilterClause(StrictModel):
 
 class SortClause(StrictModel):
     field: SortField
-    order: SortOrder = "desc"
-    nulls: NullOrder = "last"
+    order: SortOrder = Field(
+        default="desc", description=labels_to_description(SORT_ORDER_LABELS)
+    )
+    nulls: NullOrder = Field(
+        default="last", description=labels_to_description(NULL_ORDER_LABELS)
+    )
 
 
 class ProductQueryRequest(StrictModel):
@@ -185,7 +191,9 @@ class ProductSearchRequest(StrictModel):
 
 
 class AggregateMetric(StrictModel):
-    operation: AggregateOperation
+    operation: AggregateOperation = Field(
+        description=labels_to_description(AGGREGATE_OPERATION_LABELS)
+    )
     field: AggregateField | None = None
     alias: str = Field(pattern=r"^[a-z][a-z0-9_]{0,62}$")
 
@@ -204,8 +212,12 @@ class AggregateMetric(StrictModel):
 
 class AggregateOrder(StrictModel):
     field: str = Field(pattern=r"^[a-z][a-z0-9_]{0,62}$")
-    order: SortOrder = "desc"
-    nulls: NullOrder = "last"
+    order: SortOrder = Field(
+        default="desc", description=labels_to_description(SORT_ORDER_LABELS)
+    )
+    nulls: NullOrder = Field(
+        default="last", description=labels_to_description(NULL_ORDER_LABELS)
+    )
 
 
 class ProductAggregateRequest(StrictModel):
@@ -240,17 +252,25 @@ class ProductRankRequest(StrictModel):
     q: str | None = Field(default=None, max_length=300)
     filters: list[FilterClause] = Field(default_factory=list, max_length=30)
     metric: NumericField
-    order: SortOrder = "desc"
-    method: RankMethod = "dense_rank"
+    order: SortOrder = Field(
+        default="desc", description=labels_to_description(SORT_ORDER_LABELS)
+    )
+    method: RankMethod = Field(
+        default="dense_rank", description=labels_to_description(RANK_METHOD_LABELS)
+    )
     partition_by: list[GroupField] = Field(default_factory=list, max_length=3)
     top_n: int = Field(default=10, ge=1, le=100)
     result_limit: int = Field(default=500, ge=1, le=2000)
 
 
 class ProductSelector(StrictModel):
-    source_table: SourceTable | None = None
+    source_table: SourceTable | None = Field(
+        default=None, description=labels_to_description(SOURCE_TABLE_LABELS)
+    )
     source_row_number: int | None = Field(default=None, ge=2)
-    product_type: ProductType | None = None
+    product_type: ProductType | None = Field(
+        default=None, description=labels_to_description(PRODUCT_TYPE_LABELS)
+    )
     product_id: str | None = Field(default=None, min_length=1, max_length=100)
 
     @model_validator(mode="after")
@@ -278,7 +298,9 @@ def json_key(selector: "ProductSelector") -> tuple[object, ...]:
 
 class ComparisonMetric(StrictModel):
     field: NumericField
-    order: SortOrder | None = None
+    order: SortOrder | None = Field(
+        default=None, description=labels_to_description(SORT_ORDER_LABELS)
+    )
 
 
 class ProductCompareRequest(StrictModel):
@@ -306,7 +328,7 @@ class ProductCompareRequest(StrictModel):
 
 
 class GetProductRequest(StrictModel):
-    source_table: SourceTable
+    source_table: SourceTable = Field(description=labels_to_description(SOURCE_TABLE_LABELS))
     source_row_number: int = Field(ge=2)
 
 
@@ -341,12 +363,6 @@ class AgentPlan(StrictModel):
         return self
 
 
-GraphPredicate = Literal[
-    "managedBy", "manages", "hasAssetClass", "investsInRegion",
-    "denominatedIn", "hasRiskGrade", "tracksIndex", "holdsSecurity", "heldBy",
-]
-GraphDirection = Literal["out", "in", "both"]
-
 
 class OntologyResolveRequest(StrictModel):
     query: str = Field(min_length=1, max_length=1000)
@@ -354,8 +370,12 @@ class OntologyResolveRequest(StrictModel):
 
 class GraphLookupRequest(StrictModel):
     term: str = Field(min_length=1, max_length=300)
-    predicate: GraphPredicate | None = None
-    direction: GraphDirection = "both"
+    predicate: GraphPredicate | None = Field(
+        default=None, description=labels_to_description(GRAPH_PREDICATE_LABELS)
+    )
+    direction: GraphDirection = Field(
+        default="both", description=labels_to_description(GRAPH_DIRECTION_LABELS)
+    )
     entity_type: str | None = Field(default=None, max_length=100)
     limit: int = Field(default=30, ge=1, le=100)
 
@@ -363,7 +383,9 @@ class GraphLookupRequest(StrictModel):
 class SemanticSearchRequest(StrictModel):
     query: str = Field(min_length=1, max_length=2000)
     product_id: str | None = Field(default=None, max_length=100)
-    product_type: ProductType | None = None
+    product_type: ProductType | None = Field(
+        default=None, description=labels_to_description(PRODUCT_TYPE_LABELS)
+    )
     document_type: str | None = Field(default=None, max_length=100)
     limit: int = Field(default=10, ge=1, le=50)
 
@@ -371,7 +393,9 @@ class SemanticSearchRequest(StrictModel):
 class FederatedSearchRequest(StrictModel):
     query: str = Field(min_length=1, max_length=2000)
     structured_query: ProductQueryRequest | None = None
-    graph_predicate: GraphPredicate | None = None
+    graph_predicate: GraphPredicate | None = Field(
+        default=None, description=labels_to_description(GRAPH_PREDICATE_LABELS)
+    )
     include_external_documents: bool = True
     product_limit: int = Field(default=20, ge=1, le=100)
     graph_limit: int = Field(default=20, ge=1, le=100)

@@ -59,4 +59,5 @@ def test_system_prompt_documents_correct_filter_and_metric_argument_shape():
     # HCX-005 was also observed inventing Korean-text aliases (e.g. "공모펀드_개수"),
     # which fail AggregateMetric.alias's ASCII snake_case pattern. Keep the prompt
     # explicit that alias must stay ASCII lowercase even when explaining in Korean.
-    assert "alias는 반드시 영문 소문자 ASCII" in SYSTEM_PROMPT
+    assert "alias는 영문 소문자/숫자/밑줄만 사용" in SYSTEM_PROMPT
+    assert "한글·공백·대문자 금지" in SYSTEM_PROMPT

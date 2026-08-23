@@ -30,8 +30,12 @@ def compile_filters(q: str | None, filters: Iterable[Any]) -> tuple[str, list[An
     parameters: list[Any] = []
 
     if q and q.strip():
-        conditions.append("search_text ILIKE %s ESCAPE '\\'")
-        parameters.append(f"%{_escape_like(q.strip())}%")
+        # 토큰 단위로 나눠 각각 ILIKE AND 조건으로 걸어준다. 원본 상품명의 띄어쓰기가
+        # 일관되지 않아서(예: "KODEX 200" vs "KODEX200") q 전체를 하나의 부분 문자열로
+        # 매칭하면 모델이 자연스럽게 띄어쓴 이름이 실제로는 안 걸리는 경우가 관찰됨.
+        for token in q.strip().split():
+            conditions.append("search_text ILIKE %s ESCAPE '\\'")
+            parameters.append(f"%{_escape_like(token)}%")
 
     for clause in filters:
         field = str(clause.field)
