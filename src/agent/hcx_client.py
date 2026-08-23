@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import json
 import os
-import uuid
 from dataclasses import dataclass
 from typing import Any, Callable
 
 import httpx
 
+from .ncp_client import ncp_api_key_from_env, ncp_headers
 from .prompts import SYSTEM_PROMPT
 from .tool_registry import openai_tool_catalog
 
@@ -22,8 +22,8 @@ class HCXSettings:
 
     @classmethod
     def from_env(cls) -> "HCXSettings | None":
-        api_key = os.getenv("HCX_API_KEY", "").strip()
-        if not api_key:
+        api_key = ncp_api_key_from_env()
+        if api_key is None:
             return None
         return cls(
             api_key=api_key,
@@ -48,7 +48,6 @@ class HCXAgentClient:
         self.settings = settings
 
     def _request(self, messages: list[dict[str, Any]]) -> dict[str, Any]:
-        request_id = str(uuid.uuid4())
         payload = {
             "model": self.settings.model,
             "messages": messages,
@@ -57,11 +56,7 @@ class HCXAgentClient:
             "temperature": 0,
             "max_tokens": 2048,
         }
-        headers = {
-            "Authorization": f"Bearer {self.settings.api_key}",
-            "Content-Type": "application/json",
-            "X-NCP-CLOVASTUDIO-REQUEST-ID": request_id,
-        }
+        headers = ncp_headers(self.settings.api_key)
         with httpx.Client(timeout=self.settings.timeout_seconds) as client:
             response = client.post(
                 f"{self.settings.base_url}/chat/completions",

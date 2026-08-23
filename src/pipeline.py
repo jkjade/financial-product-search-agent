@@ -122,11 +122,6 @@ def _scan_dataset(
     return report
 
 
-def preprocess_dataset(dataset: DatasetConfig, max_rows: int | None = None) -> dict[str, Any]:
-    """In-process helper used by focused tests and development."""
-    return _scan_dataset(dataset, row_consumer=None, max_rows=max_rows)
-
-
 def _worker_command(
     mode: str,
     dataset: DatasetConfig,

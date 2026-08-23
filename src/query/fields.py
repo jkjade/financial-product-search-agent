@@ -10,7 +10,6 @@ FieldKind = Literal["text", "numeric", "date", "boolean"]
 class FieldSpec:
     column: str
     kind: FieldKind
-    filterable: bool = True
     sortable: bool = True
     groupable: bool = False
     default_direction: Literal["asc", "desc"] | None = None

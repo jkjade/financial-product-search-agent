@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import os
-import uuid
 from dataclasses import dataclass
 from typing import Any
 
 import httpx
+
+from .ncp_client import ncp_api_key_from_env, ncp_headers
 
 
 @dataclass(frozen=True)
@@ -17,8 +18,8 @@ class EmbeddingSettings:
 
     @classmethod
     def from_env(cls) -> "EmbeddingSettings | None":
-        api_key = os.getenv("HCX_API_KEY", "").strip()
-        if not api_key:
+        api_key = ncp_api_key_from_env()
+        if api_key is None:
             return None
         return cls(
             api_key=api_key,
@@ -47,11 +48,7 @@ class ClovaEmbeddingClient:
         if len(text) > 10000:
             # Embedding v2 token calculator documents a 10,000-character Korean input bound.
             text = text[:10000]
-        headers = {
-            "Authorization": f"Bearer {self.settings.api_key}",
-            "X-NCP-CLOVASTUDIO-REQUEST-ID": str(uuid.uuid4()),
-            "Content-Type": "application/json",
-        }
+        headers = ncp_headers(self.settings.api_key)
         if self.settings.model == "bge-m3":
             url = f"{self.settings.base_url}/v1/api-tools/embedding/v2"
         else:

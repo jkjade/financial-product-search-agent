@@ -1,18 +1,11 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from typing import Any, Iterable
 
 from .fields import FIELD_SPECS
 
 _ALIAS_RE = re.compile(r"^[a-z][a-z0-9_]{0,62}$")
-
-
-@dataclass(frozen=True)
-class BuiltQuery:
-    sql: str
-    parameters: list[Any]
 
 
 def quote_alias(alias: str) -> str:
