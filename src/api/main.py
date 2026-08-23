@@ -157,7 +157,7 @@ def capabilities() -> dict[str, Any]:
             "external_semantic_search": True,
             "answer_validation": True,
             "external_evidence_cutoff": _snapshot_date(),
-            "ontology_file": ontology_info()["ontology_file"],
+            "ontology_files": ontology_info()["ontology_files"],
         },
         "tool_names": list(TOOL_MODELS),
         "tool_catalog_url": "/tools/catalog",

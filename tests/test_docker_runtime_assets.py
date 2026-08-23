@@ -6,8 +6,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_docker_runtime_contains_phase25_semantic_assets():
     required = [
         ROOT / "ontology" / "business_rules.json",
-        ROOT / "ontology" / "term_map.json",
-        ROOT / "ontology" / "financial_product_ontology.ttl",
+        ROOT / "ontology" / "common.ttl",
+        ROOT / "ontology" / "bond_kr.ttl",
+        ROOT / "ontology" / "etf_kr.ttl",
+        ROOT / "ontology" / "etf_gl.ttl",
+        ROOT / "ontology" / "fund_pub.ttl",
         ROOT / "docker-compose.yml",
         ROOT / "Dockerfile",
     ]

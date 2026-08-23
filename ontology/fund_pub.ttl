@@ -1,0 +1,161 @@
+@prefix fp: <https://example.org/financial-product-agent/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+fp:PublicFund a owl:Class ; rdfs:subClassOf fp:Product ; rdfs:label "공모펀드"@ko .
+
+fp:riskCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "risk_code"@en ;
+    fp:column "risk_code" .
+
+fp:riskName a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "위험등급"@ko ;
+    fp:column "risk_name" ;
+    fp:alias "위험등급", "위험 등급", "신용등급", "신용 등급", "risk grade", "credit rating" .
+
+fp:baseIndex a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "기초지수"@ko ;
+    fp:column "base_index" ;
+    fp:alias "기초지수", "벤치마크", "추종지수", "index", "benchmark" .
+
+fp:return1w a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_1w"@en ;
+    fp:column "return_1w" .
+
+fp:return1m a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_1m"@en ;
+    fp:column "return_1m" .
+
+fp:return3m a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_3m"@en ;
+    fp:column "return_3m" .
+
+fp:return6m a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_6m"@en ;
+    fp:column "return_6m" .
+
+fp:return1y a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "1년수익률"@ko ;
+    fp:column "return_1y" ;
+    fp:alias "1년수익률", "1년 수익률", "1y return", "one year return" .
+
+fp:return2y a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_2y"@en ;
+    fp:column "return_2y" .
+
+fp:return3y a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_3y"@en ;
+    fp:column "return_3y" .
+
+fp:return5y a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_5y"@en ;
+    fp:column "return_5y" .
+
+fp:isCurrencyHedged a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "is_currency_hedged"@en ;
+    fp:column "is_currency_hedged" .
+
+fp:fundEstablishCountry a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "fund_establish_country"@en ;
+    fp:column "fund_establish_country" .
+
+fp:return18m a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "return_18m"@en ;
+    fp:column "return_18m" .
+
+fp:fundSetupTypeCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "fund_setup_type_code"@en ;
+    fp:column "fund_setup_type_code" .
+
+fp:isForeignBasePrice a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "is_foreign_base_price"@en ;
+    fp:column "is_foreign_base_price" .
+
+fp:fssProductCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "fss_product_code"@en ;
+    fp:column "fss_product_code" .
+
+fp:isHedgeFund a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "is_hedge_fund"@en ;
+    fp:column "is_hedge_fund" .
+
+fp:interestDividendType a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "interest_dividend_type"@en ;
+    fp:column "interest_dividend_type" .
+
+fp:kofiaClassificationCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "kofia_classification_code"@en ;
+    fp:column "kofia_classification_code" .
+
+fp:managerProductCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "manager_product_code"@en ;
+    fp:column "manager_product_code" .
+
+fp:isOffshoreFund a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "is_offshore_fund"@en ;
+    fp:column "is_offshore_fund" .
+
+fp:managerExternalOrgCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "manager_external_org_code"@en ;
+    fp:column "manager_external_org_code" .
+
+fp:professionalSaleControlCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "professional_sale_control_code"@en ;
+    fp:column "professional_sale_control_code" .
+
+fp:fundAttributeCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "fund_attribute_code"@en ;
+    fp:column "fund_attribute_code" .
+
+fp:privateFundType a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "private_fund_type"@en ;
+    fp:column "private_fund_type" .
+
+fp:publicPrivateType a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "public_private_type"@en ;
+    fp:column "public_private_type" .
+
+fp:individualCorpType a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "individual_corp_type"@en ;
+    fp:column "individual_corp_type" .
+
+fp:representativeKsdCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "representative_ksd_code"@en ;
+    fp:column "representative_ksd_code" .
+
+fp:trusteeExternalOrgCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "trustee_external_org_code"@en ;
+    fp:column "trustee_external_org_code" .

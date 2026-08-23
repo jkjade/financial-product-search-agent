@@ -9,12 +9,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_ontology_files_exist_and_snapshot_rule_is_fixed():
     info = ontology_info()
-    assert info["ontology_file"] == "ontology/financial_product_ontology.ttl"
+    assert info["ontology_files"] == [
+        "ontology/common.ttl",
+        "ontology/bond_kr.ttl",
+        "ontology/etf_kr.ttl",
+        "ontology/etf_gl.ttl",
+        "ontology/fund_pub.ttl",
+    ]
     rules = load_business_rules()
     assert rules["dataset_snapshot_date"] == "2026-07-11"
     assert rules["external_evidence_cutoff"] == "2026-07-11"
-    ttl = (ROOT / info["ontology_file"]).read_text(encoding="utf-8")
-    for token in ("fp:FinancialProduct", "fp:ETF", "fp:managedBy", "fp:tracksIndex"):
+    ttl = "\n".join((ROOT / f).read_text(encoding="utf-8") for f in info["ontology_files"])
+    for token in ("fp:Product", "fp:ETF", "fp:managedBy", "fp:tracksIndex"):
         assert token in ttl
 
 
@@ -70,7 +76,7 @@ def test_pgvector_external_evidence_contract_is_present():
 
 
 def test_external_holdings_contract_builds_graph_relations():
-    ontology = (ROOT / "ontology" / "financial_product_ontology.ttl").read_text(encoding="utf-8")
+    ontology = (ROOT / "ontology" / "common.ttl").read_text(encoding="utf-8")
     loader = (ROOT / "src" / "semantic" / "ingest_holdings.py").read_text(encoding="utf-8")
     semantic_sql = (ROOT / "sql" / "005_semantic.sql").read_text(encoding="utf-8")
     assert "fp:holdsSecurity" in ontology

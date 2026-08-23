@@ -1,0 +1,187 @@
+@prefix fp: <https://example.org/financial-product-agent/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+fp:OverseasETF a owl:Class ; rdfs:subClassOf fp:ETF ; rdfs:label "해외 ETF"@ko .
+
+fp:issuerOrManager a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "운용사"@ko ;
+    fp:column "issuer_or_manager" ;
+    fp:alias "운용사", "자산운용사", "발행사", "issuer", "asset manager", "manager" .
+
+fp:baseIndex a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "기초지수"@ko ;
+    fp:column "base_index" ;
+    fp:alias "기초지수", "벤치마크", "추종지수", "index", "benchmark" .
+
+fp:feeRate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "보수"@ko ;
+    fp:column "fee_rate" ;
+    fp:alias "보수", "보수율", "운용보수", "fee", "expense ratio" .
+
+fp:return1d a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "return_1d"@en ;
+    fp:column "return_1d" .
+
+fp:price a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "가격"@ko ;
+    fp:column "price" ;
+    fp:alias "가격", "종가", "평가가격", "price" .
+
+fp:productInfoUpdateDate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
+    rdfs:label "product_info_update_date"@en ;
+    fp:column "product_info_update_date" .
+
+fp:marketDataUpdateDate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
+    rdfs:label "market_data_update_date"@en ;
+    fp:column "market_data_update_date" .
+
+fp:weeklyDataUpdateDate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
+    rdfs:label "weekly_data_update_date"@en ;
+    fp:column "weekly_data_update_date" .
+
+fp:priceBaseDate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
+    rdfs:label "price_base_date"@en ;
+    fp:column "price_base_date" .
+
+fp:sizeBaseDate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
+    rdfs:label "size_base_date"@en ;
+    fp:column "size_base_date" .
+
+fp:listingDate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
+    rdfs:label "listing_date"@en ;
+    fp:column "listing_date" .
+
+fp:basePrice a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "base_price"@en ;
+    fp:column "base_price" .
+
+fp:dayHigh a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "day_high"@en ;
+    fp:column "day_high" .
+
+fp:dayLow a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "day_low"@en ;
+    fp:column "day_low" .
+
+fp:lastNav a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "last_nav"@en ;
+    fp:column "last_nav" .
+
+fp:premiumDiscountRate a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "premium_discount_rate"@en ;
+    fp:column "premium_discount_rate" .
+
+fp:tradingValue1d a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_value_1d"@en ;
+    fp:column "trading_value_1d" .
+
+fp:tradingVolume1d a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_volume_1d"@en ;
+    fp:column "trading_volume_1d" .
+
+fp:exchangeCode a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "exchange_code"@en ;
+    fp:column "exchange_code" .
+
+fp:productGroupCode a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "product_group_code"@en ;
+    fp:column "product_group_code" .
+
+fp:parValue a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "par_value"@en ;
+    fp:column "par_value" .
+
+fp:listedShareCount a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "listed_share_count"@en ;
+    fp:column "listed_share_count" .
+
+fp:marketCode a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "market_code"@en ;
+    fp:column "market_code" .
+
+fp:realtimeVolume a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "realtime_volume"@en ;
+    fp:column "realtime_volume" .
+
+fp:isCoreEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "is_core_etf"@en ;
+    fp:column "is_core_etf" .
+
+fp:etfStrategy a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "etf_strategy"@en ;
+    fp:column "etf_strategy" .
+
+fp:isEtn a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "is_etn"@en ;
+    fp:column "is_etn" .
+
+fp:indexReplicationMethod a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "index_replication_method"@en ;
+    fp:column "index_replication_method" .
+
+fp:isIndexTracking a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "is_index_tracking"@en ;
+    fp:column "is_index_tracking" .
+
+fp:isInverse a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "is_inverse"@en ;
+    fp:column "is_inverse" .
+
+fp:baseDateMatched a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "base_date_matched"@en ;
+    fp:column "base_date_matched" .
+
+fp:closePriceSource a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "close_price_source"@en ;
+    fp:column "close_price_source" .
+
+fp:dayOpen a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
+    rdfs:label "day_open"@en ;
+    fp:column "day_open" .
+
+fp:lipperId a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "lipper_id"@en ;
+    fp:column "lipper_id" .
+
+fp:usCik a owl:DatatypeProperty ;
+    rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
+    rdfs:label "us_cik"@en ;
+    fp:column "us_cik" .

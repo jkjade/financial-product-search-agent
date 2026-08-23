@@ -1,0 +1,290 @@
+@prefix fp: <https://example.org/financial-product-agent/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+fp:DomesticETF a owl:Class ; rdfs:subClassOf fp:ETF ; rdfs:label "국내 ETF"@ko .
+
+fp:issuerOrManager a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "운용사"@ko ;
+    fp:column "issuer_or_manager" ;
+    fp:alias "운용사", "자산운용사", "발행사", "issuer", "asset manager", "manager" .
+
+fp:riskCode a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "risk_code"@en ;
+    fp:column "risk_code" .
+
+fp:riskName a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "위험등급"@ko ;
+    fp:column "risk_name" ;
+    fp:alias "위험등급", "위험 등급", "신용등급", "신용 등급", "risk grade", "credit rating" .
+
+fp:baseIndex a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "기초지수"@ko ;
+    fp:column "base_index" ;
+    fp:alias "기초지수", "벤치마크", "추종지수", "index", "benchmark" .
+
+fp:feeRate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "보수"@ko ;
+    fp:column "fee_rate" ;
+    fp:alias "보수", "보수율", "운용보수", "fee", "expense ratio" .
+
+fp:otherFeeRate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "other_fee_rate"@en ;
+    fp:column "other_fee_rate" .
+
+fp:return1d a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "return_1d"@en ;
+    fp:column "return_1d" .
+
+fp:return1m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "return_1m"@en ;
+    fp:column "return_1m" .
+
+fp:return3m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "return_3m"@en ;
+    fp:column "return_3m" .
+
+fp:return6m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "return_6m"@en ;
+    fp:column "return_6m" .
+
+fp:return1y a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "1년수익률"@ko ;
+    fp:column "return_1y" ;
+    fp:alias "1년수익률", "1년 수익률", "1y return", "one year return" .
+
+fp:returnYtd a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "연초대비"@ko ;
+    fp:column "return_ytd" ;
+    fp:alias "ytd", "연초대비", "연초 대비", "연초 이후 수익률" .
+
+fp:price a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "가격"@ko ;
+    fp:column "price" ;
+    fp:alias "가격", "종가", "평가가격", "price" .
+
+fp:productInfoUpdateDate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:label "product_info_update_date"@en ;
+    fp:column "product_info_update_date" .
+
+fp:marketDataUpdateDate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:label "market_data_update_date"@en ;
+    fp:column "market_data_update_date" .
+
+fp:weeklyDataUpdateDate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:label "weekly_data_update_date"@en ;
+    fp:column "weekly_data_update_date" .
+
+fp:listingDate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:label "listing_date"@en ;
+    fp:column "listing_date" .
+
+fp:tradeEndDate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:label "trade_end_date"@en ;
+    fp:column "trade_end_date" .
+
+fp:leverageFactor a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "leverage_factor"@en ;
+    fp:column "leverage_factor" .
+
+fp:basePrice a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "base_price"@en ;
+    fp:column "base_price" .
+
+fp:dayHigh a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "day_high"@en ;
+    fp:column "day_high" .
+
+fp:dayLow a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "day_low"@en ;
+    fp:column "day_low" .
+
+fp:lastNav a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "last_nav"@en ;
+    fp:column "last_nav" .
+
+fp:premiumDiscountRate a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "premium_discount_rate"@en ;
+    fp:column "premium_discount_rate" .
+
+fp:tradingValue1d a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_value_1d"@en ;
+    fp:column "trading_value_1d" .
+
+fp:tradingVolume1d a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_volume_1d"@en ;
+    fp:column "trading_volume_1d" .
+
+fp:exchangeCode a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "exchange_code"@en ;
+    fp:column "exchange_code" .
+
+fp:productGroupCode a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "product_group_code"@en ;
+    fp:column "product_group_code" .
+
+fp:parValue a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "par_value"@en ;
+    fp:column "par_value" .
+
+fp:listedShareCount a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "listed_share_count"@en ;
+    fp:column "listed_share_count" .
+
+fp:marketCode a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "market_code"@en ;
+    fp:column "market_code" .
+
+fp:isCoreEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "is_core_etf"@en ;
+    fp:column "is_core_etf" .
+
+fp:etfStrategy a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "etf_strategy"@en ;
+    fp:column "etf_strategy" .
+
+fp:trackingError a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "tracking_error"@en ;
+    fp:column "tracking_error" .
+
+fp:navChangeAmount a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "nav_change_amount"@en ;
+    fp:column "nav_change_amount" .
+
+fp:prevDayNav a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "prev_day_nav"@en ;
+    fp:column "prev_day_nav" .
+
+fp:tradingValueAvg1m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_value_avg_1m"@en ;
+    fp:column "trading_value_avg_1m" .
+
+fp:tradingValueAvg5d a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_value_avg_5d"@en ;
+    fp:column "trading_value_avg_5d" .
+
+fp:tradingVolumeAvg1m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_volume_avg_1m"@en ;
+    fp:column "trading_volume_avg_1m" .
+
+fp:tradingVolumeAvg5d a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "trading_volume_avg_5d"@en ;
+    fp:column "trading_volume_avg_5d" .
+
+fp:circulatingNetAssetAmount a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "circulating_net_asset_amount"@en ;
+    fp:column "circulating_net_asset_amount" .
+
+fp:circulatingShareCount a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "circulating_share_count"@en ;
+    fp:column "circulating_share_count" .
+
+fp:dividendPerShare a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "dividend_per_share"@en ;
+    fp:column "dividend_per_share" .
+
+fp:dividendYield a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "dividend_yield"@en ;
+    fp:column "dividend_yield" .
+
+fp:exchangeName a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "exchange_name"@en ;
+    fp:column "exchange_name" .
+
+fp:marketName a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "market_name"@en ;
+    fp:column "market_name" .
+
+fp:navPerShare a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "nav_per_share"@en ;
+    fp:column "nav_per_share" .
+
+fp:netAssetPerShare a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "net_asset_per_share"@en ;
+    fp:column "net_asset_per_share" .
+
+fp:netProfitPerShare a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "net_profit_per_share"@en ;
+    fp:column "net_profit_per_share" .
+
+fp:netAssetRatioPerShare a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "net_asset_ratio_per_share"@en ;
+    fp:column "net_asset_ratio_per_share" .
+
+fp:pensionRiskClass a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "pension_risk_class"@en ;
+    fp:column "pension_risk_class" .
+
+fp:isPensionTradable a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "is_pension_tradable"@en ;
+    fp:column "is_pension_tradable" .
+
+fp:etfSectorCode a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "etf_sector_code"@en ;
+    fp:column "etf_sector_code" .
+
+fp:isSpac a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:label "is_spac"@en ;
+    fp:column "is_spac" .
+
+fp:totalShareCount a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:label "total_share_count"@en ;
+    fp:column "total_share_count" .

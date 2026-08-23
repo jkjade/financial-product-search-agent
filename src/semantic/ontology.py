@@ -1,15 +1,18 @@
 from __future__ import annotations
 
-import json
 import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from rdflib import OWL, RDF, RDFS, Graph, Namespace
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TERM_MAP_PATH = PROJECT_ROOT / "ontology" / "term_map.json"
-BUSINESS_RULES_PATH = PROJECT_ROOT / "ontology" / "business_rules.json"
-ONTOLOGY_PATH = PROJECT_ROOT / "ontology" / "financial_product_ontology.ttl"
+ONTOLOGY_DIR = PROJECT_ROOT / "ontology"
+BUSINESS_RULES_PATH = ONTOLOGY_DIR / "business_rules.json"
+
+FP = Namespace("https://example.org/financial-product-agent/ontology#")
+ONTOLOGY_TTL_FILES = ("common.ttl", "bond_kr.ttl", "etf_kr.ttl", "etf_gl.ttl", "fund_pub.ttl")
 
 
 def _normalize(text: str) -> str:
@@ -17,12 +20,72 @@ def _normalize(text: str) -> str:
 
 
 @lru_cache(maxsize=1)
+def load_ontology_graph() -> Graph:
+    graph = Graph()
+    for filename in ONTOLOGY_TTL_FILES:
+        graph.parse(ONTOLOGY_DIR / filename, format="turtle")
+    return graph
+
+
+def _labels_and_aliases(graph: Graph, subject: Any) -> list[str]:
+    values = [str(v) for v in graph.objects(subject, RDFS.label)]
+    values += [str(v) for v in graph.objects(subject, FP.alias)]
+    return values
+
+
+@lru_cache(maxsize=1)
 def load_term_map() -> dict[str, Any]:
-    return json.loads(TERM_MAP_PATH.read_text(encoding="utf-8"))
+    """온톨로지 ttl 5개(ontology/*.ttl)를 파싱해서 resolve_query_terms()가 쓰는
+    {"product_types": [...], "fields": [...], "relations": [...],
+    "ranking_semantics": [...]} 모양으로 변환한다.
+
+    예전엔 ontology/term_map.json을 그대로 읽었지만, ttl과 내용이 완전히
+    겹쳐서 ttl 하나로 통합했다(term_map.json은 삭제됨). 반환 모양은 그대로라
+    resolve_query_terms()는 수정할 필요가 없다.
+
+    파싱이 실패하면(ttl 파일 손상 등) 빈 결과를 돌려줘서, 온톨로지 기능만
+    조용히 비활성화되고 나머지 서비스는 그대로 동작하게 한다.
+    """
+    try:
+        graph = load_ontology_graph()
+    except Exception:
+        return {"product_types": [], "fields": [], "relations": [], "ranking_semantics": []}
+
+    product_types = [
+        {"canonical": str(product_type), "aliases": _labels_and_aliases(graph, cls)}
+        for cls in graph.subjects(FP.productType, None)
+        for product_type in [graph.value(cls, FP.productType)]
+    ]
+    fields = [
+        {"canonical": str(column), "aliases": _labels_and_aliases(graph, prop)}
+        for prop in graph.subjects(RDF.type, OWL.DatatypeProperty)
+        for column in [graph.value(prop, FP.column)]
+        if column is not None
+    ]
+    relations = [
+        {"canonical": str(prop).rsplit("#", 1)[-1], "aliases": _labels_and_aliases(graph, prop)}
+        for prop in graph.subjects(RDF.type, OWL.ObjectProperty)
+    ]
+    ranking_semantics = [
+        {
+            "aliases": [str(v) for v in graph.objects(individual, FP.alias)],
+            "field": str(graph.value(individual, FP.column)),
+            "order": str(graph.value(individual, FP.order)),
+        }
+        for individual in graph.subjects(RDF.type, FP.RankingSemantic)
+    ]
+    return {
+        "product_types": product_types,
+        "fields": fields,
+        "relations": relations,
+        "ranking_semantics": ranking_semantics,
+    }
 
 
 @lru_cache(maxsize=1)
 def load_business_rules() -> dict[str, Any]:
+    import json
+
     return json.loads(BUSINESS_RULES_PATH.read_text(encoding="utf-8"))
 
 
@@ -30,8 +93,7 @@ def ontology_info() -> dict[str, Any]:
     rules = load_business_rules()
     term_map = load_term_map()
     return {
-        "ontology_file": str(ONTOLOGY_PATH.relative_to(PROJECT_ROOT)),
-        "term_map_file": str(TERM_MAP_PATH.relative_to(PROJECT_ROOT)),
+        "ontology_files": [str((ONTOLOGY_DIR / f).relative_to(PROJECT_ROOT)) for f in ONTOLOGY_TTL_FILES],
         "business_rules_file": str(BUSINESS_RULES_PATH.relative_to(PROJECT_ROOT)),
         "dataset_snapshot_date": rules["dataset_snapshot_date"],
         "product_type_concepts": len(term_map.get("product_types", [])),
