@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import difflib
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from ..query.fields import (
     DATE_FIELDS_SET,
@@ -39,15 +40,20 @@ from ..agent.vocab import (
 
 
 def _field_literal(members: tuple[str, ...]) -> Any:
-    """fields.py의 튜플로부터 Literal을 동적 생성.
-
-    StrEnum + $ref 방식은 HCX에 보내는 스키마 크기를 줄여주지만, 실측(A/B 테스트)
-    결과 필드명 하나가 프로퍼티 자리에 그대로 나열되는 대신 `$ref` 포인터 뒤에
-    숨어버려서 모델이 유효 필드 목록을 무시하고 엉뚱한 이름(예: fee_rate 대신
-    expense_ratio)을 지어내는 사례가 확인됐다. Literal은 인라인 enum으로 그대로
-    나가므로 이 회귀가 없다 (정확도가 페이로드 크기보다 우선이라는 판단으로 복귀).
-    """
     return Literal[members]
+
+def _fuzzy_correct_field(value: Any) -> Any:
+    if not isinstance(value, str) or value in FILTER_FIELDS:
+        return value
+    strong = difflib.get_close_matches(value, FILTER_FIELDS, n=1, cutoff=0.6)
+    if strong:
+        return strong[0]
+
+    weak = difflib.get_close_matches(value, FILTER_FIELDS, n=3, cutoff=0.4)
+    if weak:
+        raise ValueError(f"'{value}' is not a valid field. 혹시 이 필드를 찾으셨나요?: {', '.join(weak)}")
+    return value
+
 
 FilterField = _field_literal(FILTER_FIELDS)
 SortField = FilterField
@@ -109,6 +115,8 @@ class FilterClause(StrictModel):
     operator: FilterOperator = Field(description=labels_to_description(FILTER_OPERATOR_LABELS))
     value: ScalarValue | None = None
     values: list[ScalarValue] | None = Field(default=None, max_length=100)
+
+    _correct_field = field_validator("field", mode="before")(_fuzzy_correct_field)
 
     @model_validator(mode="after")
     def validate_shape(self) -> "FilterClause":

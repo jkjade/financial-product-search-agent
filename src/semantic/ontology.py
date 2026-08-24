@@ -35,17 +35,6 @@ def _labels_and_aliases(graph: Graph, subject: Any) -> list[str]:
 
 @lru_cache(maxsize=1)
 def load_term_map() -> dict[str, Any]:
-    """온톨로지 ttl 5개(ontology/*.ttl)를 파싱해서 resolve_query_terms()가 쓰는
-    {"product_types": [...], "fields": [...], "relations": [...],
-    "ranking_semantics": [...]} 모양으로 변환한다.
-
-    예전엔 ontology/term_map.json을 그대로 읽었지만, ttl과 내용이 완전히
-    겹쳐서 ttl 하나로 통합했다(term_map.json은 삭제됨). 반환 모양은 그대로라
-    resolve_query_terms()는 수정할 필요가 없다.
-
-    파싱이 실패하면(ttl 파일 손상 등) 빈 결과를 돌려줘서, 온톨로지 기능만
-    조용히 비활성화되고 나머지 서비스는 그대로 동작하게 한다.
-    """
     try:
         graph = load_ontology_graph()
     except Exception:
@@ -57,7 +46,11 @@ def load_term_map() -> dict[str, Any]:
         for product_type in [graph.value(cls, FP.productType)]
     ]
     fields = [
-        {"canonical": str(column), "aliases": _labels_and_aliases(graph, prop)}
+        {
+            "canonical": str(column),
+            "aliases": _labels_and_aliases(graph, prop),
+            "comment": str(comment) if (comment := graph.value(prop, RDFS.comment)) else None,
+        }
         for prop in graph.subjects(RDF.type, OWL.DatatypeProperty)
         for column in [graph.value(prop, FP.column)]
         if column is not None
@@ -117,13 +110,14 @@ def resolve_query_terms(query: str) -> dict[str, Any]:
             for alias in item.get("aliases", []):
                 normalized_alias = _normalize(alias)
                 if normalized_alias and normalized_alias in normalized_query:
-                    matches.append(
-                        {
-                            "category": category,
-                            "canonical": item["canonical"],
-                            "matched_alias": alias,
-                        }
-                    )
+                    match = {
+                        "category": category,
+                        "canonical": item["canonical"],
+                        "matched_alias": alias,
+                    }
+                    if item.get("comment"):
+                        match["note"] = item["comment"]
+                    matches.append(match)
                     break
 
     ranking_matches: list[dict[str, Any]] = []

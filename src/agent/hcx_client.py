@@ -10,6 +10,7 @@ import httpx
 from .ncp_client import ncp_api_key_from_env, ncp_headers
 from .prompts import SYSTEM_PROMPT
 from .tool_registry import openai_tool_catalog
+from ..semantic.ontology import resolve_query_terms
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,28 @@ class HCXSettings:
             timeout_seconds=float(os.getenv("HCX_TIMEOUT_SECONDS", "60")),
             max_tool_rounds=int(os.getenv("AGENT_MAX_TOOL_ROUNDS", "4")),
         )
+
+
+def _build_ontology_hint(question: str) -> str | None:
+    """질문을 HCX에 보내기 전에 서버가 먼저 resolve_query_terms()를 돌려서,
+    모델이 resolve_ontology 도구를 스스로 호출하기를 기다리지 않고 인식된
+    용어를 바로 보여준다 (실험: 온톨로지 정보가 '호출해야 보이는 정보'에서
+    '항상 보이는 정보'로 바뀌면 필드 선택 정확도가 오르는지 확인)."""
+    try:
+        resolved = resolve_query_terms(question)
+    except Exception:
+        return None
+    lines = []
+    for match in resolved.get("matches", []):
+        line = f'- "{match["matched_alias"]}" → {match["canonical"]}'
+        if match.get("note"):
+            line += f' ({match["note"]})'
+        lines.append(line)
+    for item in resolved.get("ranking_semantics", []):
+        lines.append(f'- "{item["matched_alias"]}" → {item["field"]} ({item["order"]})')
+    if not lines:
+        return None
+    return "질문에서 자동으로 인식된 용어(온톨로지 기준, 참고만 하고 결과가 이상하면 재확인하세요):\n" + "\n".join(lines)
 
 
 class HCXAgentClient:
@@ -71,9 +94,11 @@ class HCXAgentClient:
         question: str,
         tool_executor: Callable[[str, dict[str, Any]], dict[str, Any]],
     ) -> dict[str, Any]:
+        ontology_hint = _build_ontology_hint(question)
+        user_content = f"{question}\n\n{ontology_hint}" if ontology_hint else question
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": question},
+            {"role": "user", "content": user_content},
         ]
         tool_results: list[dict[str, Any]] = []
         execution_summary: list[dict[str, Any]] = []

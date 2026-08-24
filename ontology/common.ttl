@@ -139,8 +139,9 @@ fp:saleAvailable a owl:DatatypeProperty ;
 fp:sizeAmount a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:decimal ;
     rdfs:label "순자산"@ko ;
+    rdfs:comment "펀드/ETF에서는 순자산총액(AUM), 채권에서는 발행잔액을 의미. issue_amount 같은 필드는 없음."@ko ;
     fp:column "size_amount" ;
-    fp:alias "aum", "순자산", "순자산총액", "규모", "자산규모", "size" .
+    fp:alias "aum", "순자산", "순자산총액", "규모", "자산규모", "size", "발행잔액", "발행 잔액", "발행총액", "발행 총액", "채권잔액", "채권 잔액" .
 
 fp:dataBaseDate a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:date ;

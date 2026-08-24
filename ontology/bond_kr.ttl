@@ -69,33 +69,45 @@ fp:couponRate a owl:DatatypeProperty ;
 
 fp:corpPretaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "corp_pretax_yield"@en ;
-    fp:column "corp_pretax_yield" .
+    rdfs:label "법인 세전 수익률"@ko ;
+    rdfs:comment "법인 투자자 기준, 세금을 떼기 전 수익률. corp_aftertax_yield(세후)와 혼동 주의."@ko ;
+    fp:column "corp_pretax_yield" ;
+    fp:alias "법인 세전 수익률", "법인세전수익률", "세전 수익률", "세전수익률" .
 
 fp:corpAftertaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "corp_aftertax_yield"@en ;
-    fp:column "corp_aftertax_yield" .
+    rdfs:label "법인 세후 수익률"@ko ;
+    rdfs:comment "법인 투자자 기준, 세금을 뗀 후 수익률. corp_pretax_yield(세전)와 혼동 주의."@ko ;
+    fp:column "corp_aftertax_yield" ;
+    fp:alias "법인 세후 수익률", "법인세후수익률", "법인 세후" .
 
 fp:indivAftertaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "indiv_aftertax_yield"@en ;
-    fp:column "indiv_aftertax_yield" .
+    rdfs:label "개인 세후 수익률"@ko ;
+    rdfs:comment "개인 투자자 기준, 세금을 뗀 후 수익률. corp_aftertax_yield(법인 세후)와 혼동 주의 — 법인/개인 구분."@ko ;
+    fp:column "indiv_aftertax_yield" ;
+    fp:alias "개인 세후 수익률", "개인세후수익률", "개인 세후" .
 
 fp:preferentialTaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "preferential_tax_yield"@en ;
-    fp:column "preferential_tax_yield" .
+    rdfs:label "세금우대 수익률"@ko ;
+    rdfs:comment "세금우대 계좌 등 우대세율을 적용받는 경우의 수익률."@ko ;
+    fp:column "preferential_tax_yield" ;
+    fp:alias "세금우대 수익률", "세금우대수익률", "세금 우대 수익률" .
 
 fp:avgAnnualYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "avg_annual_yield"@en ;
-    fp:column "avg_annual_yield" .
+    rdfs:label "연평균 수익률"@ko ;
+    rdfs:comment "만기까지의 수익률을 연 단위로 환산한 평균값."@ko ;
+    fp:column "avg_annual_yield" ;
+    fp:alias "연평균 수익률", "연평균수익률", "연 평균 수익률" .
 
 fp:depositEquivalentYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "deposit_equivalent_yield"@en ;
-    fp:column "deposit_equivalent_yield" .
+    rdfs:label "예금환산 수익률"@ko ;
+    rdfs:comment "은행 예금 이자율과 비교할 수 있도록 환산한 수익률."@ko ;
+    fp:column "deposit_equivalent_yield" ;
+    fp:alias "예금환산 수익률", "예금환산수익률", "예금 환산 수익률" .
 
 fp:remainingDays a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
