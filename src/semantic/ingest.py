@@ -48,6 +48,16 @@ def ingest(path: Path, *, embed: bool) -> dict[str, Any]:
                     f"Document {raw['doc_id']} has as_of_date {as_of_date}, later than cutoff {cutoff}"
                 )
             embedding = client.embed(str(raw["text"])) if client else None
+
+            # [추가] 기존 metadata를 유지하면서
+            # 외부 문서의 publisher 정보를 검색용 metadata에 저장
+            metadata = dict(raw.get("metadata") or {})
+
+            # [추가] JSONL 최상위 publisher가 있으면
+            # metadata.publisher에도 동일하게 저장
+            if raw.get("publisher"):
+                metadata["publisher"] = raw["publisher"]
+
             cursor.execute(
                 """
                 INSERT INTO semantic.document_chunk (
@@ -72,7 +82,8 @@ def ingest(path: Path, *, embed: bool) -> dict[str, Any]:
                     raw.get("document_type"), raw.get("product_id"), raw.get("product_type"),
                     as_of_date, settings.model if settings and embedding else None,
                     ("[" + ",".join(str(v) for v in embedding) + "]") if embedding is not None else None,
-                    Jsonb(raw.get("metadata") or {}),
+                    # [추가] publisher가 포함된 metadata 저장
+                    Jsonb(metadata),
                 ),
             )
             inserted += 1

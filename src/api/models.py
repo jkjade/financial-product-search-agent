@@ -395,7 +395,31 @@ class SemanticSearchRequest(StrictModel):
         default=None, description=labels_to_description(PRODUCT_TYPE_LABELS)
     )
     document_type: str | None = Field(default=None, max_length=100)
+
+    # [추가] 외부 비정형 데이터 출처 필터
+    publisher: str | None = Field(default=None, max_length=200)
+
+    # [추가] 외부 문서 기준일 검색 범위
+    as_of_from: date | None = None
+    as_of_to: date | None = None
+
+    # [추가] 관련도가 낮은 검색 결과 제외
+    min_score: float = Field(default=0.05, ge=0.0, le=1.0)
+
     limit: int = Field(default=10, ge=1, le=50)
+
+    # [추가] 시작일이 종료일보다 늦은 잘못된 요청 방지
+    @model_validator(mode="after")
+    def validate_date_range(self) -> "SemanticSearchRequest":
+        if (
+            self.as_of_from is not None
+            and self.as_of_to is not None
+            and self.as_of_from > self.as_of_to
+        ):
+            raise ValueError(
+                "as_of_from must be earlier than or equal to as_of_to"
+            )
+        return self
 
 
 class FederatedSearchRequest(StrictModel):

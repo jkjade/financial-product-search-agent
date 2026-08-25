@@ -126,6 +126,21 @@ def semantic_search_documents(
     if request.document_type:
         filters.append("document_type = %s")
         params.append(request.document_type)
+
+    # [추가] 외부 문서 발행처 기준 검색
+    if request.publisher:
+        filters.append("metadata ->> 'publisher' ILIKE %s")
+        params.append(f"%{request.publisher}%")
+
+    # [추가] 외부 문서 기준일 시작 범위
+    if request.as_of_from:
+        filters.append("as_of_date >= %s")
+        params.append(request.as_of_from)
+
+    # [추가] 외부 문서 기준일 종료 범위
+    if request.as_of_to:
+        filters.append("as_of_date <= %s")
+        params.append(request.as_of_to)
     where = " AND ".join(filters)
 
     # Avoid a remote embedding call when there is nothing vectorized to search.
@@ -175,6 +190,7 @@ def semantic_search_documents(
                 WITH scored AS (
                     SELECT doc_id, title, text_content, source_url, document_type,
                            product_id, product_type, as_of_date, embedding_model, metadata,
+                           metadata ->> 'publisher' AS publisher,  -- [추가]q
                            CASE WHEN embedding IS NOT NULL
                                 THEN 1 - (embedding <=> %s::vector)
                                 ELSE NULL
@@ -182,17 +198,29 @@ def semantic_search_documents(
                            GREATEST(similarity(title, %s), similarity(text_content, %s)) AS lexical_score
                     FROM semantic.document_chunk
                     WHERE {where}
+                ),
+                ranked AS (
+                    SELECT *,
+                           CASE WHEN vector_score IS NOT NULL
+                                THEN 0.8 * vector_score + 0.2 * lexical_score
+                                ELSE lexical_score
+                           END AS score
+                    FROM scored
                 )
-                SELECT *,
-                       CASE WHEN vector_score IS NOT NULL
-                            THEN 0.8 * vector_score + 0.2 * lexical_score
-                            ELSE lexical_score
-                       END AS score
-                FROM scored
+                SELECT *
+                FROM ranked
+                WHERE score >= %s  -- [추가]
                 ORDER BY score DESC, as_of_date DESC
                 LIMIT %s
                 """,
-                [vector_literal, request.query, request.query, *params, request.limit],
+                [
+                    vector_literal,
+                    request.query,
+                    request.query,
+                    *params,
+                    request.min_score,  # [추가]
+                    request.limit,
+                ],
             )
             items = cursor.fetchall()
             retrieval_mode = (
@@ -203,16 +231,30 @@ def semantic_search_documents(
         else:
             cursor.execute(
                 f"""
-                SELECT doc_id, title, text_content, source_url, document_type,
-                       product_id, product_type, as_of_date, embedding_model, metadata,
-                       GREATEST(similarity(title, %s), similarity(text_content, %s),
-                                CASE WHEN title ILIKE %s OR text_content ILIKE %s THEN 1.0 ELSE 0.0 END) AS score
-                FROM semantic.document_chunk
-                WHERE {where}
+                WITH scored AS (
+                    SELECT doc_id, title, text_content, source_url, document_type,
+                           product_id, product_type, as_of_date, embedding_model, metadata,
+                           metadata ->> 'publisher' AS publisher,  -- [추가]
+                           GREATEST(similarity(title, %s), similarity(text_content, %s),
+                                    CASE WHEN title ILIKE %s OR text_content ILIKE %s THEN 1.0 ELSE 0.0 END) AS score
+                    FROM semantic.document_chunk
+                    WHERE {where}
+                )
+                SELECT *
+                FROM scored
+                WHERE score >= %s  -- [추가]
                 ORDER BY score DESC, as_of_date DESC
                 LIMIT %s
                 """,
-                [request.query, request.query, f"%{request.query}%", f"%{request.query}%", *params, request.limit],
+                q[
+                    request.query,
+                    request.query,
+                    f"%{request.query}%",
+                    f"%{request.query}%",
+                    *params,
+                    request.min_score,  # [추가]
+                    request.limit,
+                ],
             )
             items = cursor.fetchall()
             retrieval_mode = "lexical_fallback"

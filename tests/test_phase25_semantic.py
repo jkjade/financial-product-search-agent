@@ -1,4 +1,9 @@
+from datetime import date
 from pathlib import Path
+
+# [추가] 비정형 검색 요청 검증 테스트용
+import pytest
+from pydantic import ValidationError
 
 from src.agent.answer_validation import finalize_grounded_answer, validate_answer_text
 from src.api.models import FederatedSearchRequest, GraphLookupRequest, SemanticSearchRequest
@@ -84,3 +89,54 @@ def test_external_holdings_contract_builds_graph_relations():
     assert "semantic.external_holding" in semantic_sql
     assert '"holdsSecurity"' in loader
     assert '"heldBy"' in loader
+
+# [추가] publisher, 날짜 범위, 최소 관련도 필터 입력 검증
+def test_semantic_search_request_accepts_external_filters():
+    request = SemanticSearchRequest(
+        query="AI 반도체 관련 ETF",
+        publisher="미래에셋자산운용",
+        as_of_from=date(2026, 8, 1),
+        as_of_to=date(2026, 8, 24),
+        min_score=0.2,
+        limit=5,
+    )
+
+    assert request.publisher == "미래에셋자산운용"
+    assert request.as_of_from == date(2026, 8, 1)
+    assert request.as_of_to == date(2026, 8, 24)
+    assert request.min_score == 0.2
+    assert request.limit == 5
+
+
+# [추가] 잘못된 날짜 범위와 min_score 입력 차단 검증
+def test_semantic_search_request_rejects_invalid_external_filters():
+    with pytest.raises(ValidationError):
+        SemanticSearchRequest(
+            query="ETF",
+            as_of_from=date(2026, 8, 24),
+            as_of_to=date(2026, 8, 1),
+        )
+
+    with pytest.raises(ValidationError):
+        SemanticSearchRequest(query="ETF", min_score=-0.1)
+
+    with pytest.raises(ValidationError):
+        SemanticSearchRequest(query="ETF", min_score=1.1)
+
+
+# [추가] 외부 비정형 검색 구현 계약 검증
+def test_external_document_search_contract_is_present():
+    engine = (ROOT / "src" / "services" / "semantic_engine.py").read_text(
+        encoding="utf-8"
+    )
+    ingest = (ROOT / "src" / "semantic" / "ingest.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "metadata ->> 'publisher' ILIKE %s" in engine
+    assert "as_of_date >= %s" in engine
+    assert "request.as_of_to" in engine
+    assert "request.min_score" in engine
+    assert "metadata ->> 'publisher' AS publisher" in engine
+    assert 'metadata["publisher"] = raw["publisher"]' in ingest
+    assert "Jsonb(metadata)" in ingest
