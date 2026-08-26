@@ -96,38 +96,45 @@ fp:sourceTable a owl:DatatypeProperty ;
 fp:productId a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "product_id"@en ;
+    rdfs:comment "상품번호/채권종목번호"@ko ;
     fp:column "product_id" .
 
 fp:productCode a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "product_code"@en ;
+    rdfs:comment "상품번호/채권종목번호"@ko ;
     fp:column "product_code" .
 
 fp:productName a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "product_name"@en ;
+    rdfs:comment "상품명/채권명"@ko ;
     fp:column "product_name" .
 
 fp:shortName a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "short_name"@en ;
+    rdfs:comment "상품약어명"@ko ;
     fp:column "short_name" .
 
 fp:assetClass a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "자산군"@ko ;
+    rdfs:comment "상품중분류명"@ko ;
     fp:column "asset_class" ;
     fp:alias "자산군", "자산 유형", "asset class" .
 
 fp:investmentRegion a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "투자지역"@ko ;
+    rdfs:comment "국가코드: 종목번호 앞 2자리(KR 등)"@ko ;
     fp:column "investment_region" ;
     fp:alias "투자지역", "지역", "국가", "investment region", "region" .
 
 fp:currency a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "통화"@ko ;
+    rdfs:comment "통화코드"@ko ;
     fp:column "currency" ;
     fp:alias "통화", "표시통화", "currency" .
 
@@ -166,6 +173,7 @@ fp:intradayInav a owl:DatatypeProperty ;
 fp:dividendCycle a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "dividend_cycle"@en ;
+    rdfs:comment "분배주기(A/Q/M/S)"@ko ;
     fp:column "dividend_cycle" .
 
 fp:etfSector a owl:DatatypeProperty ;

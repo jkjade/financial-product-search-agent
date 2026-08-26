@@ -1,7 +1,7 @@
 CREATE INDEX IF NOT EXISTS ix_bond_product_id ON core.domestic_bonds (pd_no);
 CREATE INDEX IF NOT EXISTS ix_bond_maturity ON core.domestic_bonds (mat_dt);
 CREATE INDEX IF NOT EXISTS ix_bond_yield ON core.domestic_bonds (buy_yield DESC NULLS LAST);
-CREATE INDEX IF NOT EXISTS ix_bond_risk ON core.domestic_bonds (pd_risk_gcd, pd_evco_crd_grd, crd_grd);
+CREATE INDEX IF NOT EXISTS ix_bond_risk ON core.domestic_bonds (pd_risk_gcd, crd_grd);
 CREATE INDEX IF NOT EXISTS ix_bond_buyable ON core.domestic_bonds (buyable_quantity DESC NULLS LAST);
 CREATE INDEX IF NOT EXISTS ix_bond_name_trgm ON core.domestic_bonds USING GIN (pd_nm gin_trgm_ops);
 

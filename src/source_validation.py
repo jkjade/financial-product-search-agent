@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import hashlib
-import re
 from pathlib import Path
 from typing import Any
 
 from .config import PROJECT_ROOT, DatasetConfig, load_datasets
 from .xlsx_stream import iter_xlsx_rows
-
-_SNAPSHOT_PATTERN = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
@@ -35,18 +32,14 @@ def _read_checksum_manifest(path: Path) -> dict[str, str]:
     return checksums
 
 
-def _schema_definition(dataset: DatasetConfig) -> tuple[str | None, list[str], list[str]]:
+def _schema_definition(dataset: DatasetConfig) -> tuple[list[str], list[str]]:
     rows = iter_xlsx_rows(dataset.schema_file)
     try:
-        first_row = next(rows)
         header_row = next(rows)
     except StopIteration as error:
         raise RuntimeError(f"Schema workbook is incomplete: {dataset.schema_file}") from error
 
-    snapshot_match = _SNAPSHOT_PATTERN.search(first_row[0] if first_row else "")
-    snapshot_date = snapshot_match.group(1) if snapshot_match else None
-
-    if not header_row or header_row[0].strip().lower() not in {"컬럼명", "column_name"}:
+    if not header_row or header_row[1].strip().lower() not in {"컬럼명", "column_name"}:
         raise RuntimeError(
             f"Unexpected schema header in {dataset.schema_file.name}: {header_row!r}"
         )
@@ -54,11 +47,11 @@ def _schema_definition(dataset: DatasetConfig) -> tuple[str | None, list[str], l
     names: list[str] = []
     source_types: list[str] = []
     for row in rows:
-        if not row or not row[0].strip():
+        if not row or not row[1].strip():
             continue
-        names.append(row[0].strip().lower())
+        names.append(row[1].strip().lower())
         source_types.append((row[2] if len(row) > 2 else "").strip().lower())
-    return snapshot_date, names, source_types
+    return names, source_types
 
 
 def validate_dataset_definition(dataset: DatasetConfig) -> dict[str, Any]:
@@ -73,7 +66,7 @@ def validate_dataset_definition(dataset: DatasetConfig) -> dict[str, Any]:
     except StopIteration as error:
         raise RuntimeError(f"Data workbook is empty: {dataset.data_file}") from error
 
-    schema_snapshot, schema_names, schema_types = _schema_definition(dataset)
+    schema_names, schema_types = _schema_definition(dataset)
     config_names = dataset.column_names
     config_source_names = [column.source_name.strip().lower() for column in dataset.columns]
     config_source_types = [column.source_type.strip().lower() for column in dataset.columns]
@@ -87,10 +80,6 @@ def validate_dataset_definition(dataset: DatasetConfig) -> dict[str, Any]:
         errors.append("config source_name values do not match canonical column names")
     if schema_types != config_source_types:
         errors.append("schema source types do not match config source_type values")
-    if schema_snapshot != dataset.data_base_date:
-        errors.append(
-            f"schema snapshot date {schema_snapshot!r} != configured {dataset.data_base_date!r}"
-        )
     if dataset.id_column not in config_names:
         errors.append(f"id column missing: {dataset.id_column}")
     if dataset.name_column not in config_names:

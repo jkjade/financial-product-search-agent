@@ -1,15 +1,19 @@
-"""1회성 온톨로지 ttl 생성 스크립트.
+"""1회성 온톨로지 ttl 생성 스크립트 (2026-08 시점: 최초 생성 당시 스냅샷, 현재는 비활성).
 
-FIELD_SPECS(src/query/fields.py) + 실측 도메인 분류(Postgres) + 기존
+FIELD_SPECS(src/query/fields.py) + 실측 도메인 분류(Postgres) + 당시
 ontology/term_map.json(별칭)을 조합해서 ontology/{common,bond_kr,etf_kr,
-etf_gl,fund_pub}.ttl 5개를 생성한다.
+etf_gl,fund_pub}.ttl 5개를 최초 생성했다.
 
-앱 실행 경로에는 들어가지 않는 개발용 도구다. 실행 후 결과물(ttl 5개)만
-커밋하고, 이 스크립트가 완전히 대체하는 ontology/term_map.json과
-ontology/financial_product_ontology.ttl은 별도로 삭제한다.
+이후 term_map.json은 삭제됐고(ttl 파일 자체가 유일한 소스), ttl 5개에는
+그 뒤로 rdfs:comment 보강(2026-08-21 스냅샷의 공식 컬럼코멘트 반영 등)과
+alias 수동 추가가 계속 쌓였다. 그래서 이 스크립트를 그대로 재실행하면
+term_map.json이 없어 즉시 실패하고, 설령 입력을 복원해도 그간 손으로
+누적한 rdfs:comment/fp:alias가 전부 덮어써진다 — 재실행 금지.
 
-사용법: (레포 루트에서, DB 접속 가능한 환경 — 로컬이면 docker exec로)
-    python3 scripts/generate_ontology.py
+앱 실행 경로에는 들어가지 않는 개발용 도구이며, 현재는 "ttl 파일이
+어떤 모양으로 시작됐는지"를 보여주는 기록용으로만 남겨둔다. ttl 5개에
+새 필드/별칭/설명을 추가할 때는 이 스크립트가 아니라 ttl 파일을 직접
+편집한다.
 """
 
 from __future__ import annotations

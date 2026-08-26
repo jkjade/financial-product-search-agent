@@ -4,7 +4,7 @@ from src.config import load_datasets
 def test_dataset_config_matches_expected_counts():
     datasets = load_datasets()
     assert len(datasets) == 4
-    assert sum(dataset.expected_rows for dataset in datasets) == 145393
+    assert sum(dataset.expected_rows for dataset in datasets) == 53375
     assert {dataset.table_id for dataset in datasets} == {
         "PRBD01N001",
         "PREF01N001",

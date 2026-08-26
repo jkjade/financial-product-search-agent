@@ -10,178 +10,213 @@ fp:OverseasETF a owl:Class ; rdfs:subClassOf fp:ETF ; rdfs:label "해외 ETF"@ko
 fp:issuerOrManager a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "운용사"@ko ;
+    rdfs:comment "운용사"@ko ;
     fp:column "issuer_or_manager" ;
     fp:alias "운용사", "자산운용사", "발행사", "issuer", "asset manager", "manager" .
 
 fp:baseIndex a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "기초지수"@ko ;
+    rdfs:comment "기초지수"@ko ;
     fp:column "base_index" ;
     fp:alias "기초지수", "벤치마크", "추종지수", "index", "benchmark" .
 
 fp:feeRate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "보수"@ko ;
+    rdfs:comment "연간보수율"@ko ;
     fp:column "fee_rate" ;
     fp:alias "보수", "보수율", "운용보수", "fee", "expense ratio" .
 
 fp:return1d a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "return_1d"@en ;
+    rdfs:comment "수익률_1D"@ko ;
     fp:column "return_1d" .
 
 fp:price a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "가격"@ko ;
+    rdfs:comment "종가 / 실시간 현재가"@ko ;
     fp:column "price" ;
     fp:alias "가격", "종가", "평가가격", "price" .
 
 fp:productInfoUpdateDate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
     rdfs:label "product_info_update_date"@en ;
+    rdfs:comment "변동갱신일자"@ko ;
     fp:column "product_info_update_date" .
 
 fp:marketDataUpdateDate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
     rdfs:label "market_data_update_date"@en ;
+    rdfs:comment "일간갱신일자"@ko ;
     fp:column "market_data_update_date" .
 
 fp:weeklyDataUpdateDate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
     rdfs:label "weekly_data_update_date"@en ;
+    rdfs:comment "주간갱신일자"@ko ;
     fp:column "weekly_data_update_date" .
 
 fp:priceBaseDate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
     rdfs:label "price_base_date"@en ;
+    rdfs:comment "선택된 종가의 원천 기준일"@ko ;
     fp:column "price_base_date" .
 
 fp:sizeBaseDate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
     rdfs:label "size_base_date"@en ;
+    rdfs:comment "NAV 원천 etf_reference 기준일"@ko ;
     fp:column "size_base_date" .
 
 fp:listingDate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:date ;
     rdfs:label "listing_date"@en ;
+    rdfs:comment "설정일"@ko ;
     fp:column "listing_date" .
 
 fp:basePrice a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "base_price"@en ;
+    rdfs:comment "기준가"@ko ;
     fp:column "base_price" .
 
 fp:dayHigh a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "day_high"@en ;
+    rdfs:comment "고가"@ko ;
     fp:column "day_high" .
 
 fp:dayLow a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "day_low"@en ;
+    rdfs:comment "저가"@ko ;
     fp:column "day_low" .
 
 fp:lastNav a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "last_nav"@en ;
+    rdfs:comment "추정 주당 NAV"@ko ;
     fp:column "last_nav" .
 
 fp:premiumDiscountRate a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "premium_discount_rate"@en ;
+    rdfs:comment "종가 대비 추정 NAV 괴리율"@ko ;
     fp:column "premium_discount_rate" .
 
 fp:tradingValue1d a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "trading_value_1d"@en ;
+    rdfs:comment "외화거래대금"@ko ;
     fp:column "trading_value_1d" .
 
 fp:tradingVolume1d a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "trading_volume_1d"@en ;
+    rdfs:comment "거래량"@ko ;
     fp:column "trading_volume_1d" .
 
 fp:exchangeCode a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "exchange_code"@en ;
+    rdfs:comment "거래소코드"@ko ;
     fp:column "exchange_code" .
 
 fp:productGroupCode a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "product_group_code"@en ;
+    rdfs:comment "상품군종류"@ko ;
     fp:column "product_group_code" .
 
 fp:parValue a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "par_value"@en ;
+    rdfs:comment "액면가"@ko ;
     fp:column "par_value" .
 
 fp:listedShareCount a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "listed_share_count"@en ;
+    rdfs:comment "상장주식수"@ko ;
     fp:column "listed_share_count" .
 
 fp:marketCode a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "market_code"@en ;
+    rdfs:comment "거래소국가코드"@ko ;
     fp:column "market_code" .
 
 fp:realtimeVolume a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "realtime_volume"@en ;
+    rdfs:comment "실시간 거래량"@ko ;
     fp:column "realtime_volume" .
 
 fp:isCoreEtf a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "is_core_etf"@en ;
+    rdfs:comment "핵심 ETF 여부"@ko ;
     fp:column "is_core_etf" .
 
 fp:etfStrategy a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "etf_strategy"@en ;
+    rdfs:comment "운용전략"@ko ;
     fp:column "etf_strategy" .
 
 fp:isEtn a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "is_etn"@en ;
+    rdfs:comment "ETN 여부"@ko ;
     fp:column "is_etn" .
 
 fp:indexReplicationMethod a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "index_replication_method"@en ;
+    rdfs:comment "인덱스 복제방법"@ko ;
     fp:column "index_replication_method" .
 
 fp:isIndexTracking a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "is_index_tracking"@en ;
+    rdfs:comment "인덱스 추적 여부"@ko ;
     fp:column "is_index_tracking" .
 
 fp:isInverse a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "is_inverse"@en ;
+    rdfs:comment "인버스 또는 숏 여부"@ko ;
     fp:column "is_inverse" .
 
 fp:baseDateMatched a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "base_date_matched"@en ;
+    rdfs:comment "NAV/종가 기준일 일치 여부"@ko ;
     fp:column "base_date_matched" .
 
 fp:closePriceSource a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "close_price_source"@en ;
+    rdfs:comment "선택된 종가 원천 컬럼"@ko ;
     fp:column "close_price_source" .
 
 fp:dayOpen a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:decimal ;
     rdfs:label "day_open"@en ;
+    rdfs:comment "시가"@ko ;
     fp:column "day_open" .
 
 fp:lipperId a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "lipper_id"@en ;
+    rdfs:comment "Lipper 펀드코드"@ko ;
     fp:column "lipper_id" .
 
 fp:usCik a owl:DatatypeProperty ;
     rdfs:domain fp:OverseasETF ; rdfs:range xsd:string ;
     rdfs:label "us_cik"@en ;
+    rdfs:comment "미국 CIK"@ko ;
     fp:column "us_cik" .

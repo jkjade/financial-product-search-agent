@@ -193,7 +193,7 @@ def _write_manifest(
     actual_total = sum(item["rows_processed"] for item in reports)
     manifest = {
         "pipeline_version": "2.5.1",
-        "data_base_date": "2026-07-11",
+        "data_base_date": datasets[0].data_base_date,
         "processing_mode": "isolated-worker-stream-to-postgres",
         "partial_run": partial_run,
         "generated_at": _utc_now(),

@@ -45,7 +45,7 @@ CREATE TABLE semantic.document_chunk (
     embedding vector(1024),
     metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
     created_at timestamptz NOT NULL DEFAULT now(),
-    CHECK (as_of_date <= DATE '2026-07-11')
+    CHECK (as_of_date <= DATE '2026-08-21')
 );
 
 
@@ -59,7 +59,7 @@ CREATE TABLE semantic.external_holding (
     as_of_date date NOT NULL,
     source_url text,
     metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
-    CHECK (as_of_date <= DATE '2026-07-11')
+    CHECK (as_of_date <= DATE '2026-08-21')
 );
 
 -- Product entities use the source row as a stable identifier.

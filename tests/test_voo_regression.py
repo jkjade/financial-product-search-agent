@@ -8,14 +8,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_voo_source_row_regression():
-    path = ROOT / "data" / "raw" / "PREF02N001_datarows.xlsx"
+    path = ROOT / "data" / "raw" / "pref02n001_data.xlsx"
     rows = iter_xlsx_rows(path)
     headers = [value.strip().lower() for value in next(rows)]
-    row_589 = next(islice(rows, 587, 588))
-    item = dict(zip(headers, row_589))
+    row_5996 = next(islice(rows, 5994, 5995))
+    item = dict(zip(headers, row_5996))
 
     assert item["pd_itm_no"] == "VOO"
-    assert item["du_clpr"] == "693.83000000"
-    assert item["du_last_aum"] == "995484630000.00"
-    assert item["du_clpr_base_dt"] == "20260616"
-    assert item["du_nav_base_dt"].startswith("2026-06-14")
+    assert item["du_clpr"] == "703.71"
+    assert item["du_last_aum"] == "997351790000"
+    assert item["du_clpr_base_dt"] == "20260821"
+    assert item["du_nav_base_dt"] == "20260822"

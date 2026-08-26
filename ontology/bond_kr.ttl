@@ -10,61 +10,72 @@ fp:Bond a owl:Class ; rdfs:subClassOf fp:Product ; rdfs:label "채권"@ko .
 fp:issuerOrManager a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:label "운용사"@ko ;
+    rdfs:comment "발행기관/발행자명"@ko ;
     fp:column "issuer_or_manager" ;
     fp:alias "운용사", "자산운용사", "발행사", "issuer", "asset manager", "manager" .
 
 fp:riskCode a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:label "risk_code"@en ;
+    rdfs:comment "상품위험등급 원문 코드"@ko ;
     fp:column "risk_code" .
 
 fp:riskName a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:label "위험등급"@ko ;
+    rdfs:comment "적용신용등급"@ko ;
     fp:column "risk_name" ;
     fp:alias "위험등급", "위험 등급", "신용등급", "신용 등급", "risk grade", "credit rating" .
 
 fp:yieldRate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "채권수익률"@ko ;
+    rdfs:comment "매수수익률/매수금리 / 민평수익률/민평금리"@ko ;
     fp:column "yield_rate" ;
     fp:alias "채권수익률", "채권 수익률", "매수수익률", "yield" .
 
 fp:price a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "가격"@ko ;
+    rdfs:comment "평가일단가/Clean Price 성격"@ko ;
     fp:column "price" ;
     fp:alias "가격", "종가", "평가가격", "price" .
 
 fp:productInfoUpdateDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
     rdfs:label "product_info_update_date"@en ;
+    rdfs:comment "민평정보 기준일/최근 업데이트 일자"@ko ;
     fp:column "product_info_update_date" .
 
 fp:creditRatingBaseDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
     rdfs:label "credit_rating_base_date"@en ;
+    rdfs:comment "신용등급 적용일자(등급 미변경 시 과거 일자로 유지될 수 있음)"@ko ;
     fp:column "credit_rating_base_date" .
 
 fp:issueDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
     rdfs:label "issue_date"@en ;
+    rdfs:comment "발행일자"@ko ;
     fp:column "issue_date" .
 
 fp:maturityDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
     rdfs:label "maturity_date"@en ;
+    rdfs:comment "상환일자(영구채는 1차 콜행사개시일)"@ko ;
     fp:column "maturity_date" .
 
 fp:bondKind a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:label "채권종류"@ko ;
+    rdfs:comment "예탁원 기준 채권종류명"@ko ;
     fp:column "bond_kind" ;
     fp:alias "채권종류", "채권 종류", "채권유형", "채권 유형", "채권분류", "채권 분류", "bond kind", "bond type" .
 
 fp:couponRate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "coupon_rate"@en ;
+    rdfs:comment "표면이자율/쿠폰금리"@ko ;
     fp:column "coupon_rate" .
 
 fp:corpPretaxYield a owl:DatatypeProperty ;
@@ -112,49 +123,59 @@ fp:depositEquivalentYield a owl:DatatypeProperty ;
 fp:remainingDays a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "remaining_days"@en ;
+    rdfs:comment "잔존일수"@ko ;
     fp:column "remaining_days" .
 
 fp:duration a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "duration"@en ;
+    rdfs:comment "듀레이션"@ko ;
     fp:column "duration" .
 
 fp:convexity a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "convexity"@en ;
+    rdfs:comment "컨벡시티"@ko ;
     fp:column "convexity" .
 
 fp:nextDayDuration a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "next_day_duration"@en ;
+    rdfs:comment "익일 듀레이션"@ko ;
     fp:column "next_day_duration" .
 
 fp:nextDayConvexity a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "next_day_convexity"@en ;
+    rdfs:comment "익일 컨벡시티"@ko ;
     fp:column "next_day_convexity" .
 
 fp:dirtyPrice a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "dirty_price"@en ;
+    rdfs:comment "이자부단가/Dirty Price"@ko ;
     fp:column "dirty_price" .
 
 fp:nextDayEvalPrice a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "next_day_eval_price"@en ;
+    rdfs:comment "익일 평가일단가"@ko ;
     fp:column "next_day_eval_price" .
 
 fp:nextDayYieldRate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "next_day_yield_rate"@en ;
+    rdfs:comment "익일 민평수익률/민평금리"@ko ;
     fp:column "next_day_yield_rate" .
 
 fp:nextDayDirtyPrice a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:label "next_day_dirty_price"@en ;
+    rdfs:comment "익일 이자부단가"@ko ;
     fp:column "next_day_dirty_price" .
 
 fp:bondMidClass a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:label "bond_mid_class"@en ;
+    rdfs:comment "상품소분류명"@ko ;
     fp:column "bond_mid_class" .

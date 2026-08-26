@@ -5,12 +5,15 @@
       "table_id": "PRBD01N001",
       "product_type": "DOMESTIC_BOND",
       "table": "domestic_bonds",
-      "expected_rows": 42394,
+      "expected_rows": 21882,
       "date_columns": [
+        "crd_grd_dt",
+        "exg_close_price_base_dt",
+        "info_base_dt",
         "isu_dt",
         "mat_dt",
         "pd_std_info_update",
-        "crd_grd_dt"
+        "sale_yield_base_dt"
       ],
       "numeric_overrides": [],
       "id_column": "pd_no",
@@ -24,7 +27,7 @@
         "investment_region": "pd_ctry_cd",
         "currency": "curr_cd",
         "risk_code": "pd_risk_gcd",
-        "risk_name": "pd_evco_crd_grd|crd_grd",
+        "risk_name": "crd_grd",
         "yield_rate": "buy_yield|applied_yield",
         "size_amount": "isu_bal_amt",
         "price": "eval_price",
@@ -32,369 +35,531 @@
         "description": "std_pd_mcls_nm|std_pd_scls_nm|bd_knd",
         "bond_kind": "bd_knd"
       },
-      "data_file": "data/raw/PRBD01N001_datarows.xlsx",
-      "schema_file": "data/raw/PRBD01N001_schema.xlsx",
-      "data_base_date": "2026-07-11",
+      "data_file": "data/raw/prbd01n001_data.xlsx",
+      "schema_file": "data/raw/prbd01n001_schema.xlsx",
+      "data_base_date": "2026-08-21",
       "columns": [
         {
-          "name": "pd_no",
-          "source_name": "PD_NO",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_exg_mkt",
-          "source_name": "PD_EXG_MKT",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_nm",
-          "source_name": "PD_NM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_abrv_nm",
-          "source_name": "PD_ABRV_NM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_eng_nm",
-          "source_name": "PD_ENG_NM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_abrv_eng_nm",
-          "source_name": "PD_ABRV_ENG_NM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_ctry_cd",
-          "source_name": "PD_CTRY_CD",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_pbcm",
-          "source_name": "PD_PBCM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "std_pd_mcls_nm",
-          "source_name": "STD_PD_MCLS_NM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "std_pd_scls_nm",
-          "source_name": "STD_PD_SCLS_NM",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "bd_knd",
-          "source_name": "BD_KND",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "curr_cd",
-          "source_name": "CURR_CD",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "isu_bal_amt",
-          "source_name": "ISU_BAL_AMT",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "isu_dt",
-          "source_name": "ISU_DT",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "date"
-        },
-        {
-          "name": "mat_dt",
-          "source_name": "MAT_DT",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "date"
-        },
-        {
-          "name": "srfc_irt",
-          "source_name": "SRFC_IRT",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "pd_evco_crd_grd",
-          "source_name": "PD_EVCO_CRD_GRD",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "",
-          "example": "",
-          "type": "text"
-        },
-        {
-          "name": "pd_risk_gcd",
-          "source_name": "PD_RISK_GCD",
-          "key": "",
-          "source_type": "bigint",
-          "korean_name": "",
-          "example": "",
-          "type": "integer"
-        },
-        {
-          "name": "pd_std_info_update",
-          "source_name": "PD_STD_INFO_UPDATE",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "date"
-        },
-        {
-          "name": "buy_yield",
-          "source_name": "BUY_YIELD",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "corp_pretax_yield",
-          "source_name": "CORP_PRETAX_YIELD",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "corp_after_tax_yield",
-          "source_name": "CORP_AFTER_TAX_YIELD",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
           "name": "after_tax_yield",
-          "source_name": "AFTER_TAX_YIELD",
+          "source_name": "after_tax_yield",
           "key": "",
           "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "pref_tax_yield",
-          "source_name": "PREF_TAX_YIELD",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "avg_annual_tax_yield",
-          "source_name": "AVG_ANNUAL_TAX_YIELD",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "depo_equiv_yield_154",
-          "source_name": "DEPO_EQUIV_YIELD_154",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "buyable_quantity",
-          "source_name": "BUYABLE_QUANTITY",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "remaining_days",
-          "source_name": "REMAINING_DAYS",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "dur",
-          "source_name": "DUR",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "cov",
-          "source_name": "COV",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "ndy_dur",
-          "source_name": "NDY_DUR",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "ndy_cov",
-          "source_name": "NDY_COV",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
-          "type": "numeric"
-        },
-        {
-          "name": "eval_price",
-          "source_name": "EVAL_PRICE",
-          "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "개인 세후 운용수익률",
+          "example": "3.2464",
           "type": "numeric"
         },
         {
           "name": "applied_yield",
-          "source_name": "APPLIED_YIELD",
+          "source_name": "applied_yield",
           "key": "",
           "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "민평수익률/민평금리",
+          "example": "3.714",
           "type": "numeric"
         },
         {
-          "name": "dirty",
-          "source_name": "DIRTY",
+          "name": "avg_annual_tax_yield",
+          "source_name": "avg_annual_tax_yield",
           "key": "",
           "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "세후 연평균수익률",
+          "example": "0",
           "type": "numeric"
         },
         {
-          "name": "ndy_eval_price",
-          "source_name": "NDY_EVAL_PRICE",
+          "name": "bdbns_abl_chnl_nm",
+          "source_name": "bdbns_abl_chnl_nm",
           "key": "",
-          "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "source_type": "text",
+          "korean_name": "채권매매가능채널구분명",
+          "example": "온오프 겸용",
+          "type": "text"
+        },
+        {
+          "name": "bdbns_abl_chnl_tcd",
+          "source_name": "bdbns_abl_chnl_tcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "채권매매가능채널구분코드",
+          "example": "0",
+          "type": "text"
+        },
+        {
+          "name": "bd_inrt_tcd",
+          "source_name": "bd_inrt_tcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "금리구분",
+          "example": "고정금리",
+          "type": "text"
+        },
+        {
+          "name": "bd_intp_tcd",
+          "source_name": "bd_intp_tcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "이자지급구분",
+          "example": "이표채",
+          "type": "text"
+        },
+        {
+          "name": "bd_knd",
+          "source_name": "bd_knd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "예탁원 기준 채권종류명",
+          "example": "유동화회사채",
+          "type": "text"
+        },
+        {
+          "name": "bd_ofr_tcd",
+          "source_name": "bd_ofr_tcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "모집구분",
+          "example": "공모",
+          "type": "text"
+        },
+        {
+          "name": "bd_tisu_a",
+          "source_name": "bd_tisu_a",
+          "key": "",
+          "source_type": "numeric(26,8)",
+          "korean_name": "총발행금액",
+          "example": "10000000000",
           "type": "numeric"
         },
         {
-          "name": "ndy_applied_yield",
-          "source_name": "NDY_APPLIED_YIELD",
+          "name": "buyable_quantity",
+          "source_name": "buyable_quantity",
           "key": "",
           "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "매수가능수량",
+          "example": "689393000",
           "type": "numeric"
         },
         {
-          "name": "ndy_dirty",
-          "source_name": "NDY_DIRTY",
+          "name": "buy_yield",
+          "source_name": "buy_yield",
           "key": "",
           "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "매수수익률/매수금리",
+          "example": "3.42",
+          "type": "numeric"
+        },
+        {
+          "name": "corp_after_tax_yield",
+          "source_name": "corp_after_tax_yield",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "법인 세후 투자수익률",
+          "example": "3.2464",
+          "type": "numeric"
+        },
+        {
+          "name": "corp_pretax_yield",
+          "source_name": "corp_pretax_yield",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "법인 세전 투자수익률",
+          "example": "3.4529",
+          "type": "numeric"
+        },
+        {
+          "name": "cov",
+          "source_name": "cov",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "컨벡시티",
+          "example": "0.2915",
           "type": "numeric"
         },
         {
           "name": "crd_grd",
-          "source_name": "CRD_GRD",
+          "source_name": "crd_grd",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "적용신용등급",
+          "example": "AAA",
           "type": "text"
         },
         {
           "name": "crd_grd_dt",
-          "source_name": "CRD_GRD_DT",
+          "source_name": "crd_grd_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "신용등급 적용일자(등급 미변경 시 과거 일자로 유지될 수 있음)",
+          "example": "20251212",
+          "type": "date"
+        },
+        {
+          "name": "curr_cd",
+          "source_name": "curr_cd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "통화코드",
+          "example": "KRW",
+          "type": "text"
+        },
+        {
+          "name": "depo_equiv_yield_154",
+          "source_name": "depo_equiv_yield_154",
           "key": "",
           "source_type": "double precision",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "예금환산수익률(세율 15.4 기준)",
+          "example": "3.837",
+          "type": "numeric"
+        },
+        {
+          "name": "depo_equiv_yield_495",
+          "source_name": "depo_equiv_yield_495",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "은행환산수익률(세율 49.5 기준)",
+          "example": "5.523",
+          "type": "numeric"
+        },
+        {
+          "name": "dirty",
+          "source_name": "dirty",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "이자부단가/Dirty Price",
+          "example": "9994.15",
+          "type": "numeric"
+        },
+        {
+          "name": "dur",
+          "source_name": "dur",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "듀레이션",
+          "example": "0.499",
+          "type": "numeric"
+        },
+        {
+          "name": "eval_price",
+          "source_name": "eval_price",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "평가일단가/Clean Price 성격",
+          "example": "9994.15",
+          "type": "numeric"
+        },
+        {
+          "name": "exg_close_price",
+          "source_name": "exg_close_price",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "장내 채권종가",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
+          "name": "exg_close_price_base_dt",
+          "source_name": "exg_close_price_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "장내 채권종가/종가수익률 기준일",
+          "example": "20250930",
           "type": "date"
+        },
+        {
+          "name": "exg_close_yield",
+          "source_name": "exg_close_yield",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "장내 종가수익률",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
+          "name": "exrt_grte_ern_r",
+          "source_name": "exrt_grte_ern_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "만기보장수익률",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
+          "name": "exrt_grte_ern_r_tcd",
+          "source_name": "exrt_grte_ern_r_tcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "만기보장수익률구분코드",
+          "example": "99",
+          "type": "text"
+        },
+        {
+          "name": "exrt_rpy_r",
+          "source_name": "exrt_rpy_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "만기상환율",
+          "example": "100",
+          "type": "numeric"
+        },
+        {
+          "name": "info_base_dt",
+          "source_name": "info_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "판매/민평 공통 기준일",
+          "example": "20260821",
+          "type": "date"
+        },
+        {
+          "name": "info_seq",
+          "source_name": "info_seq",
+          "key": "",
+          "source_type": "bigint",
+          "korean_name": "동일 종목/시장/기준일 내 판매 LOT 구분 순번",
+          "example": "1",
+          "type": "integer"
+        },
+        {
+          "name": "isu_bal_amt",
+          "source_name": "isu_bal_amt",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "발행잔액/발행금액잔액",
+          "example": "10000000000",
+          "type": "numeric"
+        },
+        {
+          "name": "isu_dt",
+          "source_name": "isu_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "발행일자",
+          "example": "20251223",
+          "type": "date"
+        },
+        {
+          "name": "mat_dt",
+          "source_name": "mat_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상환일자(영구채는 1차 콜행사개시일)",
+          "example": "20270223",
+          "type": "date"
+        },
+        {
+          "name": "ndy_applied_yield",
+          "source_name": "ndy_applied_yield",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "익일 민평수익률/민평금리",
+          "example": "3.714",
+          "type": "numeric"
+        },
+        {
+          "name": "ndy_cov",
+          "source_name": "ndy_cov",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "익일 컨벡시티",
+          "example": "0.2893",
+          "type": "numeric"
+        },
+        {
+          "name": "ndy_dirty",
+          "source_name": "ndy_dirty",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "익일 이자부단가",
+          "example": "9995.15",
+          "type": "numeric"
+        },
+        {
+          "name": "ndy_dur",
+          "source_name": "ndy_dur",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "익일 듀레이션",
+          "example": "0.4971",
+          "type": "numeric"
+        },
+        {
+          "name": "ndy_eval_price",
+          "source_name": "ndy_eval_price",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "익일 평가일단가",
+          "example": "9995.15",
+          "type": "numeric"
+        },
+        {
+          "name": "pd_abrv_eng_nm",
+          "source_name": "pd_abrv_eng_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품영문약어명",
+          "example": "First 5G 84th SEC1-14",
+          "type": "text"
+        },
+        {
+          "name": "pd_abrv_nm",
+          "source_name": "pd_abrv_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품약어명",
+          "example": "퍼스트파이브지84차유1-14",
+          "type": "text"
+        },
+        {
+          "name": "pd_ctry_cd",
+          "source_name": "pd_ctry_cd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "국가코드: 종목번호 앞 2자리(KR 등)",
+          "example": "KR",
+          "type": "text"
+        },
+        {
+          "name": "pd_eng_nm",
+          "source_name": "pd_eng_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품영문명",
+          "example": "First 5G Eighty Fourth Securitization Specialty1-14",
+          "type": "text"
+        },
+        {
+          "name": "pd_exg_mkt",
+          "source_name": "pd_exg_mkt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "거래구분",
+          "example": "장내",
+          "type": "text"
+        },
+        {
+          "name": "pd_nm",
+          "source_name": "pd_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품명/채권명",
+          "example": "퍼스트파이브지제팔십사차유동화전문1-14",
+          "type": "text"
+        },
+        {
+          "name": "pd_no",
+          "source_name": "pd_no",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품번호/채권종목번호",
+          "example": "KR60143NEFC6",
+          "type": "text"
+        },
+        {
+          "name": "pd_pbcm",
+          "source_name": "pd_pbcm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "발행기관/발행자명",
+          "example": "퍼스트파이브지제팔십사차유동화전문(",
+          "type": "text"
+        },
+        {
+          "name": "pd_pen_tr_yn",
+          "source_name": "pd_pen_tr_yn",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "퇴직연금 편입 가능 여부",
+          "example": "N",
+          "type": "text"
+        },
+        {
+          "name": "pd_risk_gcd",
+          "source_name": "pd_risk_gcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품위험등급 원문 코드",
+          "example": "15",
+          "type": "integer"
+        },
+        {
+          "name": "pd_risk_nm",
+          "source_name": "pd_risk_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품위험등급명",
+          "example": "낮은위험(5등급)",
+          "type": "text"
+        },
+        {
+          "name": "pd_std_info_update",
+          "source_name": "pd_std_info_update",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "민평정보 기준일/최근 업데이트 일자",
+          "example": "20260821",
+          "type": "date"
+        },
+        {
+          "name": "pref_tax_yield",
+          "source_name": "pref_tax_yield",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "세금우대 세후 운용수익률",
+          "example": "3.3255",
+          "type": "numeric"
+        },
+        {
+          "name": "remaining_days",
+          "source_name": "remaining_days",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "잔존일수",
+          "example": "186",
+          "type": "numeric"
+        },
+        {
+          "name": "sale_yield_base_dt",
+          "source_name": "sale_yield_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "판매수익률 기준일",
+          "example": "20260821",
+          "type": "date"
+        },
+        {
+          "name": "srfc_irt",
+          "source_name": "srfc_irt",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "표면이자율/쿠폰금리",
+          "example": "3.112",
+          "type": "numeric"
+        },
+        {
+          "name": "std_pd_mcls_nm",
+          "source_name": "std_pd_mcls_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품중분류명",
+          "example": "회사채",
+          "type": "text"
+        },
+        {
+          "name": "std_pd_scls_nm",
+          "source_name": "std_pd_scls_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품소분류명",
+          "example": "일반사채",
+          "type": "text"
+        },
+        {
+          "name": "trade_price",
+          "source_name": "trade_price",
+          "key": "",
+          "source_type": "double precision",
+          "korean_name": "매매단가(표준투입단가)",
+          "example": "10188",
+          "type": "numeric"
         }
       ]
     },
@@ -403,19 +568,24 @@
       "table_id": "PREF01N001",
       "product_type": "DOMESTIC_ETF",
       "table": "domestic_etfs",
-      "expected_rows": 1734,
+      "expected_rows": 1780,
       "date_columns": [
         "cu_upt_dt",
+        "du_chas_errt_base_dt",
+        "du_diff_rt_base_dt",
+        "du_nav_base_dt",
         "du_upt_dt",
+        "du_vlty_base_dt",
+        "fn_base_dt",
+        "fn_portfolio_dt",
+        "pd_dvid_base_dt",
+        "pd_dvid_prc_base_dt",
         "pd_lste_dt",
         "pd_lstg_dt",
+        "ref_base_dt",
         "wu_upt_dt"
       ],
-      "numeric_overrides": [
-        "cu_charge_etc_rt",
-        "cu_charge_rt",
-        "cu_lev_fector"
-      ],
+      "numeric_overrides": [],
       "id_column": "pd_itm_no",
       "name_column": "pd_nm",
       "common_mapping": {
@@ -439,12 +609,12 @@
         "return_ytd": "du_er_ytd",
         "size_amount": "pd_net_tamt|du_last_aum",
         "price": "du_clpr|ru_mkt_price",
-        "description": "cu_strtegy|pd_sect_nm",
+        "description": "cu_strtegy",
         "base_index": "cu_base_index"
       },
-      "data_file": "data/raw/PREF01N001_datarows.xlsx",
-      "schema_file": "data/raw/PREF01N001_schema.xlsx",
-      "data_base_date": "2026-07-11",
+      "data_file": "data/raw/pref01n001_data.xlsx",
+      "schema_file": "data/raw/pref01n001_schema.xlsx",
+      "data_base_date": "2026-08-21",
       "columns": [
         {
           "name": "cu_base_index",
@@ -452,7 +622,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "기초지수",
-          "example": "",
+          "example": "Rogers International Commodity TR",
           "type": "text"
         },
         {
@@ -461,7 +631,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "기타비용요율",
-          "example": "",
+          "example": "0",
           "type": "numeric"
         },
         {
@@ -470,7 +640,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "총보수요율",
-          "example": "",
+          "example": "0",
           "type": "numeric"
         },
         {
@@ -479,7 +649,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "운용사",
-          "example": "",
+          "example": "KB",
           "type": "text"
         },
         {
@@ -488,7 +658,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "배수",
-          "example": "",
+          "example": "1",
           "type": "numeric"
         },
         {
@@ -497,7 +667,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "운용전략",
-          "example": "",
+          "example": "액티브",
           "type": "text"
         },
         {
@@ -506,233 +676,368 @@
           "key": "",
           "source_type": "text",
           "korean_name": "변동갱신일자",
-          "example": "",
+          "example": "20260824",
           "type": "date"
         },
         {
           "name": "du_bpr",
           "source_name": "du_bpr",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "기준가",
-          "example": "9915.00",
+          "example": "9800",
           "type": "numeric"
         },
         {
           "name": "du_chas_errt",
           "source_name": "du_chas_errt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "추적오차율",
-          "example": "0.26",
+          "example": "35.14",
           "type": "numeric"
+        },
+        {
+          "name": "du_chas_errt_base_dt",
+          "source_name": "du_chas_errt_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "추적오차율 기준일",
+          "example": "20260821",
+          "type": "date"
         },
         {
           "name": "du_clpr",
           "source_name": "du_clpr",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "종가",
-          "example": "9915.00",
+          "example": "9050",
           "type": "numeric"
         },
         {
           "name": "du_diff_rt",
           "source_name": "du_diff_rt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "괴리율",
-          "example": "1.44",
+          "example": "-0.11",
           "type": "numeric"
+        },
+        {
+          "name": "du_diff_rt_base_dt",
+          "source_name": "du_diff_rt_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "괴리율 기준일",
+          "example": "20260821",
+          "type": "date"
         },
         {
           "name": "du_er_1d",
           "source_name": "du_er_1d",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "수익률_1D",
-          "example": "-0.44",
+          "example": "-7.65",
           "type": "numeric"
         },
         {
           "name": "du_er_1m",
           "source_name": "du_er_1m",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "수익률_1M",
-          "example": "0.58",
+          "example": "8.51",
           "type": "numeric"
         },
         {
           "name": "du_er_1y",
           "source_name": "du_er_1y",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "수익률_1Y",
-          "example": "17.10",
+          "example": "-20.23",
           "type": "numeric"
         },
         {
           "name": "du_er_3m",
           "source_name": "du_er_3m",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "수익률_3M",
-          "example": "-0.03",
+          "example": "-27.95",
           "type": "numeric"
         },
         {
           "name": "du_er_6m",
           "source_name": "du_er_6m",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "수익률_6M",
-          "example": "9.41",
+          "example": "-44.32",
           "type": "numeric"
         },
         {
           "name": "du_er_ytd",
           "source_name": "du_er_ytd",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "수익률_YTD",
-          "example": "2.88",
+          "example": "-41.16",
           "type": "numeric"
         },
         {
           "name": "du_hpr",
           "source_name": "du_hpr",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "고가",
-          "example": "9979.00",
+          "example": "9470",
           "type": "numeric"
         },
         {
           "name": "du_last_aum",
           "source_name": "du_last_aum",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "최종AUM",
-          "example": "60720672000.00",
+          "example": "53907833000",
           "type": "numeric"
         },
         {
           "name": "du_last_nav",
           "source_name": "du_last_nav",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "최종NAV",
-          "example": "9873.28",
+          "example": "9060.139999999999",
           "type": "numeric"
         },
         {
           "name": "du_lpr",
           "source_name": "du_lpr",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "시가",
-          "example": "9905.00",
+          "example": "8915",
           "type": "numeric"
+        },
+        {
+          "name": "du_nav_base_dt",
+          "source_name": "du_nav_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "NAV 기준일",
+          "example": "20260821",
+          "type": "date"
         },
         {
           "name": "du_nav_rnf_amt",
           "source_name": "du_nav_rnf_amt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "전일NAV등락금액",
-          "example": "-161.91",
+          "example": "-690.38",
           "type": "numeric"
         },
         {
           "name": "du_nav_yday",
           "source_name": "du_nav_yday",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "전일NAV",
-          "example": "10035.19",
+          "example": "9750.52",
           "type": "numeric"
         },
         {
           "name": "du_upt_dt",
           "source_name": "du_upt_dt",
           "key": "",
-          "source_type": "timestamp without time zone",
+          "source_type": "text",
           "korean_name": "일간갱신일자",
-          "example": "20260225",
+          "example": "20260821",
           "type": "date"
         },
         {
           "name": "du_val_1d",
           "source_name": "du_val_1d",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "일거래대금",
-          "example": "810630570.00",
+          "example": "3155290152",
           "type": "numeric"
         },
         {
           "name": "du_val_1m",
           "source_name": "du_val_1m",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "일거래대금평균_1M",
-          "example": "847009967.75",
+          "example": "2992916177.95",
           "type": "numeric"
         },
         {
           "name": "du_val_5d",
           "source_name": "du_val_5d",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "일거래대금평균_5D",
-          "example": "683306859.40",
+          "example": "2671795446",
           "type": "numeric"
+        },
+        {
+          "name": "du_vlty_1m",
+          "source_name": "du_vlty_1m",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "최근 20거래일 연환산 변동성(%)",
+          "example": "93.3973869",
+          "type": "numeric"
+        },
+        {
+          "name": "du_vlty_1y",
+          "source_name": "du_vlty_1y",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "최근 252거래일 연환산 변동성(%)",
+          "example": "46.33365051",
+          "type": "numeric"
+        },
+        {
+          "name": "du_vlty_3m",
+          "source_name": "du_vlty_3m",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "최근 60거래일 연환산 변동성(%)",
+          "example": "60.20410692",
+          "type": "numeric"
+        },
+        {
+          "name": "du_vlty_6m",
+          "source_name": "du_vlty_6m",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "최근 120거래일 연환산 변동성(%)",
+          "example": "54.02524337",
+          "type": "numeric"
+        },
+        {
+          "name": "du_vlty_base_dt",
+          "source_name": "du_vlty_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "변동성 산출 기준일",
+          "example": "20260821",
+          "type": "date"
         },
         {
           "name": "du_vol_1d",
           "source_name": "du_vol_1d",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "일거래량",
-          "example": "81758.00",
+          "example": "346324",
           "type": "numeric"
         },
         {
           "name": "du_vol_avg_1m",
           "source_name": "du_vol_avg_1m",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "거래량평균_1M",
-          "example": "87324.85",
+          "example": "327080.05",
           "type": "numeric"
         },
         {
           "name": "du_vol_avg_5d",
           "source_name": "du_vol_avg_5d",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "거래량평균_5D",
-          "example": "69132.40",
+          "example": "280918.6",
           "type": "numeric"
         },
         {
-          "name": "nru_mkt_diff_rt",
-          "source_name": "nru_mkt_diff_rt",
+          "name": "fn_average_coupon",
+          "source_name": "fn_average_coupon",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "괴리율",
-          "example": "0.00",
+          "source_type": "numeric(28,8)",
+          "korean_name": "평균쿠폰이자율",
+          "example": "3.24038568",
           "type": "numeric"
         },
         {
-          "name": "nru_mkt_inav",
-          "source_name": "nru_mkt_inav",
+          "name": "fn_average_maturity",
+          "source_name": "fn_average_maturity",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "장중 iNAV",
-          "example": "0.00",
+          "source_type": "numeric(28,8)",
+          "korean_name": "평균잔존만기",
+          "example": "",
           "type": "numeric"
+        },
+        {
+          "name": "fn_average_quality",
+          "source_name": "fn_average_quality",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "평균신용품질",
+          "example": "2.00000000",
+          "type": "numeric"
+        },
+        {
+          "name": "fn_base_dt",
+          "source_name": "fn_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "펀더멘털 기준일",
+          "example": "20260822",
+          "type": "date"
+        },
+        {
+          "name": "fn_effective_duration",
+          "source_name": "fn_effective_duration",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "듀레이션",
+          "example": "",
+          "type": "numeric"
+        },
+        {
+          "name": "fn_effective_maturity",
+          "source_name": "fn_effective_maturity",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "실질만기",
+          "example": "1.38867145",
+          "type": "numeric"
+        },
+        {
+          "name": "fn_modified_duration",
+          "source_name": "fn_modified_duration",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "수정듀레이션",
+          "example": "",
+          "type": "numeric"
+        },
+        {
+          "name": "fn_nominal_maturity",
+          "source_name": "fn_nominal_maturity",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "명목만기",
+          "example": "1.38867145",
+          "type": "numeric"
+        },
+        {
+          "name": "fn_portfolio_dt",
+          "source_name": "fn_portfolio_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "포트폴리오 기준일",
+          "example": "20260531",
+          "type": "date"
         },
         {
           "name": "pd_abrv_nm",
@@ -740,25 +1045,25 @@
           "key": "",
           "source_type": "text",
           "korean_name": "상품약어명",
-          "example": "TIGER 엔비디아미국채커버드콜밸런스(합성)",
+          "example": "RISE 바이오TOP10액티브",
           "type": "text"
         },
         {
           "name": "pd_circ_net_tamt",
           "source_name": "pd_circ_net_tamt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "유통순자산총액",
-          "example": "61869000000.00",
+          "example": "58310000000",
           "type": "numeric"
         },
         {
           "name": "pd_circ_stk_cnt",
           "source_name": "pd_circ_stk_cnt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "유통주식수",
-          "example": "6150000.00",
+          "example": "5950000",
           "type": "numeric"
         },
         {
@@ -780,36 +1085,108 @@
           "type": "text"
         },
         {
+          "name": "pd_divd_amt_ann",
+          "source_name": "pd_divd_amt_ann",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "연간 추정 분배금",
+          "example": "19532.29716669",
+          "type": "numeric"
+        },
+        {
           "name": "pd_divd_amt_pshr",
           "source_name": "pd_divd_amt_pshr",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "주당 배당금",
-          "example": "0.00",
+          "source_type": "numeric(28,8)",
+          "korean_name": "주당 분배금(원천 우선, 없으면 회당 추정)",
+          "example": "95.60770452",
           "type": "numeric"
+        },
+        {
+          "name": "pd_dvid_base_dt",
+          "source_name": "pd_dvid_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "분배정보 기준일",
+          "example": "20260822",
+          "type": "date"
         },
         {
           "name": "pd_dvid_cycl",
           "source_name": "pd_dvid_cycl",
           "key": "",
           "source_type": "text",
-          "korean_name": "당주기",
+          "korean_name": "분배주기(A/Q/M/S)",
+          "example": "Q",
+          "type": "text"
+        },
+        {
+          "name": "pd_dvid_inc_dist",
+          "source_name": "pd_dvid_inc_dist",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "원천 성과배분/분배금",
           "example": "",
+          "type": "numeric"
+        },
+        {
+          "name": "pd_dvid_nav",
+          "source_name": "pd_dvid_nav",
+          "key": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "분배금 계산 기준 NAV",
+          "example": "9369.629999999999",
+          "type": "numeric"
+        },
+        {
+          "name": "pd_dvid_pay_cnt",
+          "source_name": "pd_dvid_pay_cnt",
+          "key": "",
+          "source_type": "numeric(28,0)",
+          "korean_name": "연간 지급횟수",
+          "example": "4",
+          "type": "numeric"
+        },
+        {
+          "name": "pd_dvid_pay_months",
+          "source_name": "pd_dvid_pay_months",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "분배 지급월",
+          "example": "January,April,July,October",
+          "type": "text"
+        },
+        {
+          "name": "pd_dvid_prc_base_dt",
+          "source_name": "pd_dvid_prc_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "분배금 계산 NAV 기준일",
+          "example": "20260820",
+          "type": "date"
+        },
+        {
+          "name": "pd_dvid_tax_basis",
+          "source_name": "pd_dvid_tax_basis",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "분배 과세기준",
+          "example": "Gross",
           "type": "text"
         },
         {
           "name": "pd_dvid_yield",
           "source_name": "pd_dvid_yield",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "배당수익률",
-          "example": "0.00",
+          "source_type": "numeric(28,8)",
+          "korean_name": "연환산 분배수익률",
+          "example": "0.040816",
           "type": "numeric"
         },
         {
           "name": "pd_exg_mkt_cd",
           "source_name": "pd_exg_mkt_cd",
-          "key": "PK",
+          "key": "",
           "source_type": "text",
           "korean_name": "거래소코드",
           "example": "EXG_MKT_NO_001",
@@ -834,39 +1211,39 @@
           "type": "text"
         },
         {
+          "name": "pd_isin_cd",
+          "source_name": "pd_isin_cd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "Refinitiv ISIN",
+          "example": "KR70000Z0003",
+          "type": "text"
+        },
+        {
           "name": "pd_itm_no",
           "source_name": "pd_itm_no",
-          "key": "PK",
+          "key": "",
           "source_type": "text",
           "korean_name": "상품번호",
-          "example": "KR70000D0009",
+          "example": "KR70000Z0003",
           "type": "text"
         },
         {
           "name": "pd_itm_no_ma",
           "source_name": "pd_itm_no_ma",
-          "key": "PK",
+          "key": "",
           "source_type": "text",
           "korean_name": "상품번호_미래에셋",
-          "example": "A0000D0",
+          "example": "A0000Z0",
           "type": "text"
-        },
-        {
-          "name": "pd_lst_price",
-          "source_name": "pd_lst_price",
-          "key": "",
-          "source_type": "numeric",
-          "korean_name": "상품액면가",
-          "example": "0.00",
-          "type": "numeric"
         },
         {
           "name": "pd_lst_stk_cnt",
           "source_name": "pd_lst_stk_cnt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "상품상장주식수",
-          "example": "6200000.00",
+          "example": "5850000",
           "type": "numeric"
         },
         {
@@ -884,7 +1261,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "상품거래가능일자",
-          "example": "20241217",
+          "example": "20241224",
           "type": "date"
         },
         {
@@ -906,48 +1283,12 @@
           "type": "text"
         },
         {
-          "name": "pd_nav_pshr",
-          "source_name": "pd_nav_pshr",
-          "key": "",
-          "source_type": "numeric",
-          "korean_name": "주당 순자산가치",
-          "example": "0.00",
-          "type": "numeric"
-        },
-        {
-          "name": "pd_net_ast_pshr",
-          "source_name": "pd_net_ast_pshr",
-          "key": "",
-          "source_type": "numeric",
-          "korean_name": "주당 순자산",
-          "example": "0.00",
-          "type": "numeric"
-        },
-        {
-          "name": "pd_net_prft_pshr",
-          "source_name": "pd_net_prft_pshr",
-          "key": "",
-          "source_type": "numeric",
-          "korean_name": "주당 순이익",
-          "example": "0.00",
-          "type": "numeric"
-        },
-        {
-          "name": "pd_net_rt_ast_pshr",
-          "source_name": "pd_net_rt_ast_pshr",
-          "key": "",
-          "source_type": "numeric",
-          "korean_name": "주당 순자산비율",
-          "example": "0.00",
-          "type": "numeric"
-        },
-        {
           "name": "pd_net_tamt",
           "source_name": "pd_net_tamt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "순자산총액",
-          "example": "61716390155.00",
+          "example": "57040533390",
           "type": "numeric"
         },
         {
@@ -956,7 +1297,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "상품명",
-          "example": "미래에셋 TIGER NVDA-UST커버드콜증권상장지수투자신탁(채권혼합-파생재간접형)(합성)",
+          "example": "KB RISE 바이오TOP10액티브증권상장지수투자신탁(주식)",
           "type": "text"
         },
         {
@@ -965,7 +1306,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "연금거래위험구분",
-          "example": "안전자산",
+          "example": "위험자산",
           "type": "text"
         },
         {
@@ -978,12 +1319,21 @@
           "type": "text"
         },
         {
+          "name": "pd_ric",
+          "source_name": "pd_ric",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "Refinitiv RIC",
+          "example": "0000Z0.KS",
+          "type": "text"
+        },
+        {
           "name": "pd_risk_cd",
           "source_name": "pd_risk_cd",
           "key": "",
           "source_type": "text",
           "korean_name": "상품등급코드",
-          "example": "PD_RISK_GCD_13",
+          "example": "PD_RISK_GCD_12",
           "type": "text"
         },
         {
@@ -992,7 +1342,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "상품등급명",
-          "example": "다소높은위험(3등급)",
+          "example": "높은위험(2등급)",
           "type": "text"
         },
         {
@@ -1014,15 +1364,6 @@
           "type": "text"
         },
         {
-          "name": "pd_sect_nm",
-          "source_name": "pd_sect_nm",
-          "key": "",
-          "source_type": "text",
-          "korean_name": "ETF 섹터명",
-          "example": "",
-          "type": "text"
-        },
-        {
           "name": "pd_spac_yn",
           "source_name": "pd_spac_yn",
           "key": "",
@@ -1035,10 +1376,19 @@
           "name": "pd_stk_cnt",
           "source_name": "pd_stk_cnt",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "상장주식수",
-          "example": "6150000.00",
+          "example": "5850000",
           "type": "numeric"
+        },
+        {
+          "name": "pd_ticker",
+          "source_name": "pd_ticker",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "Refinitiv 티커",
+          "example": "0000Z0",
+          "type": "text"
         },
         {
           "name": "pd_tr_yn",
@@ -1050,21 +1400,66 @@
           "type": "text"
         },
         {
+          "name": "ref_ast_type",
+          "source_name": "ref_ast_type",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "refinitiv 자산유형",
+          "example": "Equity",
+          "type": "text"
+        },
+        {
+          "name": "ref_base_dt",
+          "source_name": "ref_base_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "refinitiv 기준일",
+          "example": "20260822",
+          "type": "date"
+        },
+        {
+          "name": "ref_base_index",
+          "source_name": "ref_base_index",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "refinitiv 벤치마크",
+          "example": "KRX Bio TOP 10 KRW",
+          "type": "text"
+        },
+        {
+          "name": "ref_fund_mgmt_co",
+          "source_name": "ref_fund_mgmt_co",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "refinitiv 운용사",
+          "example": "KB Asset Ltd",
+          "type": "text"
+        },
+        {
+          "name": "ref_geo_focus",
+          "source_name": "ref_geo_focus",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "refinitiv 투자지역",
+          "example": "Korea",
+          "type": "text"
+        },
+        {
           "name": "ru_mkt_price",
           "source_name": "ru_mkt_price",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "현재가",
-          "example": "0.00",
+          "example": "9050",
           "type": "numeric"
         },
         {
           "name": "ru_mkt_volume",
           "source_name": "ru_mkt_volume",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(28,2)",
           "korean_name": "거래량",
-          "example": "0.00",
+          "example": "346324",
           "type": "numeric"
         },
         {
@@ -1073,7 +1468,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "핵심ETF여부",
-          "example": "",
+          "example": "N",
           "type": "text"
         },
         {
@@ -1082,7 +1477,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "투자자산군",
-          "example": "",
+          "example": "주식",
           "type": "text"
         },
         {
@@ -1091,7 +1486,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "투자지역",
-          "example": "",
+          "example": "국내",
           "type": "text"
         },
         {
@@ -1100,7 +1495,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "주간갱신일자",
-          "example": "",
+          "example": "20260821",
           "type": "date"
         }
       ]
@@ -1110,7 +1505,7 @@
       "table_id": "PREF02N001",
       "product_type": "OVERSEAS_ETF",
       "table": "overseas_etfs",
-      "expected_rows": 5646,
+      "expected_rows": 6037,
       "date_columns": [
         "cu_upt_dt",
         "du_clpr_base_dt",
@@ -1138,26 +1533,26 @@
         "description": "cu_strtegy",
         "base_index": "cu_base_index"
       },
-      "data_file": "data/raw/PREF02N001_datarows.xlsx",
-      "schema_file": "data/raw/PREF02N001_schema.xlsx",
-      "data_base_date": "2026-07-11",
+      "data_file": "data/raw/pref02n001_data.xlsx",
+      "schema_file": "data/raw/pref02n001_schema.xlsx",
+      "data_base_date": "2026-08-21",
       "columns": [
         {
           "name": "cu_base_index",
           "source_name": "cu_base_index",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "기초지수",
+          "example": "Index is not provided by Management Company",
           "type": "text"
         },
         {
           "name": "cu_charge_rt",
           "source_name": "cu_charge_rt",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(18,6)",
+          "korean_name": "연간보수율",
+          "example": "0.09",
           "type": "numeric"
         },
         {
@@ -1165,8 +1560,8 @@
           "source_name": "cu_etn_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "ETN 여부",
+          "example": "Y",
           "type": "text"
         },
         {
@@ -1174,8 +1569,8 @@
           "source_name": "cu_fund_mgmt_co",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "운용사",
+          "example": "Empowered Funds LLC",
           "type": "text"
         },
         {
@@ -1183,8 +1578,8 @@
           "source_name": "cu_index_repl_mthd",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "인덱스 복제방법",
+          "example": "Full",
           "type": "text"
         },
         {
@@ -1192,8 +1587,8 @@
           "source_name": "cu_index_tracking_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "인덱스 추적 여부",
+          "example": "Y",
           "type": "text"
         },
         {
@@ -1201,17 +1596,17 @@
           "source_name": "cu_inverse_short_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "인버스 또는 숏 여부",
+          "example": "Y",
           "type": "text"
         },
         {
           "name": "cu_lev_fector",
           "source_name": "cu_lev_fector",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(18,6)",
+          "korean_name": "배수",
+          "example": "2",
           "type": "numeric"
         },
         {
@@ -1219,8 +1614,8 @@
           "source_name": "cu_strtegy",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "운용전략",
+          "example": "The Fund seeks to achieve long-term capital appreciation. Under normal circumstances, at least 80% of the Funds net assets will be invested in the equity securities of U.S. companies. The Fund may pay transaction costs, including commissions when it buys and sells securities or turns over its portfolio",
           "type": "text"
         },
         {
@@ -1228,8 +1623,8 @@
           "source_name": "cu_upt_dt",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "변동갱신일자",
+          "example": "20260822",
           "type": "date"
         },
         {
@@ -1237,26 +1632,26 @@
           "source_name": "du_base_dt_match_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "NAV/종가 기준일 일치 여부",
+          "example": "N",
           "type": "text"
         },
         {
           "name": "du_bpr",
           "source_name": "du_bpr",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "기준가",
+          "example": "58.2409",
           "type": "numeric"
         },
         {
           "name": "du_clpr",
           "source_name": "du_clpr",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "종가",
+          "example": "58.5084",
           "type": "numeric"
         },
         {
@@ -1264,8 +1659,8 @@
           "source_name": "du_clpr_base_dt",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "선택된 종가의 원천 기준일",
+          "example": "20260821",
           "type": "date"
         },
         {
@@ -1273,80 +1668,80 @@
           "source_name": "du_clpr_src",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "선택된 종가 원천 컬럼",
+          "example": "pd65n101.tday_clpr",
           "type": "text"
         },
         {
           "name": "du_diff_rt",
           "source_name": "du_diff_rt",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,6)",
+          "korean_name": "종가 대비 추정 NAV 괴리율",
+          "example": "4.23",
           "type": "numeric"
         },
         {
           "name": "du_er_1d",
           "source_name": "du_er_1d",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,6)",
+          "korean_name": "수익률_1D",
+          "example": "0.46",
           "type": "numeric"
         },
         {
           "name": "du_hpr",
           "source_name": "du_hpr",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "고가",
+          "example": "58.5084",
           "type": "numeric"
         },
         {
           "name": "du_last_aum",
           "source_name": "du_last_aum",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,2)",
+          "korean_name": "일간 순자산총액",
+          "example": "371250000",
           "type": "numeric"
         },
         {
           "name": "du_last_nav",
           "source_name": "du_last_nav",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,6)",
+          "korean_name": "추정 주당 NAV",
+          "example": "11.5",
           "type": "numeric"
         },
         {
           "name": "du_lpr",
           "source_name": "du_lpr",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "저가",
+          "example": "58.41",
           "type": "numeric"
         },
         {
           "name": "du_nav_base_dt",
           "source_name": "du_nav_base_dt",
           "key": "",
-          "source_type": "timestamp without time zone",
-          "korean_name": "",
-          "example": "",
+          "source_type": "text",
+          "korean_name": "NAV 원천 etf_reference 기준일",
+          "example": "20260822",
           "type": "date"
         },
         {
           "name": "du_opr",
           "source_name": "du_opr",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "시가",
+          "example": "58.41",
           "type": "numeric"
         },
         {
@@ -1354,26 +1749,26 @@
           "source_name": "du_upt_dt",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "일간갱신일자",
+          "example": "20260822",
           "type": "date"
         },
         {
           "name": "du_val_1d",
           "source_name": "du_val_1d",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "외화거래대금",
+          "example": "6542",
           "type": "numeric"
         },
         {
           "name": "du_vol_1d",
           "source_name": "du_vol_1d",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "거래량",
+          "example": "112",
           "type": "numeric"
         },
         {
@@ -1381,8 +1776,8 @@
           "source_name": "pd_abrv_nm",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "상품약어명_티커",
+          "example": "AAUA",
           "type": "text"
         },
         {
@@ -1390,8 +1785,8 @@
           "source_name": "pd_curr_cd",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "펀드통화코드",
+          "example": "USD",
           "type": "text"
         },
         {
@@ -1399,8 +1794,8 @@
           "source_name": "pd_exg_mkt_cd",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "거래소코드",
+          "example": "AMX",
           "type": "text"
         },
         {
@@ -1408,8 +1803,8 @@
           "source_name": "pd_grp_no",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "상품군종류",
+          "example": "ETF",
           "type": "text"
         },
         {
@@ -1417,17 +1812,17 @@
           "source_name": "pd_isin_cd",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "ISIN 코드",
+          "example": "US02072Q2755",
           "type": "text"
         },
         {
           "name": "pd_itm_no",
           "source_name": "pd_itm_no",
-          "key": "PK",
+          "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "해외 ETF RIC",
+          "example": "AAUA.K",
           "type": "text"
         },
         {
@@ -1435,8 +1830,8 @@
           "source_name": "pd_itm_no_ma",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "해외 ETF RIC_PDF 조인키",
+          "example": "AAUA.K",
           "type": "text"
         },
         {
@@ -1444,8 +1839,8 @@
           "source_name": "pd_lipper_id",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "Lipper 펀드코드",
+          "example": "40306184",
           "type": "text"
         },
         {
@@ -1453,26 +1848,26 @@
           "source_name": "pd_lstg_dt",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "설정일",
+          "example": "20260318",
           "type": "date"
         },
         {
           "name": "pd_lst_price",
           "source_name": "pd_lst_price",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "액면가",
+          "example": "0",
           "type": "numeric"
         },
         {
           "name": "pd_lst_stk_cnt",
           "source_name": "pd_lst_stk_cnt",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,2)",
+          "korean_name": "상장주식수",
+          "example": "6320000",
           "type": "numeric"
         },
         {
@@ -1480,8 +1875,8 @@
           "source_name": "pd_mkt_id",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "거래소국가코드",
+          "example": "US",
           "type": "text"
         },
         {
@@ -1489,8 +1884,8 @@
           "source_name": "pd_nm",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "상품명",
+          "example": "Alpha Architect US Equity 3 ETF",
           "type": "text"
         },
         {
@@ -1498,8 +1893,8 @@
           "source_name": "pd_sale_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "판매여부",
+          "example": "1",
           "type": "text"
         },
         {
@@ -1507,8 +1902,8 @@
           "source_name": "pd_trd_ccy",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "거래통화코드",
+          "example": "USD",
           "type": "text"
         },
         {
@@ -1516,8 +1911,8 @@
           "source_name": "pd_tr_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "거래정지여부",
+          "example": "0",
           "type": "text"
         },
         {
@@ -1525,26 +1920,26 @@
           "source_name": "pd_us_cik",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "미국 CIK",
+          "example": "1592900",
           "type": "text"
         },
         {
           "name": "ru_mkt_price",
           "source_name": "ru_mkt_price",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "실시간 현재가",
+          "example": "58.5084",
           "type": "numeric"
         },
         {
           "name": "ru_mkt_volume",
           "source_name": "ru_mkt_volume",
           "key": "",
-          "source_type": "numeric",
-          "korean_name": "",
-          "example": "",
+          "source_type": "numeric(28,8)",
+          "korean_name": "실시간 거래량",
+          "example": "112",
           "type": "numeric"
         },
         {
@@ -1552,8 +1947,8 @@
           "source_name": "wu_core_yn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "핵심 ETF 여부",
+          "example": "N",
           "type": "text"
         },
         {
@@ -1561,8 +1956,8 @@
           "source_name": "wu_inv_ast_type",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "투자자산군",
+          "example": "Equity",
           "type": "text"
         },
         {
@@ -1570,8 +1965,8 @@
           "source_name": "wu_inv_rgn",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "투자지역",
+          "example": "United States of America",
           "type": "text"
         },
         {
@@ -1579,8 +1974,8 @@
           "source_name": "wu_upt_dt",
           "key": "",
           "source_type": "text",
-          "korean_name": "",
-          "example": "",
+          "korean_name": "주간갱신일자",
+          "example": "20260822",
           "type": "date"
         }
       ]
@@ -1590,8 +1985,13 @@
       "table_id": "PRFD01N001",
       "product_type": "PUBLIC_FUND",
       "table": "public_funds",
-      "expected_rows": 95619,
-      "date_columns": [],
+      "expected_rows": 23676,
+      "date_columns": [
+        "fd_daily_bas_dt",
+        "fd_last_dstb_actg_bss_dt",
+        "fd_last_dstb_actg_eot_dt",
+        "fd_price_bas_dt"
+      ],
       "numeric_overrides": [],
       "id_column": "itm_no",
       "name_column": "itm_nm",
@@ -1617,9 +2017,9 @@
         "description": "or_attr_desc|prvo_pbff_desc|pers_corp_desc",
         "base_index": "bmrk_nm|bmrk_eng_nm"
       },
-      "data_file": "data/raw/PRFD01N001_datarows.xlsx",
-      "schema_file": "data/raw/PRFD01N001_schema.xlsx",
-      "data_base_date": "2026-07-11",
+      "data_file": "data/raw/prfd01n001_data.xlsx",
+      "schema_file": "data/raw/prfd01n001_schema.xlsx",
+      "data_base_date": "2026-08-21",
       "columns": [
         {
           "name": "bmrk_eng_nm",
@@ -1627,7 +2027,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "벤치마크영문명",
-          "example": "CALL",
+          "example": "채권종합지수 1~2Y",
           "type": "text"
         },
         {
@@ -1636,8 +2036,17 @@
           "key": "",
           "source_type": "text",
           "korean_name": "벤치마크명",
-          "example": "CALL",
+          "example": "채권종합지수 1~2년",
           "type": "text"
+        },
+        {
+          "name": "bns_bpr",
+          "source_name": "bns_bpr",
+          "key": "",
+          "source_type": "numeric(38,15)",
+          "korean_name": "매매기준가",
+          "example": "1004.27",
+          "type": "numeric"
         },
         {
           "name": "curr_cd",
@@ -1658,6 +2067,15 @@
           "type": "text"
         },
         {
+          "name": "fd_daily_bas_dt",
+          "source_name": "fd_daily_bas_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "펀드데일리정보 기준일자",
+          "example": "20260821",
+          "type": "date"
+        },
+        {
           "name": "fd_estb_ctry_cd",
           "source_name": "fd_estb_ctry_cd",
           "key": "",
@@ -1676,48 +2094,102 @@
           "type": "text"
         },
         {
+          "name": "fd_last_dstb_actg_bss_dt",
+          "source_name": "fd_last_dstb_actg_bss_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "최근 분배 회계기초일자",
+          "example": "20110907",
+          "type": "date"
+        },
+        {
+          "name": "fd_last_dstb_actg_eot_dt",
+          "source_name": "fd_last_dstb_actg_eot_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "최근 분배 회계기말일자",
+          "example": "20110919",
+          "type": "date"
+        },
+        {
+          "name": "fd_last_dstb_r",
+          "source_name": "fd_last_dstb_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "최근 분배율",
+          "example": "-0.08799999999999999",
+          "type": "numeric"
+        },
+        {
           "name": "fd_mm18_ern_r",
           "source_name": "fd_mm18_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 18개월수익률",
-          "example": "4.85",
+          "example": "3.92",
           "type": "numeric"
         },
         {
           "name": "fd_mm1_ern_r",
           "source_name": "fd_mm1_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 1개월수익률",
-          "example": "0.26",
+          "example": "0.24",
           "type": "numeric"
         },
         {
           "name": "fd_mm3_ern_r",
           "source_name": "fd_mm3_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 3개월수익률",
-          "example": "0.78",
+          "example": "0.68",
           "type": "numeric"
         },
         {
           "name": "fd_mm6_ern_r",
           "source_name": "fd_mm6_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 6개월수익률",
-          "example": "1.46",
+          "example": "1.29",
           "type": "numeric"
         },
         {
           "name": "fd_nast_suma",
           "source_name": "fd_nast_suma",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(22,4)",
           "korean_name": "펀드 순자산",
-          "example": "2390679722503.0000",
+          "example": "211242055347",
+          "type": "numeric"
+        },
+        {
+          "name": "fd_price_bas_dt",
+          "source_name": "fd_price_bas_dt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "펀드 기준가/수익률 기준일자",
+          "example": "20260821",
+          "type": "date"
+        },
+        {
+          "name": "fd_prsv_r",
+          "source_name": "fd_prsv_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "보전율",
+          "example": "2.025",
+          "type": "numeric"
+        },
+        {
+          "name": "fd_sbpr",
+          "source_name": "fd_sbpr",
+          "key": "",
+          "source_type": "numeric(30,12)",
+          "korean_name": "시가평가금액",
+          "example": "0",
           "type": "numeric"
         },
         {
@@ -1726,52 +2198,52 @@
           "key": "",
           "source_type": "text",
           "korean_name": "펀드설정유형코드",
-          "example": "10",
+          "example": "00",
           "type": "text"
         },
         {
           "name": "fd_wk1_ern_r",
           "source_name": "fd_wk1_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 1주일수익률",
-          "example": "0.09",
+          "example": "",
           "type": "numeric"
         },
         {
           "name": "fd_yr1_ern_r",
           "source_name": "fd_yr1_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 1년수익률",
-          "example": "2.93",
+          "example": "2.57",
           "type": "numeric"
         },
         {
           "name": "fd_yr2_ern_r",
           "source_name": "fd_yr2_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 2년수익률",
-          "example": "6.93",
+          "example": "5.6",
           "type": "numeric"
         },
         {
           "name": "fd_yr3_ern_r",
           "source_name": "fd_yr3_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 3년수익률",
-          "example": "13.57",
+          "example": "9.390000000000001",
           "type": "numeric"
         },
         {
           "name": "fd_yr5_ern_r",
           "source_name": "fd_yr5_ern_r",
           "key": "",
-          "source_type": "numeric",
+          "source_type": "numeric(30,2)",
           "korean_name": "펀드 5년수익률",
-          "example": "18.87",
+          "example": "14.51",
           "type": "numeric"
         },
         {
@@ -1789,7 +2261,43 @@
           "key": "",
           "source_type": "text",
           "korean_name": "금융감독원종목번호",
-          "example": "0010173C4558",
+          "example": "000000000000",
+          "type": "text"
+        },
+        {
+          "name": "han_clas_fee_type",
+          "source_name": "han_clas_fee_type",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "클래스 수수료 부과 유형",
+          "example": "수수료미징구",
+          "type": "text"
+        },
+        {
+          "name": "han_clas_nm",
+          "source_name": "han_clas_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "클래스 한글 표기",
+          "example": "수수료미징구-온라인",
+          "type": "text"
+        },
+        {
+          "name": "han_clas_policies",
+          "source_name": "han_clas_policies",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "클래스 부가 정책",
+          "example": "랩,펀드",
+          "type": "text"
+        },
+        {
+          "name": "han_clas_sales_channel",
+          "source_name": "han_clas_sales_channel",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "클래스 판매채널",
+          "example": "온라인",
           "type": "text"
         },
         {
@@ -1816,7 +2324,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "종목약어명",
-          "example": "삼성 베스트 MMF 법인 제1호",
+          "example": "CRYSTAL신MMFE1-1비주",
           "type": "text"
         },
         {
@@ -1825,7 +2333,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "종목영문약어명",
-          "example": "KB China A-share Sec",
+          "example": "Fidel_Singapore",
           "type": "text"
         },
         {
@@ -1834,7 +2342,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "종목영문명",
-          "example": "삼성 베스트 MMF 법인 제1호",
+          "example": "크리스탈신종MMFE1-1비주식",
           "type": "text"
         },
         {
@@ -1843,16 +2351,16 @@
           "key": "",
           "source_type": "text",
           "korean_name": "종목명",
-          "example": "삼성 베스트 MMF 법인 제1호",
+          "example": "크리스탈신종MMFE1-1비주식",
           "type": "text"
         },
         {
           "name": "itm_no",
           "source_name": "itm_no",
-          "key": "PK",
+          "key": "",
           "source_type": "text",
           "korean_name": "종목번호",
-          "example": "KR5014410050",
+          "example": "KR5010101611",
           "type": "text"
         },
         {
@@ -1861,7 +2369,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "금융투자협회펀드분류코드",
-          "example": "1EE11Z1200101ZZZZZZ6",
+          "example": "00000000000000000000",
           "type": "text"
         },
         {
@@ -1870,7 +2378,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "예탁원종목번호",
-          "example": "KRZ500626190",
+          "example": "KRZ500023970",
           "type": "text"
         },
         {
@@ -1879,7 +2387,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "운용사종목번호",
-          "example": "0109913",
+          "example": "31147",
           "type": "text"
         },
         {
@@ -1892,6 +2400,15 @@
           "type": "text"
         },
         {
+          "name": "ofwk_trus_rwrd_r",
+          "source_name": "ofwk_trus_rwrd_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "일반사무관리보수",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
           "name": "or_attr_desc",
           "source_name": "or_attr_desc",
           "key": "",
@@ -1901,12 +2418,21 @@
           "type": "text"
         },
         {
+          "name": "or_co_rwrd_r",
+          "source_name": "or_co_rwrd_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "집합투자업자보수",
+          "example": "2",
+          "type": "numeric"
+        },
+        {
           "name": "or_co_xtn_itt_cd",
           "source_name": "or_co_xtn_itt_cd",
           "key": "",
           "source_type": "text",
           "korean_name": "운용회사대외기관코드",
-          "example": "00040010",
+          "example": "00040011",
           "type": "text"
         },
         {
@@ -1924,7 +2450,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "개인법인구분코드 설명",
-          "example": "법인",
+          "example": "해당없음",
           "type": "text"
         },
         {
@@ -1937,12 +2463,30 @@
           "type": "text"
         },
         {
-          "name": "prfd_attr_cd",
-          "source_name": "prfd_attr_cd",
-          "key": "PK",
+          "name": "prfd_attr_cds",
+          "source_name": "prfd_attr_cds",
+          "key": "",
           "source_type": "text",
-          "korean_name": "펀드별속성코드",
-          "example": "V101",
+          "korean_name": "펀드별속성코드 목록(쉼표 구분)",
+          "example": "C101,V101,D102,C103",
+          "type": "text"
+        },
+        {
+          "name": "prfd_attr_cnt",
+          "source_name": "prfd_attr_cnt",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "펀드별속성 개수",
+          "example": "0",
+          "type": "integer"
+        },
+        {
+          "name": "prfd_attr_search_text",
+          "source_name": "prfd_attr_search_text",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "상품검색용 속성 코드/명칭",
+          "example": "D102 국내위탁판매 V101 국내 C101 추가 C103 개방",
           "type": "text"
         },
         {
@@ -1969,8 +2513,17 @@
           "key": "",
           "source_type": "text",
           "korean_name": "대표예탁원종목번호",
-          "example": "030200109913",
+          "example": "KR0000000000",
           "type": "text"
+        },
+        {
+          "name": "sale_co_rwrd_r",
+          "source_name": "sale_co_rwrd_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "판매회사보수",
+          "example": "2.025",
+          "type": "numeric"
         },
         {
           "name": "sale_yn",
@@ -1978,7 +2531,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "판매여부",
-          "example": "판매중",
+          "example": "판매완료",
           "type": "text"
         },
         {
@@ -1987,7 +2540,7 @@
           "key": "",
           "source_type": "text",
           "korean_name": "표준종목번호",
-          "example": "KR5214272621",
+          "example": "KR5205363884",
           "type": "text"
         },
         {
@@ -2000,18 +2553,90 @@
           "type": "text"
         },
         {
+          "name": "trusc_rwrd_r",
+          "source_name": "trusc_rwrd_r",
+          "key": "",
+          "source_type": "numeric(20,12)",
+          "korean_name": "신탁업자보수",
+          "example": "0.35",
+          "type": "numeric"
+        },
+        {
           "name": "trusc_xtn_itt_cd",
           "source_name": "trusc_xtn_itt_cd",
           "key": "",
           "source_type": "text",
           "korean_name": "수탁회사대외기관코드",
-          "example": "00050004",
+          "example": "00020081",
           "type": "text"
+        },
+        {
+          "name": "zrin_attr_nms",
+          "source_name": "zrin_attr_nms",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "제로인속성명 목록(쉼표 구분)",
+          "example": "추가,국내,개방,국내위탁판매",
+          "type": "text"
+        },
+        {
+          "name": "zrin_btyp_cd",
+          "source_name": "zrin_btyp_cd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "제로인대유형코드",
+          "example": "29",
+          "type": "text"
+        },
+        {
+          "name": "zrin_btyp_nm",
+          "source_name": "zrin_btyp_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "제로인대유형명",
+          "example": "기타",
+          "type": "text"
+        },
+        {
+          "name": "zrin_dmst_bd_cmst_rt",
+          "source_name": "zrin_dmst_bd_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인국내채권구성비율",
+          "example": "29.58",
+          "type": "numeric"
+        },
+        {
+          "name": "zrin_dmst_stk_cmst_rt",
+          "source_name": "zrin_dmst_stk_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인국내주식구성비율",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
+          "name": "zrin_etc_ast_cmst_rt",
+          "source_name": "zrin_etc_ast_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인기타자산구성비율",
+          "example": "29.45",
+          "type": "numeric"
+        },
+        {
+          "name": "zrin_fd_cmst_rt",
+          "source_name": "zrin_fd_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인펀드구성비율",
+          "example": "0",
+          "type": "numeric"
         },
         {
           "name": "zrin_fd_ivst_risk_gcd",
           "source_name": "zrin_fd_ivst_risk_gcd",
-          "key": "PK",
+          "key": "",
           "source_type": "text",
           "korean_name": "제로인펀드투자위험등급코드",
           "example": "6",
@@ -2024,6 +2649,51 @@
           "source_type": "text",
           "korean_name": "제로인펀드투자위험등급명",
           "example": "매우 낮은 위험",
+          "type": "text"
+        },
+        {
+          "name": "zrin_liqt_cmst_rt",
+          "source_name": "zrin_liqt_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인유동성구성비율",
+          "example": "40.97",
+          "type": "numeric"
+        },
+        {
+          "name": "zrin_ovrs_bd_cmst_rt",
+          "source_name": "zrin_ovrs_bd_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인해외채권구성비율",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
+          "name": "zrin_ovrs_stk_cmst_rt",
+          "source_name": "zrin_ovrs_stk_cmst_rt",
+          "key": "",
+          "source_type": "numeric(26,12)",
+          "korean_name": "제로인해외주식구성비율",
+          "example": "0",
+          "type": "numeric"
+        },
+        {
+          "name": "zrin_pcd",
+          "source_name": "zrin_pcd",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "제로인유형코드",
+          "example": "29920",
+          "type": "text"
+        },
+        {
+          "name": "zrin_ptn_nm",
+          "source_name": "zrin_ptn_nm",
+          "key": "",
+          "source_type": "text",
+          "korean_name": "제로인유형명",
+          "example": "영구미분류",
           "type": "text"
         }
       ]
