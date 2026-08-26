@@ -50,12 +50,6 @@ SELECT
     END AS sale_available,
     pd_exg_mkt AS trade_status_raw,
     NULL::text AS base_index,
-    CONCAT_WS(
-        ' | ',
-        NULLIF(BTRIM(std_pd_mcls_nm), ''),
-        NULLIF(BTRIM(std_pd_scls_nm), ''),
-        NULLIF(BTRIM(bd_knd), '')
-    ) AS description,
     ARRAY_REMOVE(ARRAY[
         CASE WHEN isu_bal_amt < 0 THEN 'NEGATIVE_SIZE' END,
         CASE WHEN eval_price IS NOT NULL AND eval_price <= 0 THEN 'NON_POSITIVE_PRICE' END,
@@ -217,7 +211,6 @@ SELECT
     END,
     pd_tr_yn,
     cu_base_index,
-    NULLIF(BTRIM(cu_strtegy), ''),
     ARRAY_REMOVE(ARRAY[
         CASE WHEN cu_charge_rt < 0 THEN 'NEGATIVE_FEE' END,
         CASE WHEN COALESCE(pd_net_tamt, du_last_aum) < 0 THEN 'NEGATIVE_SIZE' END,
@@ -384,7 +377,6 @@ SELECT
     END,
     pd_tr_yn,
     cu_base_index,
-    cu_strtegy,
     ARRAY_REMOVE(ARRAY[
         CASE WHEN cu_charge_rt < 0 THEN 'NEGATIVE_FEE' END,
         CASE WHEN du_last_aum < 0 THEN 'NEGATIVE_SIZE' END,
@@ -554,12 +546,6 @@ SELECT
     END,
     sale_yn,
     COALESCE(bmrk_nm, bmrk_eng_nm),
-    CONCAT_WS(
-        ' | ',
-        NULLIF(BTRIM(or_attr_desc), ''),
-        NULLIF(BTRIM(prvo_pbff_desc), ''),
-        NULLIF(BTRIM(pers_corp_desc), '')
-    ),
     ARRAY_REMOVE(ARRAY[
         CASE WHEN fd_nast_suma < 0 THEN 'NEGATIVE_SIZE' END
     ], NULL)::text[],

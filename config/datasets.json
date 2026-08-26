@@ -32,7 +32,6 @@
         "size_amount": "isu_bal_amt",
         "price": "eval_price",
         "maturity_date": "mat_dt",
-        "description": "std_pd_mcls_nm|std_pd_scls_nm|bd_knd",
         "bond_kind": "bd_knd"
       },
       "data_file": "data/raw/prbd01n001_data.xlsx",
@@ -609,7 +608,6 @@
         "return_ytd": "du_er_ytd",
         "size_amount": "pd_net_tamt|du_last_aum",
         "price": "du_clpr|ru_mkt_price",
-        "description": "cu_strtegy",
         "base_index": "cu_base_index"
       },
       "data_file": "data/raw/pref01n001_data.xlsx",
@@ -1530,7 +1528,6 @@
         "return_1d": "du_er_1d",
         "size_amount": "du_last_aum",
         "price": "du_clpr|ru_mkt_price",
-        "description": "cu_strtegy",
         "base_index": "cu_base_index"
       },
       "data_file": "data/raw/pref02n001_data.xlsx",
@@ -2014,7 +2011,6 @@
         "return_3y": "fd_yr3_ern_r",
         "return_5y": "fd_yr5_ern_r",
         "size_amount": "fd_nast_suma",
-        "description": "or_attr_desc|prvo_pbff_desc|pers_corp_desc",
         "base_index": "bmrk_nm|bmrk_eng_nm"
       },
       "data_file": "data/raw/prfd01n001_data.xlsx",
