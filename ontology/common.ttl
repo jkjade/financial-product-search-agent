@@ -99,12 +99,6 @@ fp:productId a owl:DatatypeProperty ;
     rdfs:comment "상품번호/채권종목번호"@ko ;
     fp:column "product_id" .
 
-fp:productCode a owl:DatatypeProperty ;
-    rdfs:domain fp:Product ; rdfs:range xsd:string ;
-    rdfs:label "product_code"@en ;
-    rdfs:comment "상품번호/채권종목번호"@ko ;
-    fp:column "product_code" .
-
 fp:productName a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "product_name"@en ;
@@ -174,7 +168,7 @@ fp:dividendCycle a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;
     rdfs:label "dividend_cycle"@en ;
     rdfs:comment "분배주기(A/Q/M/S)"@ko ;
-    fp:column "dividend_cycle" .
+    fp:column "pd_dvid_cycl" .
 
 fp:etfSector a owl:DatatypeProperty ;
     rdfs:domain fp:Product ; rdfs:range xsd:string ;

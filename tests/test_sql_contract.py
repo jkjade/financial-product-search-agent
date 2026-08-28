@@ -49,7 +49,7 @@ def test_catalog_union_selects_have_same_column_count():
         assert match is not None
         counts.append(_count_top_level_select_items(match.group(1)))
 
-    assert counts == [136, 136, 136, 136]
+    assert counts == [31, 31, 31, 31]
 
 
 def test_catalog_has_provenance_quality_and_core_indexes():

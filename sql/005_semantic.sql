@@ -62,6 +62,31 @@ CREATE TABLE semantic.external_holding (
     CHECK (as_of_date <= DATE '2026-08-21')
 );
 
+-- 2026-08 뷰 분리 이후 issuer_or_manager/risk_name/base_index는 도메인마다
+-- 있는 곳이 달라 공통 뷰(search.product_catalog)에는 없다. 지식그래프 관계를
+-- 채우려면 4개 도메인 뷰를 이 필드 기준으로만 다시 묶어야 해서 보조 뷰를 둔다.
+DROP VIEW IF EXISTS search.semantic_source;
+CREATE VIEW search.semantic_source AS
+SELECT source_table, source_row_number, data_base_date,
+       issuer_or_manager, asset_class, investment_region, currency,
+       risk_name, NULL::text AS base_index
+FROM search.domestic_bond_catalog
+UNION ALL
+SELECT source_table, source_row_number, data_base_date,
+       issuer_or_manager, asset_class, investment_region, currency,
+       risk_name, base_index
+FROM search.domestic_etf_catalog
+UNION ALL
+SELECT source_table, source_row_number, data_base_date,
+       issuer_or_manager, asset_class, investment_region, currency,
+       NULL::text AS risk_name, base_index
+FROM search.overseas_etf_catalog
+UNION ALL
+SELECT source_table, source_row_number, data_base_date,
+       NULL::text AS issuer_or_manager, asset_class, investment_region, currency,
+       risk_name, base_index
+FROM search.public_fund_catalog;
+
 -- Product entities use the source row as a stable identifier.
 INSERT INTO semantic.entity (
     entity_id, entity_type, canonical_name, normalized_name, aliases,
@@ -72,14 +97,12 @@ SELECT
     product_type,
     product_name,
     lower(btrim(product_name)),
-    ARRAY_REMOVE(ARRAY[product_id, product_code, short_name], NULL),
+    ARRAY_REMOVE(ARRAY[product_id, short_name], NULL),
+    -- fee_rate/return_1y/yield_rate 등은 도메인 전용 뷰로 옮겨가서(2026-08 뷰
+    -- 분리) 공통 뷰인 search.product_catalog에는 더 이상 없다. 지식그래프
+    -- 엔티티 속성은 공통 필드 범위로 유지한다.
     jsonb_strip_nulls(jsonb_build_object(
         'product_id', product_id,
-        'product_code', product_code,
-        'fee_rate', fee_rate,
-        'return_1y', return_1y,
-        'return_ytd', return_ytd,
-        'yield_rate', yield_rate,
         'size_amount', size_amount,
         'price', price
     )),
@@ -91,17 +114,17 @@ FROM search.product_catalog;
 -- Shared concept entities are deduplicated by normalized value and entity type.
 WITH raw_values AS (
     SELECT 'ASSET_MANAGER'::text AS entity_type, issuer_or_manager AS value
-    FROM search.product_catalog WHERE issuer_or_manager IS NOT NULL AND btrim(issuer_or_manager) <> ''
+    FROM search.semantic_source WHERE issuer_or_manager IS NOT NULL AND btrim(issuer_or_manager) <> ''
     UNION ALL
-    SELECT 'ASSET_CLASS', asset_class FROM search.product_catalog WHERE asset_class IS NOT NULL AND btrim(asset_class) <> ''
+    SELECT 'ASSET_CLASS', asset_class FROM search.semantic_source WHERE asset_class IS NOT NULL AND btrim(asset_class) <> ''
     UNION ALL
-    SELECT 'INVESTMENT_REGION', investment_region FROM search.product_catalog WHERE investment_region IS NOT NULL AND btrim(investment_region) <> ''
+    SELECT 'INVESTMENT_REGION', investment_region FROM search.semantic_source WHERE investment_region IS NOT NULL AND btrim(investment_region) <> ''
     UNION ALL
-    SELECT 'CURRENCY', currency FROM search.product_catalog WHERE currency IS NOT NULL AND btrim(currency) <> ''
+    SELECT 'CURRENCY', currency FROM search.semantic_source WHERE currency IS NOT NULL AND btrim(currency) <> ''
     UNION ALL
-    SELECT 'RISK_GRADE', risk_name FROM search.product_catalog WHERE risk_name IS NOT NULL AND btrim(risk_name) <> ''
+    SELECT 'RISK_GRADE', risk_name FROM search.semantic_source WHERE risk_name IS NOT NULL AND btrim(risk_name) <> ''
     UNION ALL
-    SELECT 'BENCHMARK_INDEX', base_index FROM search.product_catalog WHERE base_index IS NOT NULL AND btrim(base_index) <> ''
+    SELECT 'BENCHMARK_INDEX', base_index FROM search.semantic_source WHERE base_index IS NOT NULL AND btrim(base_index) <> ''
 ), values_to_insert AS (
     SELECT entity_type, lower(btrim(value)) AS normalized_value, min(value) AS value
     FROM raw_values
@@ -122,7 +145,7 @@ SELECT
     'managedBy',
     'asset_manager:' || md5(lower(btrim(p.issuer_or_manager))),
     p.source_table, p.source_row_number, p.data_base_date
-FROM search.product_catalog p
+FROM search.semantic_source p
 WHERE p.issuer_or_manager IS NOT NULL AND btrim(p.issuer_or_manager) <> '';
 
 INSERT INTO semantic.relation (subject_id, predicate, object_id, source_table, source_row_number, data_base_date)
@@ -131,7 +154,7 @@ SELECT
     'hasAssetClass',
     'asset_class:' || md5(lower(btrim(p.asset_class))),
     p.source_table, p.source_row_number, p.data_base_date
-FROM search.product_catalog p
+FROM search.semantic_source p
 WHERE p.asset_class IS NOT NULL AND btrim(p.asset_class) <> '';
 
 INSERT INTO semantic.relation (subject_id, predicate, object_id, source_table, source_row_number, data_base_date)
@@ -140,7 +163,7 @@ SELECT
     'investsInRegion',
     'investment_region:' || md5(lower(btrim(p.investment_region))),
     p.source_table, p.source_row_number, p.data_base_date
-FROM search.product_catalog p
+FROM search.semantic_source p
 WHERE p.investment_region IS NOT NULL AND btrim(p.investment_region) <> '';
 
 INSERT INTO semantic.relation (subject_id, predicate, object_id, source_table, source_row_number, data_base_date)
@@ -149,7 +172,7 @@ SELECT
     'denominatedIn',
     'currency:' || md5(lower(btrim(p.currency))),
     p.source_table, p.source_row_number, p.data_base_date
-FROM search.product_catalog p
+FROM search.semantic_source p
 WHERE p.currency IS NOT NULL AND btrim(p.currency) <> '';
 
 INSERT INTO semantic.relation (subject_id, predicate, object_id, source_table, source_row_number, data_base_date)
@@ -158,7 +181,7 @@ SELECT
     'hasRiskGrade',
     'risk_grade:' || md5(lower(btrim(p.risk_name))),
     p.source_table, p.source_row_number, p.data_base_date
-FROM search.product_catalog p
+FROM search.semantic_source p
 WHERE p.risk_name IS NOT NULL AND btrim(p.risk_name) <> '';
 
 INSERT INTO semantic.relation (subject_id, predicate, object_id, source_table, source_row_number, data_base_date)
@@ -167,7 +190,7 @@ SELECT
     'tracksIndex',
     'benchmark_index:' || md5(lower(btrim(p.base_index))),
     p.source_table, p.source_row_number, p.data_base_date
-FROM search.product_catalog p
+FROM search.semantic_source p
 WHERE p.base_index IS NOT NULL AND btrim(p.base_index) <> '';
 
 -- Inverse edges are materialized because reverse questions are common and this keeps

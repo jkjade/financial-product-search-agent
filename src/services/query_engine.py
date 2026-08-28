@@ -20,21 +20,93 @@ from ..api.models import (
 from ..query.fields import FIELD_SPECS, LEGACY_SORT_ALIASES
 from ..query.sql_builder import compile_filters, compile_order, metric_expression, quote_alias
 
-SELECT_FIELDS = """
-    product_type, source_table, source_row_number, source_file, data_base_date,
-    product_info_update_date, market_data_update_date, weekly_data_update_date,
-    price_base_date, size_base_date, return_base_date,
-    credit_rating_base_date, issue_date, listing_date, trade_end_date,
-    product_id, product_code, product_name, short_name,
-    issuer_or_manager, asset_class, investment_region, currency,
-    risk_code, risk_name, fee_rate, other_fee_rate,
-    return_1d, return_1w, return_1m, return_3m, return_6m,
-    return_1y, return_2y, return_3y, return_5y, return_ytd,
-    yield_rate, size_amount, price, maturity_date,
-    sale_available, trade_status_raw, base_index,
-    quality_flags, reference_date_note, reference_dates, bond_kind,
-    coupon_rate, corp_pretax_yield, corp_aftertax_yield, indiv_aftertax_yield, preferential_tax_yield, avg_annual_yield, deposit_equivalent_yield, remaining_days, duration, convexity, next_day_duration, next_day_convexity, dirty_price, next_day_eval_price, next_day_yield_rate, next_day_dirty_price, bond_mid_class, leverage_factor, base_price, day_high, day_low, last_nav, premium_discount_rate, trading_value_1d, trading_volume_1d, exchange_code, product_group_code, par_value, listed_share_count, market_code, realtime_volume, is_core_etf, etf_strategy, tracking_error, nav_change_amount, prev_day_nav, trading_value_avg_1m, trading_value_avg_5d, trading_volume_avg_1m, trading_volume_avg_5d, intraday_premium_discount_rate, intraday_inav, circulating_net_asset_amount, circulating_share_count, dividend_per_share, dividend_cycle, dividend_yield, exchange_name, market_name, nav_per_share, net_asset_per_share, net_profit_per_share, net_asset_ratio_per_share, pension_risk_class, is_pension_tradable, etf_sector_code, etf_sector, is_spac, total_share_count, is_etn, index_replication_method, is_index_tracking, is_inverse, base_date_matched, close_price_source, day_open, lipper_id, us_cik, is_currency_hedged, fund_establish_country, return_18m, fund_setup_type_code, is_foreign_base_price, fss_product_code, is_hedge_fund, interest_dividend_type, kofia_classification_code, manager_product_code, is_offshore_fund, manager_external_org_code, professional_sale_control_code, fund_attribute_code, private_fund_type, public_private_type, individual_corp_type, representative_ksd_code, trustee_external_org_code
+COMMON_SELECT_FIELDS = """
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, etf_sector, fn_average_maturity, fn_effective_duration, fn_modified_duration, intraday_inav, intraday_premium_discount_rate, nav_per_share, net_asset_per_share, net_asset_ratio_per_share, net_profit_per_share, pd_dvid_inc_dist, return_1w, return_base_date
 """
+
+DOMESTIC_BOND_SELECT_FIELDS = """
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, avg_annual_tax_yield, bd_inrt_tcd, bd_intp_tcd, bd_ofr_tcd, bd_tisu_a, bdbns_abl_chnl_nm, bdbns_abl_chnl_tcd, bd_knd, std_pd_scls_nm, cov, corp_after_tax_yield, corp_pretax_yield, srfc_irt, credit_rating_base_date, depo_equiv_yield_495, depo_equiv_yield_154, dirty, dur, exg_close_price, exg_close_price_base_dt, exg_close_yield, exrt_grte_ern_r, exrt_grte_ern_r_tcd, exrt_rpy_r, after_tax_yield, info_base_dt, info_seq, is_pension_tradable, issue_date, issuer_or_manager, maturity_date, ndy_cov, ndy_dirty, ndy_dur, ndy_eval_price, ndy_applied_yield, pref_tax_yield, product_info_update_date, remaining_days, risk_code, risk_name, sale_yield_base_dt, trade_price, yield_rate
+"""
+
+DOMESTIC_ETF_SELECT_FIELDS = """
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, base_index, base_price, pd_circ_net_tamt, pd_circ_stk_cnt, day_high, day_low, pd_dvid_cycl, pd_divd_amt_pshr, dividend_yield, du_chas_errt_base_dt, du_diff_rt_base_dt, du_vlty_1m, du_vlty_1y, du_vlty_3m, du_vlty_6m, du_vlty_base_dt, etf_kr_product_code, pd_sect_cd, etf_strategy, exchange_code, pd_exg_mkt_nm, fee_rate, fn_average_coupon, fn_average_maturity, fn_average_quality, fn_base_dt, fn_effective_duration, fn_effective_maturity, fn_modified_duration, fn_nominal_maturity, fn_portfolio_dt, is_core_etf, is_pension_tradable, pd_spac_yn, issuer_or_manager, last_nav, leverage_factor, listed_share_count, listing_date, market_code, market_data_update_date, pd_mkt_nm, du_nav_rnf_amt, cu_charge_etc_rt, pd_divd_amt_ann, pd_dvid_base_dt, pd_dvid_inc_dist, pd_dvid_nav, pd_dvid_pay_cnt, pd_dvid_pay_months, pd_dvid_prc_base_dt, pd_dvid_tax_basis, pd_ric, pd_ticker, pd_pen_risk_nm, premium_discount_rate, du_nav_yday, product_group_code, product_info_update_date, realtime_volume, ref_ast_type, ref_base_dt, ref_base_index, ref_fund_mgmt_co, ref_geo_focus, return_1d, return_1m, return_1y, return_3m, return_6m, du_er_ytd, risk_code, risk_name, pd_stk_cnt, du_chas_errt, trade_end_date, trading_value_1d, du_val_1m, du_val_5d, trading_volume_1d, du_vol_avg_1m, du_vol_avg_5d, weekly_data_update_date
+"""
+
+OVERSEAS_ETF_SELECT_FIELDS = """
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, du_base_dt_match_yn, base_index, base_price, du_clpr_src, day_high, day_low, du_opr, etf_gl_product_code, etf_strategy, exchange_code, fee_rate, cu_index_repl_mthd, is_core_etf, cu_etn_yn, cu_index_tracking_yn, cu_inverse_short_yn, issuer_or_manager, last_nav, leverage_factor, pd_lipper_id, listed_share_count, listing_date, market_code, market_data_update_date, pd_lst_price, premium_discount_rate, price_base_date, product_group_code, product_info_update_date, realtime_volume, return_1d, size_base_date, trading_value_1d, trading_volume_1d, pd_us_cik, weekly_data_update_date
+"""
+
+PUBLIC_FUND_SELECT_FIELDS = """
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, base_index, dividend_yield, fd_daily_bas_dt, fd_last_dstb_actg_bss_dt, fd_last_dstb_actg_eot_dt, fd_price_bas_dt, fd_prsv_r, fd_sbpr, fss_itm_no, prfd_attr_cds, fd_estb_ctry_cd, fd_set_pcd, fund_standard_code, han_clas_fee_type, han_clas_nm, han_clas_policies, han_clas_sales_channel, pers_corp_desc, int_dvd_desc, exchdg_yn, frc_bpr_itm_yn, hdge_fd_yn, ofsfd_yn, kofia_fd_ccd, or_co_xtn_itt_cd, mtco_itm_no, ofwk_trus_rwrd_r, or_co_rwrd_r, prfd_attr_cnt, prfd_attr_search_text, prvo_fd_desc, pfiv_sale_cntl_tcd, prvo_pbff_desc, rptt_ksd_itm_no, fd_mm18_ern_r, return_1m, return_1y, fd_yr2_ern_r, return_3m, fd_yr3_ern_r, fd_yr5_ern_r, return_6m, risk_code, risk_name, sale_co_rwrd_r, trusc_rwrd_r, trusc_xtn_itt_cd, zrin_attr_nms, zrin_btyp_cd, zrin_btyp_nm, zrin_dmst_bd_cmst_rt, zrin_dmst_stk_cmst_rt, zrin_etc_ast_cmst_rt, zrin_fd_cmst_rt, zrin_liqt_cmst_rt, zrin_ovrs_bd_cmst_rt, zrin_ovrs_stk_cmst_rt, zrin_pcd, zrin_ptn_nm
+"""
+
+VIEW_BY_PRODUCT_TYPE: dict[str, tuple[str, str]] = {
+    "DOMESTIC_BOND": ("search.domestic_bond_catalog", DOMESTIC_BOND_SELECT_FIELDS),
+    "DOMESTIC_ETF": ("search.domestic_etf_catalog", DOMESTIC_ETF_SELECT_FIELDS),
+    "OVERSEAS_ETF": ("search.overseas_etf_catalog", OVERSEAS_ETF_SELECT_FIELDS),
+    "PUBLIC_FUND": ("search.public_fund_catalog", PUBLIC_FUND_SELECT_FIELDS),
+}
+COMMON_VIEW: tuple[str, str] = ("search.product_catalog", COMMON_SELECT_FIELDS)
+
+TABLE_TO_PRODUCT_TYPE: dict[str, str] = {
+    "PRBD01N001": "DOMESTIC_BOND",
+    "PREF01N001": "DOMESTIC_ETF",
+    "PREF02N001": "OVERSEAS_ETF",
+    "PRFD01N001": "PUBLIC_FUND",
+}
+
+
+def resolve_catalog_view(product_types: list[str] | None = None) -> tuple[str, str]:
+    """route_query가 좁힌 도메인에 맞춰 조회할 뷰(뷰 이름, 그 뷰의 SELECT 컬럼 목록)를 고른다.
+
+    도메인이 정확히 하나로 좁혀졌을 때만 그 도메인 전용 뷰(공통+전용 필드, NULL
+    패딩 없음)를 쓴다. 비어있거나 ALL이거나 여러 도메인이 섞이면 공통 뷰(공통
+    필드만)로 폴백한다 — 서로 다른 도메인 전용 뷰는 컬럼 구성 자체가 달라서
+    그대로 합칠 수 없기 때문이다.
+    """
+    if product_types and len(product_types) == 1 and product_types[0] in VIEW_BY_PRODUCT_TYPE:
+        return VIEW_BY_PRODUCT_TYPE[product_types[0]]
+    return COMMON_VIEW
+
+
+def view_for_source_table(source_table: str | None) -> tuple[str, str]:
+    """source_table(원본 테이블 ID)로 도메인이 이미 확정된 경우 (get_product 등)."""
+    product_type = TABLE_TO_PRODUCT_TYPE.get(source_table or "")
+    if product_type:
+        return VIEW_BY_PRODUCT_TYPE[product_type]
+    return COMMON_VIEW
+
+
+def view_for_product_type(product_type: str | None) -> tuple[str, str]:
+    if product_type:
+        return VIEW_BY_PRODUCT_TYPE.get(product_type, COMMON_VIEW)
+    return COMMON_VIEW
+
+
+_SQL_TYPE_BY_KIND = {"text": "text", "numeric": "numeric", "date": "date", "boolean": "boolean"}
+
+
+def cross_domain_union_sql(fields: list[str]) -> str:
+    """도메인 전용 필드가 섞인 목록을 도메인 구분 없이 한 번에 보고 싶은 통계/진단용
+    엔드포인트(/stats/reference-dates, /quality/summary 등)를 위한 헬퍼.
+
+    각 필드가 실제로 존재하는 도메인 뷰에서는 그 값을, 없는 도메인 뷰에서는
+    NULL을 골라 4개 도메인 뷰를 UNION ALL로 합친다. search.product_catalog는
+    공통 필드만 가지고 있어 이 용도로는 못 쓰기 때문에 매번 이렇게 조립한다.
+    """
+    blocks = []
+    for view_name, select_fields in VIEW_BY_PRODUCT_TYPE.values():
+        available = {name.strip() for name in select_fields.split(",")}
+        parts = ["product_type"]
+        for field in fields:
+            if field in available:
+                parts.append(field)
+            else:
+                sql_type = _SQL_TYPE_BY_KIND[FIELD_SPECS[field].kind]
+                parts.append(f"NULL::{sql_type} AS {field}")
+        blocks.append(f"SELECT {', '.join(parts)} FROM {view_name}")
+    return " UNION ALL ".join(blocks)
+
 
 
 def evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
@@ -85,13 +157,19 @@ def legacy_to_query(request: ProductSearchRequest) -> ProductQueryRequest:
     )
 
 
-def search_products(pool: ConnectionPool, request: ProductQueryRequest, snapshot_date: str) -> dict[str, Any]:
+def search_products(
+    pool: ConnectionPool,
+    request: ProductQueryRequest,
+    snapshot_date: str,
+    product_types: list[str] | None = None,
+) -> dict[str, Any]:
+    view_name, select_fields = resolve_catalog_view(product_types)
     where_sql, parameters = compile_filters(request.q, request.filters)
     order_sql = compile_order(request.sort)
-    count_query = f"SELECT COUNT(*) AS count FROM search.product_catalog WHERE {where_sql}"
+    count_query = f"SELECT COUNT(*) AS count FROM {view_name} WHERE {where_sql}"
     data_query = f"""
-        SELECT {SELECT_FIELDS}
-        FROM search.product_catalog
+        SELECT {select_fields}
+        FROM {view_name}
         WHERE {where_sql}
         ORDER BY {order_sql}
         LIMIT %s OFFSET %s
@@ -118,7 +196,9 @@ def aggregate_products(
     pool: ConnectionPool,
     request: ProductAggregateRequest,
     snapshot_date: str,
+    product_types: list[str] | None = None,
 ) -> dict[str, Any]:
+    view_name, _ = resolve_catalog_view(product_types)
     where_sql, parameters = compile_filters(request.q, request.filters)
     group_columns = [FIELD_SPECS[str(field)].column for field in request.group_by]
     select_parts = [f"{column} AS {quote_alias(str(field))}" for field, column in zip(request.group_by, group_columns)]
@@ -139,25 +219,25 @@ def aggregate_products(
 
     query = f"""
         SELECT {', '.join(select_parts)}
-        FROM search.product_catalog
+        FROM {view_name}
         WHERE {where_sql}
         {group_sql}
         {order_sql}
         LIMIT %s OFFSET %s
     """
-    count_query = f"SELECT COUNT(*) AS count FROM search.product_catalog WHERE {where_sql}"
+    count_query = f"SELECT COUNT(*) AS count FROM {view_name} WHERE {where_sql}"
     if group_columns:
         group_count_query = f"""
             SELECT COUNT(*) AS count
             FROM (
                 SELECT 1
-                FROM search.product_catalog
+                FROM {view_name}
                 WHERE {where_sql}
                 GROUP BY {', '.join(group_columns)}
             ) AS grouped
         """
     else:
-        group_count_query = f"SELECT 1 AS count FROM search.product_catalog WHERE {where_sql} LIMIT 1"
+        group_count_query = f"SELECT 1 AS count FROM {view_name} WHERE {where_sql} LIMIT 1"
 
     with pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(count_query, parameters)
@@ -181,7 +261,13 @@ def aggregate_products(
     }
 
 
-def rank_products(pool: ConnectionPool, request: ProductRankRequest, snapshot_date: str) -> dict[str, Any]:
+def rank_products(
+    pool: ConnectionPool,
+    request: ProductRankRequest,
+    snapshot_date: str,
+    product_types: list[str] | None = None,
+) -> dict[str, Any]:
+    view_name, select_fields = resolve_catalog_view(product_types)
     where_sql, parameters = compile_filters(request.q, request.filters)
     metric_column = FIELD_SPECS[str(request.metric)].column
     direction = "ASC" if request.order == "asc" else "DESC"
@@ -200,10 +286,10 @@ def rank_products(pool: ConnectionPool, request: ProductRankRequest, snapshot_da
     query = f"""
         WITH ranked AS (
             SELECT
-                {SELECT_FIELDS},
+                {select_fields},
                 {metric_column} AS rank_metric_value,
                 {rank_function}() OVER ({partition_sql}ORDER BY {window_order}) AS rank_position
-            FROM search.product_catalog
+            FROM {view_name}
             WHERE {where_sql} AND {metric_column} IS NOT NULL
         )
         SELECT *
@@ -214,7 +300,7 @@ def rank_products(pool: ConnectionPool, request: ProductRankRequest, snapshot_da
     """
     count_query = f"""
         SELECT COUNT(*) AS count
-        FROM search.product_catalog
+        FROM {view_name}
         WHERE {where_sql} AND {metric_column} IS NOT NULL
     """
 
@@ -237,10 +323,11 @@ def rank_products(pool: ConnectionPool, request: ProductRankRequest, snapshot_da
 
 
 def get_product(pool: ConnectionPool, request: GetProductRequest) -> dict[str, Any]:
+    view_name, _ = view_for_source_table(request.source_table)
     with pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
-            """
-            SELECT * FROM search.product_catalog
+            f"""
+            SELECT * FROM {view_name}
             WHERE source_table = %s AND source_row_number = %s
             """,
             (request.source_table, request.source_row_number),
@@ -254,14 +341,16 @@ def get_product(pool: ConnectionPool, request: GetProductRequest) -> dict[str, A
 def _fetch_selector(pool: ConnectionPool, selector: Any) -> list[dict[str, Any]]:
     with pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         if selector.source_table is not None:
+            view_name, select_fields = view_for_source_table(selector.source_table)
             cursor.execute(
-                f"SELECT {SELECT_FIELDS} FROM search.product_catalog WHERE source_table = %s AND source_row_number = %s",
+                f"SELECT {select_fields} FROM {view_name} WHERE source_table = %s AND source_row_number = %s",
                 (selector.source_table, selector.source_row_number),
             )
         else:
+            view_name, select_fields = view_for_product_type(selector.product_type)
             cursor.execute(
                 f"""
-                SELECT {SELECT_FIELDS} FROM search.product_catalog
+                SELECT {select_fields} FROM {view_name}
                 WHERE product_type = %s AND LOWER(product_id) = LOWER(%s)
                 ORDER BY source_table, source_row_number
                 """,

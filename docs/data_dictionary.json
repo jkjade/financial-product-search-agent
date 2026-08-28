@@ -31,7 +31,7 @@
       "size_amount": "isu_bal_amt",
       "price": "eval_price",
       "maturity_date": "mat_dt",
-      "bond_kind": "bd_knd"
+      "bd_knd": "bd_knd"
     },
     "data_file": "data/raw/prbd01n001_data.xlsx",
     "schema_file": "data/raw/prbd01n001_schema.xlsx",
@@ -588,7 +588,6 @@
     "name_column": "pd_nm",
     "common_mapping": {
       "product_id": "pd_itm_no",
-      "product_code": "pd_itm_no_ma",
       "product_name": "pd_nm",
       "short_name": "pd_abrv_nm",
       "issuer_or_manager": "cu_fund_mgmt_co",
@@ -598,16 +597,17 @@
       "risk_code": "pd_risk_cd",
       "risk_name": "pd_risk_nm",
       "fee_rate": "cu_charge_rt",
-      "other_fee_rate": "cu_charge_etc_rt",
       "return_1d": "du_er_1d",
       "return_1m": "du_er_1m",
       "return_3m": "du_er_3m",
       "return_6m": "du_er_6m",
       "return_1y": "du_er_1y",
-      "return_ytd": "du_er_ytd",
       "size_amount": "pd_net_tamt|du_last_aum",
       "price": "du_clpr|ru_mkt_price",
-      "base_index": "cu_base_index"
+      "base_index": "cu_base_index",
+      "etf_kr_product_code": "pd_itm_no_ma",
+      "cu_charge_etc_rt": "cu_charge_etc_rt",
+      "du_er_ytd": "du_er_ytd"
     },
     "data_file": "data/raw/pref01n001_data.xlsx",
     "schema_file": "data/raw/pref01n001_schema.xlsx",
@@ -1516,7 +1516,6 @@
     "name_column": "pd_nm",
     "common_mapping": {
       "product_id": "pd_itm_no",
-      "product_code": "pd_itm_no_ma|pd_isin_cd",
       "product_name": "pd_nm",
       "short_name": "pd_abrv_nm",
       "issuer_or_manager": "cu_fund_mgmt_co",
@@ -1527,7 +1526,8 @@
       "return_1d": "du_er_1d",
       "size_amount": "du_last_aum",
       "price": "du_clpr|ru_mkt_price",
-      "base_index": "cu_base_index"
+      "base_index": "cu_base_index",
+      "etf_gl_product_code": "pd_itm_no_ma|pd_isin_cd"
     },
     "data_file": "data/raw/pref02n001_data.xlsx",
     "schema_file": "data/raw/pref02n001_schema.xlsx",
@@ -1993,7 +1993,6 @@
     "name_column": "itm_nm",
     "common_mapping": {
       "product_id": "itm_no",
-      "product_code": "std_itm_no|ksd_itm_no",
       "product_name": "itm_nm",
       "short_name": "itm_abrv_nm",
       "asset_class": "or_attr_desc",
@@ -2006,11 +2005,12 @@
       "return_3m": "fd_mm3_ern_r",
       "return_6m": "fd_mm6_ern_r",
       "return_1y": "fd_yr1_ern_r",
-      "return_2y": "fd_yr2_ern_r",
-      "return_3y": "fd_yr3_ern_r",
-      "return_5y": "fd_yr5_ern_r",
       "size_amount": "fd_nast_suma",
-      "base_index": "bmrk_nm|bmrk_eng_nm"
+      "base_index": "bmrk_nm|bmrk_eng_nm",
+      "fund_standard_code": "std_itm_no|ksd_itm_no",
+      "fd_yr2_ern_r": "fd_yr2_ern_r",
+      "fd_yr3_ern_r": "fd_yr3_ern_r",
+      "fd_yr5_ern_r": "fd_yr5_ern_r"
     },
     "data_file": "data/raw/prfd01n001_data.xlsx",
     "schema_file": "data/raw/prfd01n001_schema.xlsx",

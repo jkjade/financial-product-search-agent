@@ -40,4 +40,4 @@ def test_api_exposes_reference_dates_and_agent_tool():
     assert '"/stats/reference-dates"' in source
     assert '"/tools/search-products"' in source
     query_source = (ROOT / "src" / "services" / "query_engine.py").read_text(encoding="utf-8")
-    assert "reference_date_note, reference_dates" in query_source
+    assert "reference_date_note, search_text, reference_dates" in query_source

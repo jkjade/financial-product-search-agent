@@ -62,133 +62,133 @@ fp:return2y a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
     rdfs:label "return_2y"@en ;
     rdfs:comment "펀드 2년수익률"@ko ;
-    fp:column "return_2y" .
+    fp:column "fd_yr2_ern_r" .
 
 fp:return3y a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
     rdfs:label "return_3y"@en ;
     rdfs:comment "펀드 3년수익률"@ko ;
-    fp:column "return_3y" .
+    fp:column "fd_yr3_ern_r" .
 
 fp:return5y a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
     rdfs:label "return_5y"@en ;
     rdfs:comment "펀드 5년수익률"@ko ;
-    fp:column "return_5y" .
+    fp:column "fd_yr5_ern_r" .
 
 fp:isCurrencyHedged a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "is_currency_hedged"@en ;
     rdfs:comment "환헤지여부"@ko ;
-    fp:column "is_currency_hedged" .
+    fp:column "exchdg_yn" .
 
 fp:fundEstablishCountry a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "fund_establish_country"@en ;
     rdfs:comment "펀드설립국가코드"@ko ;
-    fp:column "fund_establish_country" .
+    fp:column "fd_estb_ctry_cd" .
 
 fp:return18m a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
     rdfs:label "return_18m"@en ;
     rdfs:comment "펀드 18개월수익률"@ko ;
-    fp:column "return_18m" .
+    fp:column "fd_mm18_ern_r" .
 
 fp:fundSetupTypeCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "fund_setup_type_code"@en ;
     rdfs:comment "펀드설정유형코드"@ko ;
-    fp:column "fund_setup_type_code" .
+    fp:column "fd_set_pcd" .
 
 fp:isForeignBasePrice a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "is_foreign_base_price"@en ;
     rdfs:comment "외화기준가종목여부"@ko ;
-    fp:column "is_foreign_base_price" .
+    fp:column "frc_bpr_itm_yn" .
 
 fp:fssProductCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "fss_product_code"@en ;
     rdfs:comment "금융감독원종목번호"@ko ;
-    fp:column "fss_product_code" .
+    fp:column "fss_itm_no" .
 
 fp:isHedgeFund a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "is_hedge_fund"@en ;
     rdfs:comment "헤지펀드여부"@ko ;
-    fp:column "is_hedge_fund" .
+    fp:column "hdge_fd_yn" .
 
 fp:interestDividendType a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "interest_dividend_type"@en ;
     rdfs:comment "이자배당구분코드 설명"@ko ;
-    fp:column "interest_dividend_type" .
+    fp:column "int_dvd_desc" .
 
 fp:kofiaClassificationCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "kofia_classification_code"@en ;
     rdfs:comment "금융투자협회펀드분류코드"@ko ;
-    fp:column "kofia_classification_code" .
+    fp:column "kofia_fd_ccd" .
 
 fp:managerProductCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "manager_product_code"@en ;
     rdfs:comment "운용사종목번호"@ko ;
-    fp:column "manager_product_code" .
+    fp:column "mtco_itm_no" .
 
 fp:isOffshoreFund a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "is_offshore_fund"@en ;
     rdfs:comment "역외펀드여부"@ko ;
-    fp:column "is_offshore_fund" .
+    fp:column "ofsfd_yn" .
 
 fp:managerExternalOrgCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "manager_external_org_code"@en ;
     rdfs:comment "운용회사대외기관코드"@ko ;
-    fp:column "manager_external_org_code" .
+    fp:column "or_co_xtn_itt_cd" .
 
 fp:professionalSaleControlCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "professional_sale_control_code"@en ;
     rdfs:comment "전문투자자판매제어구분코드"@ko ;
-    fp:column "professional_sale_control_code" .
+    fp:column "pfiv_sale_cntl_tcd" .
 
 fp:fundAttributeCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "fund_attribute_code"@en ;
     rdfs:comment "펀드별속성코드 목록(쉼표 구분)"@ko ;
-    fp:column "fund_attribute_code" .
+    fp:column "prfd_attr_cds" .
 
 fp:privateFundType a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "private_fund_type"@en ;
     rdfs:comment "사모펀드구분코드 설명"@ko ;
-    fp:column "private_fund_type" .
+    fp:column "prvo_fd_desc" .
 
 fp:publicPrivateType a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "public_private_type"@en ;
     rdfs:comment "사모/공모구분코드 설명"@ko ;
-    fp:column "public_private_type" .
+    fp:column "prvo_pbff_desc" .
 
 fp:individualCorpType a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "individual_corp_type"@en ;
     rdfs:comment "개인법인구분코드 설명"@ko ;
-    fp:column "individual_corp_type" .
+    fp:column "pers_corp_desc" .
 
 fp:representativeKsdCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "representative_ksd_code"@en ;
     rdfs:comment "대표예탁원종목번호"@ko ;
-    fp:column "representative_ksd_code" .
+    fp:column "rptt_ksd_itm_no" .
 
 fp:trusteeExternalOrgCode a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:label "trustee_external_org_code"@en ;
     rdfs:comment "수탁회사대외기관코드"@ko ;
-    fp:column "trustee_external_org_code" .
+    fp:column "trusc_xtn_itt_cd" .
 
 fp:price a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
@@ -203,3 +203,10 @@ fp:dividendYield a owl:DatatypeProperty ;
     rdfs:comment "최근 분배율(2026-08-21 스냅샷부터 fd_last_dstb_r로 신규 제공, 그 전에는 공모펀드 dividend_yield가 항상 NULL이었음)"@ko ;
     fp:column "dividend_yield" ;
     fp:alias "분배율", "최근 분배율", "분배수익률", "dividend yield" .
+
+fp:fundStandardCode a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
+    rdfs:label "표준종목번호"@ko ;
+    rdfs:comment "표준종목번호(없으면 예탁원종목번호로 대체) — 공통 product_code에서 공모펀드만 분리한 필드"@ko ;
+    fp:column "fund_standard_code" ;
+    fp:alias "표준종목번호", "예탁원종목번호" .

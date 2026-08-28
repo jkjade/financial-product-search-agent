@@ -14,7 +14,7 @@ from ..api.models import (
     SemanticSearchRequest,
 )
 from ..semantic.ontology import resolve_query_terms
-from .query_engine import search_products
+from .query_engine import cross_domain_union_sql, search_products
 
 
 def _dataset_evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
@@ -280,16 +280,22 @@ def _fuzzy_product_candidates(
     snapshot_date: str,
     limit: int,
 ) -> dict[str, Any]:
+    # 도메인 전용 필드(fee_rate/risk_name 등)는 2026-08 뷰 분리 이후 공통 뷰에
+    # 없으므로, 4개 도메인 뷰를 즉석에서 UNION해서 예전처럼 한 번에 조회한다.
+    union_sql = cross_domain_union_sql(
+        [
+            "source_table", "source_row_number", "source_file", "data_base_date",
+            "product_id", "product_name", "short_name", "issuer_or_manager",
+            "asset_class", "investment_region", "currency", "risk_name", "base_index",
+            "fee_rate", "return_1y", "du_er_ytd", "yield_rate", "size_amount", "price",
+            "reference_dates", "quality_flags", "search_text",
+        ]
+    )
     with pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
-            """
-            SELECT product_type, source_table, source_row_number, source_file, data_base_date,
-                   product_id, product_code, product_name, short_name, issuer_or_manager,
-                   asset_class, investment_region, currency, risk_name, base_index,
-                   fee_rate, return_1y, return_ytd, yield_rate, size_amount, price,
-                   reference_dates, quality_flags,
-                   similarity(search_text, %s) AS semantic_text_score
-            FROM search.product_catalog
+            f"""
+            SELECT *, similarity(search_text, %s) AS semantic_text_score
+            FROM ({union_sql}) AS unioned
             WHERE similarity(search_text, %s) > 0.05
                OR product_name ILIKE %s
             ORDER BY semantic_text_score DESC, product_name ASC

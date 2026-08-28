@@ -20,6 +20,7 @@ from ..query.fields import FIELD_SPECS, GROUP_FIELDS, NUMERIC_FIELDS, SORT_FIELD
 from ..services.query_engine import (
     aggregate_products,
     compare_products,
+    cross_domain_union_sql,
     get_product as service_get_product,
     legacy_to_query,
     rank_products,
@@ -278,24 +279,18 @@ def stats() -> dict[str, Any]:
 @app.get("/stats/reference-dates")
 def reference_date_stats() -> dict[str, Any]:
     db_pool = _get_pool()
+    date_fields = [
+        "product_info_update_date", "market_data_update_date", "weekly_data_update_date",
+        "price_base_date", "size_base_date", "return_base_date", "credit_rating_base_date",
+        "issue_date", "listing_date", "trade_end_date", "maturity_date",
+    ]
+    union_sql = cross_domain_union_sql(date_fields)
+    count_exprs = ", ".join(f"COUNT({field}) AS {field}_count" for field in date_fields)
     with db_pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
-            """
-            SELECT
-                product_type,
-                COUNT(*) AS product_count,
-                COUNT(product_info_update_date) AS product_info_update_date_count,
-                COUNT(market_data_update_date) AS market_data_update_date_count,
-                COUNT(weekly_data_update_date) AS weekly_data_update_date_count,
-                COUNT(price_base_date) AS price_base_date_count,
-                COUNT(size_base_date) AS size_base_date_count,
-                COUNT(return_base_date) AS return_base_date_count,
-                COUNT(credit_rating_base_date) AS credit_rating_base_date_count,
-                COUNT(issue_date) AS issue_date_count,
-                COUNT(listing_date) AS listing_date_count,
-                COUNT(trade_end_date) AS trade_end_date_count,
-                COUNT(maturity_date) AS maturity_date_count
-            FROM search.product_catalog
+            f"""
+            SELECT product_type, COUNT(*) AS product_count, {count_exprs}
+            FROM ({union_sql}) AS unioned
             GROUP BY product_type
             ORDER BY product_type
             """
@@ -309,9 +304,12 @@ def reference_date_stats() -> dict[str, Any]:
 @app.get("/quality/summary")
 def quality_summary() -> dict[str, Any]:
     db_pool = _get_pool()
+    union_sql = cross_domain_union_sql(
+        ["product_id", "product_name", "quality_flags", "fee_rate", "size_amount", "price"]
+    )
     with db_pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
-            """
+            f"""
             SELECT
                 product_type,
                 COUNT(*) AS product_count,
@@ -321,7 +319,7 @@ def quality_summary() -> dict[str, Any]:
                 COUNT(*) FILTER (WHERE fee_rate < 0) AS negative_fee_count,
                 COUNT(*) FILTER (WHERE size_amount < 0) AS negative_size_count,
                 COUNT(*) FILTER (WHERE price <= 0) AS non_positive_price_count
-            FROM search.product_catalog
+            FROM ({union_sql}) AS unioned
             GROUP BY product_type
             ORDER BY product_type
             """
@@ -473,9 +471,13 @@ def answer(
 
     rounds: dict[int, list[dict[str, Any]]] = {}
     for tool_result in result["tool_results"]:
-        rounds.setdefault(tool_result["round"], []).append(
-            {"name": tool_result["tool"], "arguments": tool_result["arguments"]}
-        )
+        entry = {"name": tool_result["tool"], "arguments": tool_result["arguments"]}
+        if tool_result["tool"] == "route_query":
+            # route_query는 결과(product_types/tool 또는 실패 시 에러)가 그 자체로
+            # 중요한 진단 정보라 다른 도구와 달리 trace에도 노출한다 (실패해도
+            # 조용히 사라지지 않도록).
+            entry["result"] = tool_result["result"]
+        rounds.setdefault(tool_result["round"], []).append(entry)
     think_trace = json.dumps(
         [{"round": round_number, "tools": tools} for round_number, tools in sorted(rounds.items())],
         ensure_ascii=False,
