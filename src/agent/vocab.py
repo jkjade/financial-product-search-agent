@@ -7,12 +7,6 @@ def labels_to_description(labels: dict[str, str]) -> str:
     return "; ".join(f"{value}={label}" for value, label in labels.items())
 
 
-SOURCE_TABLE_LABELS: dict[str, str] = {
-    "PRBD01N001": "국내채권",
-    "PREF01N001": "국내 상장 ETF",
-    "PREF02N001": "해외 상장 ETF",
-    "PRFD01N001": "국내 등록 공모펀드",
-}
 SourceTable = Literal["PRBD01N001", "PREF01N001", "PREF02N001", "PRFD01N001"]
 
 RANK_METHOD_LABELS: dict[str, str] = {
@@ -97,3 +91,18 @@ PRODUCT_TYPE_LABELS: dict[str, str] = {
     "PUBLIC_FUND": "국내 등록 공모펀드",
 }
 ProductType = Literal["DOMESTIC_BOND", "DOMESTIC_ETF", "OVERSEAS_ETF", "PUBLIC_FUND"]
+
+# source_table(원본 테이블 코드)과 product_type은 같은 4개 도메인을 가리키는 서로 다른
+# 키 체계일 뿐이라, 라벨을 SOURCE_TABLE_TO_PRODUCT_TYPE으로 product_type에 위임하고
+# PRODUCT_TYPE_LABELS 하나에서 파생시킨다 — 두 딕셔너리를 따로 유지하면 한쪽만 고치고
+# 다른 쪽을 깜빡해 값이 어긋날 위험이 있다(2026-08-28 세션 정리).
+SOURCE_TABLE_TO_PRODUCT_TYPE: dict[str, str] = {
+    "PRBD01N001": "DOMESTIC_BOND",
+    "PREF01N001": "DOMESTIC_ETF",
+    "PREF02N001": "OVERSEAS_ETF",
+    "PRFD01N001": "PUBLIC_FUND",
+}
+SOURCE_TABLE_LABELS: dict[str, str] = {
+    source_table: PRODUCT_TYPE_LABELS[product_type]
+    for source_table, product_type in SOURCE_TABLE_TO_PRODUCT_TYPE.items()
+}
