@@ -55,12 +55,34 @@ def _fuzzy_correct_field(value: Any) -> Any:
     return value
 
 
+_OPERATOR_ALIASES: dict[str, str] = {
+    "ge": "gte", ">=": "gte",
+    "le": "lte", "<=": "lte",
+    ">": "gt",
+    "<": "lt",
+    "=": "eq", "==": "eq",
+    "!=": "ne", "<>": "ne",
+    "like": "contains",
+    "startswith": "starts_with",
+    "isnull": "is_null",
+    "notnull": "not_null",
+    "notin": "not_in",
+}
+
+
+def _correct_operator_alias(value: Any) -> Any:
+    if isinstance(value, str) and value in _OPERATOR_ALIASES:
+        return _OPERATOR_ALIASES[value]
+    return value
+
+
 FilterField = _field_literal(FILTER_FIELDS)
 SortField = FilterField
 GroupField = _field_literal(GROUP_FIELDS)
 NumericField = _field_literal(NUMERIC_FIELDS)
 AggregateField = FilterField
 ToolName = Literal[
+    "route_query",
     "search_products",
     "aggregate_products",
     "rank_products",
@@ -71,7 +93,13 @@ ToolName = Literal[
     "semantic_search",
     "federated_search",
 ]
-ScalarValue = str | Decimal | bool | date
+ScalarValue = str | float | bool | date
+# Decimal을 그대로 타입에 넣으면 Pydantic이 JSON Schema에 전방부정탐색(lookahead,
+# `(?!...)`)이 포함된 정밀도 보존용 정규식 패턴을 자동 생성한다. HCX처럼
+# 도구 스키마를 실제로 파싱/검증해야 하는 쪽에서는 이 복잡한 anyOf/pattern이
+# 페이로드 크기와 처리 부담을 키우는 요인이 될 수 있어(실측: 필드 enum이
+# 큰 도구일수록 간헐적 오류 빈도가 높아짐), 여기서는 숫자를 float로 받고
+# 실제 정밀도 보존(Decimal 변환)은 _coerce_filter_value에서 서버가 직접 한다.
 
 
 class StrictModel(BaseModel):
@@ -117,6 +145,7 @@ class FilterClause(StrictModel):
     values: list[ScalarValue] | None = Field(default=None, max_length=100)
 
     _correct_field = field_validator("field", mode="before")(_fuzzy_correct_field)
+    _correct_operator = field_validator("operator", mode="before")(_correct_operator_alias)
 
     @model_validator(mode="after")
     def validate_shape(self) -> "FilterClause":
@@ -338,6 +367,20 @@ class ProductCompareRequest(StrictModel):
 class GetProductRequest(StrictModel):
     source_table: SourceTable = Field(description=labels_to_description(SOURCE_TABLE_LABELS))
     source_row_number: int = Field(ge=2)
+
+
+RouteProductType = Literal["ALL", "DOMESTIC_BOND", "DOMESTIC_ETF", "OVERSEAS_ETF", "PUBLIC_FUND"]
+
+
+class RouteQueryRequest(StrictModel):
+
+    product_types: list[RouteProductType] = Field(
+        min_length=1,
+        description=(
+            "질문이 다루는 상품군. 도메인이 명확하면 그 값 하나만, 여러 도메인을 "
+            "비교/합산하거나 도메인이 불명확하면 ALL을 쓰세요."
+        ),
+    )
 
 
 class ToolCallRequest(StrictModel):
