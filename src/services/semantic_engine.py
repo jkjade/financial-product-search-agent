@@ -246,7 +246,7 @@ def semantic_search_documents(
                 ORDER BY score DESC, as_of_date DESC
                 LIMIT %s
                 """,
-                q[
+                [
                     request.query,
                     request.query,
                     f"%{request.query}%",

@@ -13,7 +13,7 @@ from .prompts import SYSTEM_PROMPT
 from .tool_registry import (
     ensure_domain_filter,
     openai_tool_catalog,
-    resolved_domain,
+    resolved_domains,
     translate_field_labels,
 )
 from ..semantic.ontology import resolve_query_terms
@@ -128,15 +128,17 @@ class HCXAgentClient:
         ]
         tool_results: list[dict[str, Any]] = []
         execution_summary: list[dict[str, Any]] = []
-        # route_query가 product_types를 도메인 하나로 좁힌 순간부터, 그 이후 라운드의
-        # 필드 스코프 도구(search_products 등) enum을 그 도메인 컬럼코멘트로 좁힌다.
+        # route_query가 product_types를 1~4개 구체 도메인으로 정한 순간부터, 그 이후
+        # 라운드의 필드 스코프 도구(search_products 등) enum을 그 도메인들 기준으로
+        # 채운다(필터는 합집합, 정렬/집계/순위/비교 지표는 라벨 완전일치 교집합).
+        # "ALL" sentinel은 더 이상 없다 — route_query는 항상 1~4개 값을 반환한다.
         # route_query는 다른 도구와 함께 매 라운드 그대로 노출되고(단독 노출 안 함),
         # tool_choice도 항상 "auto"다 — 둘 다 HCX 400 빈도를 낮추는 데 실측으로
         # 확인된 조건이라 라운드를 거듭해도 절대 안 바꾼다.
-        domain: str | None = None
+        domains: list[str] | None = None
 
         for round_index in range(1, self.settings.max_tool_rounds + 1):
-            response = self._request(messages, tools=openai_tool_catalog(domain))
+            response = self._request(messages, tools=openai_tool_catalog(domains))
             choices = response.get("choices") or []
             if not choices:
                 raise RuntimeError("HyperCLOVA X response has no choices")
@@ -163,17 +165,17 @@ class HCXAgentClient:
                 model_arguments: dict[str, Any] = {}
                 try:
                     model_arguments = json.loads(raw_arguments) if isinstance(raw_arguments, str) else raw_arguments
-                    arguments = translate_field_labels(model_arguments, domain)
-                    arguments = ensure_domain_filter(arguments, domain)
+                    arguments = translate_field_labels(name, model_arguments, domains)
+                    arguments = ensure_domain_filter(arguments, domains)
                     result = tool_executor(name, arguments)
                     status = "ok"
                 except Exception as exc:  # validation errors are returned to the model for correction
                     result = {"error": type(exc).__name__, "detail": str(exc)}
                     status = "error"
-                if name == "route_query" and isinstance(result, dict) and domain is None:
-                    candidate = resolved_domain(result.get("product_types"))
+                if name == "route_query" and isinstance(result, dict) and domains is None:
+                    candidate = resolved_domains(result.get("product_types"))
                     if candidate:
-                        domain = candidate
+                        domains = candidate
                 tool_results.append(
                     {
                         "round": round_index,

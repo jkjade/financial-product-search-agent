@@ -2,25 +2,15 @@ from __future__ import annotations
 
 from psycopg_pool import ConnectionPool
 
+from .field_labels import label_for_field
 from .fields import FIELD_SPECS
 
 PRODUCT_TYPES = ("DOMESTIC_BOND", "DOMESTIC_ETF", "OVERSEAS_ETF", "PUBLIC_FUND")
-
-ROUTABLE_PRODUCT_TYPES = ("ALL",) + PRODUCT_TYPES
 
 _domain_cache: dict[str, list[str]] | None = None
 
 
 def classify_field_domains(pool: ConnectionPool | None = None) -> dict[str, list[str]]:
-    """207개 필드 각각이 4개 product_type 뷰 중 어디에 실제로 존재하는지 분류.
-
-    2026-08 뷰 분리 이전에는 이 함수가 단일 거대 뷰(search.product_catalog)에
-    대고 매 필드·도메인 조합의 non-null count를 실측 쿼리했다. 지금은 "어느
-    도메인에 어떤 필드가 채워지는지"가 이미 뷰 설계 단계(각 도메인 전용 뷰의
-    SELECT 컬럼 목록)에서 실측·확정됐으므로, 그 정적 정의(query_engine의
-    VIEW_BY_PRODUCT_TYPE)에서 그대로 파생한다 — DB 왕복이 필요 없다.
-    `pool` 인자는 이전 호출부와의 호환을 위해 남겨뒀을 뿐 쓰이지 않는다.
-    """
     global _domain_cache
     if _domain_cache is not None:
         return _domain_cache
@@ -39,29 +29,41 @@ def classify_field_domains(pool: ConnectionPool | None = None) -> dict[str, list
 
 
 def common_fields(pool: ConnectionPool) -> list[str]:
-    """4개 도메인 전부에서 값이 채워지는 필드만 (route_query가 ALL을 고른 경우)."""
     classification = classify_field_domains(pool)
     return [field for field, domains in classification.items() if len(domains) == len(PRODUCT_TYPES)]
 
 
 def fields_for_domains(pool: ConnectionPool, product_types: list[str]) -> list[str]:
-    """route_query가 고른 product_types에 노출 가능한 필드 slug 목록.
-
-    "ALL"이 포함되면(다른 값과 같이 와도) 공통 필드만 반환한다 — ALL은 "도메인을
-    특정하지 않는 질문"이라는 뜻이라, 특정 도메인 전용 필드까지 섞으면 오히려
-    다시 전체 128개에 가까워져서 축소 효과가 없어진다.
-    """
-    if not product_types or "ALL" in product_types:
-        return common_fields(pool)
-
+    domains = list(product_types) if product_types else list(PRODUCT_TYPES)
     classification = classify_field_domains(pool)
     seen: set[str] = set()
     result: list[str] = []
-    for field, domains in classification.items():
-        if any(pt in domains for pt in product_types) and field not in seen:
+    for field, field_domains in classification.items():
+        if any(pt in field_domains for pt in domains) and field not in seen:
             seen.add(field)
             result.append(field)
     return result
+
+
+def label_field_map_for_domain(pool: ConnectionPool | None, domain: str) -> dict[str, str]:
+    classification = classify_field_domains(pool)
+    fields = sorted(field for field, domains in classification.items() if domain in domains)
+    mapping: dict[str, str] = {}
+    for field in fields:
+        mapping.setdefault(label_for_field(field, domain), field)
+    return mapping
+
+
+def shared_label_map(pool: ConnectionPool | None, product_types: list[str] | None) -> dict[str, dict[str, str]]:
+    domains = list(product_types) if product_types else list(PRODUCT_TYPES)
+    if not domains:
+        return {}
+    per_domain = {domain: label_field_map_for_domain(pool, domain) for domain in domains}
+    common_labels = sorted(set.intersection(*(set(mapping) for mapping in per_domain.values())))
+    return {
+        label: {domain: per_domain[domain][label] for domain in domains}
+        for label in common_labels
+    }
 
 
 def reset_cache() -> None:

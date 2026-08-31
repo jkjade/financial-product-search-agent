@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from decimal import Decimal
 from typing import Any
 
@@ -17,6 +18,8 @@ from ..api.models import (
     ProductSearchRequest,
     SortClause,
 )
+from ..query.field_domains import PRODUCT_TYPES, classify_field_domains, label_field_map_for_domain
+from ..query.field_labels import label_for_field
 from ..query.fields import FIELD_SPECS, LEGACY_SORT_ALIASES
 from ..query.sql_builder import compile_filters, compile_order, metric_expression, quote_alias
 
@@ -56,17 +59,63 @@ TABLE_TO_PRODUCT_TYPE: dict[str, str] = {
 }
 
 
-def resolve_catalog_view(product_types: list[str] | None = None) -> tuple[str, str]:
-    """route_query가 좁힌 도메인에 맞춰 조회할 뷰(뷰 이름, 그 뷰의 SELECT 컬럼 목록)를 고른다.
+def _resolve_domain_column(field: str, domains: list[str], target_domain: str) -> str | None:
+    classification = classify_field_domains(None)
+    present_in = classification.get(field, [])
+    if target_domain in present_in:
+        return FIELD_SPECS[field].column
+    source_domain = next((d for d in domains if d in present_in), None)
+    if source_domain is None:
+        return None
+    label = label_for_field(field, source_domain)
+    equivalent = label_field_map_for_domain(None, target_domain).get(label)
+    return FIELD_SPECS[equivalent].column if equivalent else None
 
-    도메인이 정확히 하나로 좁혀졌을 때만 그 도메인 전용 뷰(공통+전용 필드, NULL
-    패딩 없음)를 쓴다. 비어있거나 ALL이거나 여러 도메인이 섞이면 공통 뷰(공통
-    필드만)로 폴백한다 — 서로 다른 도메인 전용 뷰는 컬럼 구성 자체가 달라서
-    그대로 합칠 수 없기 때문이다.
-    """
-    if product_types and len(product_types) == 1 and product_types[0] in VIEW_BY_PRODUCT_TYPE:
-        return VIEW_BY_PRODUCT_TYPE[product_types[0]]
-    return COMMON_VIEW
+
+def _select_columns_for_domains(domains: list[str]) -> list[str]:
+    """주어진 도메인들의 SELECT_FIELDS를 합쳐 중복 없는 컬럼 목록을 만든다(등장 순서 유지)."""
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for domain in domains:
+        _, select_fields = VIEW_BY_PRODUCT_TYPE[domain]
+        for name in select_fields.split(","):
+            name = name.strip()
+            if name and name not in seen:
+                seen.add(name)
+                ordered.append(name)
+    return ordered
+
+
+def cross_domain_union_sql_for(fields: list[str], domains: list[str], unified_fields: Iterable[str] = ()) -> str:
+    unified = set(unified_fields)
+    blocks = []
+    for domain in domains:
+        view_name, select_fields = VIEW_BY_PRODUCT_TYPE[domain]
+        available = {name.strip() for name in select_fields.split(",")}
+        parts = []
+        for field in fields:
+            if field in available:
+                parts.append(field)
+            elif field in unified:
+                column = _resolve_domain_column(field, domains, domain)
+                sql_type = _SQL_TYPE_BY_KIND[FIELD_SPECS[field].kind]
+                parts.append(f"{column} AS {field}" if column else f"NULL::{sql_type} AS {field}")
+            else:
+                sql_type = _SQL_TYPE_BY_KIND[FIELD_SPECS[field].kind]
+                parts.append(f"NULL::{sql_type} AS {field}")
+        blocks.append(f"SELECT {', '.join(parts)} FROM {view_name}")
+    return " UNION ALL ".join(blocks)
+
+
+def resolve_catalog_source(
+    product_types: list[str] | None = None, unified_fields: Iterable[str] = ()
+) -> tuple[str, str]:
+    domains = list(dict.fromkeys(product_types)) if product_types else list(PRODUCT_TYPES)
+    if len(domains) == 1 and domains[0] in VIEW_BY_PRODUCT_TYPE:
+        return VIEW_BY_PRODUCT_TYPE[domains[0]]
+    fields = _select_columns_for_domains(domains)
+    union_sql = cross_domain_union_sql_for(fields, domains, unified_fields)
+    return f"({union_sql}) AS unioned", ", ".join(fields)
 
 
 def view_for_source_table(source_table: str | None) -> tuple[str, str]:
@@ -87,13 +136,6 @@ _SQL_TYPE_BY_KIND = {"text": "text", "numeric": "numeric", "date": "date", "bool
 
 
 def cross_domain_union_sql(fields: list[str]) -> str:
-    """도메인 전용 필드가 섞인 목록을 도메인 구분 없이 한 번에 보고 싶은 통계/진단용
-    엔드포인트(/stats/reference-dates, /quality/summary 등)를 위한 헬퍼.
-
-    각 필드가 실제로 존재하는 도메인 뷰에서는 그 값을, 없는 도메인 뷰에서는
-    NULL을 골라 4개 도메인 뷰를 UNION ALL로 합친다. search.product_catalog는
-    공통 필드만 가지고 있어 이 용도로는 못 쓰기 때문에 매번 이렇게 조립한다.
-    """
     blocks = []
     for view_name, select_fields in VIEW_BY_PRODUCT_TYPE.values():
         available = {name.strip() for name in select_fields.split(",")}
@@ -163,7 +205,8 @@ def search_products(
     snapshot_date: str,
     product_types: list[str] | None = None,
 ) -> dict[str, Any]:
-    view_name, select_fields = resolve_catalog_view(product_types)
+    unified_fields = {str(clause.field) for clause in request.filters} | {str(item.field) for item in request.sort}
+    view_name, select_fields = resolve_catalog_source(product_types, unified_fields)
     where_sql, parameters = compile_filters(request.q, request.filters)
     order_sql = compile_order(request.sort)
     count_query = f"SELECT COUNT(*) AS count FROM {view_name} WHERE {where_sql}"
@@ -198,7 +241,12 @@ def aggregate_products(
     snapshot_date: str,
     product_types: list[str] | None = None,
 ) -> dict[str, Any]:
-    view_name, _ = resolve_catalog_view(product_types)
+    unified_fields = (
+        {str(clause.field) for clause in request.filters}
+        | {str(field) for field in request.group_by}
+        | {str(metric.field) for metric in request.metrics if metric.field is not None}
+    )
+    view_name, _ = resolve_catalog_source(product_types, unified_fields)
     where_sql, parameters = compile_filters(request.q, request.filters)
     group_columns = [FIELD_SPECS[str(field)].column for field in request.group_by]
     select_parts = [f"{column} AS {quote_alias(str(field))}" for field, column in zip(request.group_by, group_columns)]
@@ -267,7 +315,12 @@ def rank_products(
     snapshot_date: str,
     product_types: list[str] | None = None,
 ) -> dict[str, Any]:
-    view_name, select_fields = resolve_catalog_view(product_types)
+    unified_fields = (
+        {str(clause.field) for clause in request.filters}
+        | {str(request.metric)}
+        | {str(field) for field in request.partition_by}
+    )
+    view_name, select_fields = resolve_catalog_source(product_types, unified_fields)
     where_sql, parameters = compile_filters(request.q, request.filters)
     metric_column = FIELD_SPECS[str(request.metric)].column
     direction = "ASC" if request.order == "asc" else "DESC"
@@ -408,13 +461,24 @@ def compare_products(
             "evidence": evidence(snapshot_date, "compare"),
         }
 
+    # 비교 대상 상품들이 실제로 걸쳐 있는 도메인(route_query 결과가 아니라 선택된
+    # 상품들 자신의 product_type에서 직접 구한다 — 더 정확함). 지표 필드가 라벨은
+    # 같지만 도메인마다 다른 canonical 필드로 실현되는 경우(예: "듀레이션" →
+    # DOMESTIC_BOND는 dur, DOMESTIC_ETF는 fn_effective_duration), 각 상품 행 자신의
+    # product_type에 맞는 실제 컬럼을 찾아 값을 읽는다.
+    involved_domains = list(dict.fromkeys(item["product_type"] for item in selected))
     metric_rankings: dict[str, list[dict[str, Any]]] = {}
     for metric in request.metrics:
         field = str(metric.field)
         direction = metric.order or FIELD_SPECS[field].default_direction
+        columns = {
+            index: _resolve_domain_column(field, involved_domains, item["product_type"])
+            for index, item in enumerate(selected)
+        }
         numeric_values: list[tuple[int, Decimal]] = []
         for index, item in enumerate(selected):
-            value = item.get(field)
+            column = columns[index]
+            value = item.get(column) if column else None
             if value is not None:
                 numeric_values.append((index, Decimal(str(value))))
         ranks = _dense_ranks(numeric_values, direction)
@@ -424,7 +488,7 @@ def compare_products(
                 "source_row_number": item["source_row_number"],
                 "product_id": item["product_id"],
                 "product_name": item["product_name"],
-                "value": item.get(field),
+                "value": item.get(columns[index]) if columns[index] else None,
                 "rank": ranks.get(index),
             }
             for index, item in enumerate(selected)

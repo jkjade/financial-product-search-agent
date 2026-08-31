@@ -94,12 +94,6 @@ ToolName = Literal[
     "federated_search",
 ]
 ScalarValue = str | float | bool | date
-# Decimal을 그대로 타입에 넣으면 Pydantic이 JSON Schema에 전방부정탐색(lookahead,
-# `(?!...)`)이 포함된 정밀도 보존용 정규식 패턴을 자동 생성한다. HCX처럼
-# 도구 스키마를 실제로 파싱/검증해야 하는 쪽에서는 이 복잡한 anyOf/pattern이
-# 페이로드 크기와 처리 부담을 키우는 요인이 될 수 있어(실측: 필드 enum이
-# 큰 도구일수록 간헐적 오류 빈도가 높아짐), 여기서는 숫자를 float로 받고
-# 실제 정밀도 보존(Decimal 변환)은 _coerce_filter_value에서 서버가 직접 한다.
 
 
 class StrictModel(BaseModel):
@@ -369,18 +363,25 @@ class GetProductRequest(StrictModel):
     source_row_number: int = Field(ge=2)
 
 
-RouteProductType = Literal["ALL", "DOMESTIC_BOND", "DOMESTIC_ETF", "OVERSEAS_ETF", "PUBLIC_FUND"]
+RouteProductType = Literal["DOMESTIC_BOND", "DOMESTIC_ETF", "OVERSEAS_ETF", "PUBLIC_FUND"]
 
 
 class RouteQueryRequest(StrictModel):
 
     product_types: list[RouteProductType] = Field(
         min_length=1,
+        max_length=4,
         description=(
-            "질문이 다루는 상품군. 도메인이 명확하면 그 값 하나만, 여러 도메인을 "
-            "비교/합산하거나 도메인이 불명확하면 ALL을 쓰세요."
+            "질문이 다루는 상품군 목록(1~4개). 도메인이 명확하면 해당 값만, 여러 도메인을 "
+            "비교/합산해야 하면 그 도메인들을 모두, 전 상품군에 걸친 질문이면 4개 값을 전부 나열하세요."
         ),
     )
+
+    @model_validator(mode="after")
+    def validate_unique_product_types(self) -> "RouteQueryRequest":
+        if len(self.product_types) != len(set(self.product_types)):
+            raise ValueError("product_types must not contain duplicates")
+        return self
 
 
 class ToolCallRequest(StrictModel):
