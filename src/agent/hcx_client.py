@@ -9,11 +9,11 @@ from typing import Any, Callable
 import httpx
 
 from .ncp_client import ncp_api_key_from_env, ncp_headers
-from .prompts import SYSTEM_PROMPT
+from .prompts import ROUTING_SYSTEM_PROMPT, SYSTEM_PROMPT
 from .tool_registry import (
     ensure_domain_filter,
     openai_tool_catalog,
-    resolved_domains,
+    parse_routed_domains,
     translate_field_labels,
 )
 from ..semantic.ontology import resolve_query_terms
@@ -76,15 +76,16 @@ class HCXAgentClient:
     def __init__(self, settings: HCXSettings):
         self.settings = settings
 
-    def _request(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> dict[str, Any]:
-        payload = {
+    def _request(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+        payload: dict[str, Any] = {
             "model": self.settings.model,
             "messages": messages,
-            "tools": tools,
-            "tool_choice": "auto",
             "temperature": 0,
             "max_tokens": 2048,
         }
+        if tools:
+            payload["tools"] = tools
+            payload["tool_choice"] = "auto"
         headers = ncp_headers(self.settings.api_key)
         last_error: httpx.HTTPStatusError | None = None
         attempts = 8
@@ -115,27 +116,51 @@ class HCXAgentClient:
         assert last_error is not None
         raise last_error
 
+    def _route_domains(
+        self, question: str, ontology_hint: str | None
+    ) -> tuple[list[str] | None, dict[str, Any]]:
+        user_content = f"{question}\n\n{ontology_hint}" if ontology_hint else question
+        messages: list[dict[str, Any]] = [
+            {"role": "system", "content": ROUTING_SYSTEM_PROMPT},
+            {"role": "user", "content": user_content},
+        ]
+        response = self._request(messages)
+        choices = response.get("choices") or []
+        if not choices:
+            return None, {"error": "no_choices"}
+        content = (choices[0].get("message") or {}).get("content")
+        domains = parse_routed_domains(content)
+        if domains is None:
+            return None, {"error": "could_not_parse_domains", "content": content}
+        return domains, {"product_types": domains, "content": content}
+
     def answer(
         self,
         question: str,
         tool_executor: Callable[[str, dict[str, Any]], dict[str, Any]],
     ) -> dict[str, Any]:
         ontology_hint = _build_ontology_hint(question)
-        user_content = f"{question}\n\n{ontology_hint}" if ontology_hint else question
+        # 상품군(도메인) 판별을 메인 루프 시작 전에 독립적인 순수 텍스트 호출로 먼저
+        # 처리한다(2026-08-31) — 그 결과(domains)만 자연어 힌트로 user 메시지에 얹고,
+        # 이 호출의 messages/응답 자체는 메인 히스토리에 절대 등장하지 않는다.
+        domains, route_diagnostics = self._route_domains(question, ontology_hint)
+        domain_hint = (
+            f"(참고: 이 질문은 다음 상품군에 해당하는 것으로 이미 파악됨: {', '.join(domains)})"
+            if domains
+            else None
+        )
+        hint_lines = [line for line in (ontology_hint, domain_hint) if line]
+        user_content = f"{question}\n\n" + "\n".join(hint_lines) if hint_lines else question
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_content},
         ]
-        tool_results: list[dict[str, Any]] = []
-        execution_summary: list[dict[str, Any]] = []
-        # route_query가 product_types를 1~4개 구체 도메인으로 정한 순간부터, 그 이후
-        # 라운드의 필드 스코프 도구(search_products 등) enum을 그 도메인들 기준으로
-        # 채운다(필터는 합집합, 정렬/집계/순위/비교 지표는 라벨 완전일치 교집합).
-        # "ALL" sentinel은 더 이상 없다 — route_query는 항상 1~4개 값을 반환한다.
-        # route_query는 다른 도구와 함께 매 라운드 그대로 노출되고(단독 노출 안 함),
-        # tool_choice도 항상 "auto"다 — 둘 다 HCX 400 빈도를 낮추는 데 실측으로
-        # 확인된 조건이라 라운드를 거듭해도 절대 안 바꾼다.
-        domains: list[str] | None = None
+        tool_results: list[dict[str, Any]] = [
+            {"round": 0, "tool": "route_query", "arguments": {}, "result": route_diagnostics}
+        ]
+        execution_summary: list[dict[str, Any]] = [
+            {"round": 0, "tool": "route_query", "status": "ok" if domains else "error", "returned_count": None}
+        ]
 
         for round_index in range(1, self.settings.max_tool_rounds + 1):
             response = self._request(messages, tools=openai_tool_catalog(domains))
@@ -172,10 +197,6 @@ class HCXAgentClient:
                 except Exception as exc:  # validation errors are returned to the model for correction
                     result = {"error": type(exc).__name__, "detail": str(exc)}
                     status = "error"
-                if name == "route_query" and isinstance(result, dict) and domains is None:
-                    candidate = resolved_domains(result.get("product_types"))
-                    if candidate:
-                        domains = candidate
                 tool_results.append(
                     {
                         "round": round_index,

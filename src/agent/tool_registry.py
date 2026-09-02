@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+import json
+import re
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
@@ -38,19 +40,9 @@ TOOL_MODELS: dict[str, type[BaseModel]] = {
     "federated_search": FederatedSearchRequest,
 }
 
-# 필드 enum(내부 영문 slug)을 한글 컬럼코멘트로 바꿔야 하는 도구들. resolve_ontology/
-# get_product/graph_lookup 등은 필드 enum이 아니라 다른 값을 다루므로 대상이 아니다.
 FIELD_SCOPED_TOOLS = ("search_products", "aggregate_products", "rank_products", "compare_products")
 
-# 도구별로 필드 enum이 정확히 어느 JSON-schema 경로에 있는지, 그 위치가 "filter"
-# 컨텍스트(합집합 풀 — 선택된 도메인 중 하나 이상에 존재하면 노출)인지 "unified"
-# 컨텍스트(엄격 교집합 풀 — 선택된 도메인 전부에서 라벨이 완전히 같아야 노출)인지를
-# 명시한다. 예전에는 enum 값의 frozenset을 FILTER_FIELDS/SORT_FIELDS/GROUP_FIELDS/
-# NUMERIC_FIELDS와 비교해서 이 둘을 구분했는데, fields.py에 sortable=False인 필드가
-# 하나도 없어 FILTER_FIELDS == SORT_FIELDS(집합 기준)였다 — 즉 그 방식은 애초에 두
-# 컨텍스트를 구분한 적이 없었다(우연히 항상 같은 값을 받아서 문제가 안 됐을 뿐).
-# 필터=합집합, unified=교집합으로 풀 자체가 갈라지는 지금은 경로로 명시 구분해야 한다.
-# model_json_schema() 실제 출력을 덤프해서 검증한 경로(2026-08-29).
+
 _ENUM_TARGETS: dict[str, list[tuple[tuple[Any, ...], str]]] = {
     "search_products": [
         (("$defs", "FilterClause", "properties", "field"), "filter"),
@@ -67,15 +59,11 @@ _ENUM_TARGETS: dict[str, list[tuple[tuple[Any, ...], str]]] = {
         (("properties", "partition_by", "items"), "unified"),
     ],
     "compare_products": [
-        # compare_products의 비교 지표도 정렬/집계와 동일하게 엄격 교집합 풀을 쓴다
-        # (2026-08-29 세션 결정) — 상품이 여러 도메인에 걸쳐 있으면 순위 비교도
-        # 도메인 전체에서 라벨이 같은 지표로만 해야 한다.
         (("$defs", "ComparisonMetric", "properties", "field"), "unified"),
     ],
 }
 
 TOOL_DESCRIPTIONS = {
-    "route_query": "질문을 처리하기 전에 먼저 상품군(도메인)을 정합니다. 항상 다른 도구보다 먼저 호출하세요.",
     "search_products": "조건에 맞는 금융상품을 검색하고 다중 정렬·페이지 처리·근거를 반환합니다.",
     "aggregate_products": "필터 결과를 그룹화하고 count/count_distinct/sum/avg/min/max 집계를 계산합니다.",
     "rank_products": "필터 결과에 row_number/rank/dense_rank 순위를 계산하며 그룹별 Top-N을 지원합니다.",
@@ -156,16 +144,9 @@ def _patch_field_enums(schema: dict[str, Any], tool_name: str, domains: list[str
 
 
 def openai_tool_catalog(domains: list[str] | None = None) -> list[dict[str, Any]]:
-    """도구 카탈로그를 만든다. domains가 주어지면(route_query가 고른 1~4개 구체
-    도메인) FIELD_SCOPED_TOOLS의 필드 enum을 그 도메인들 기준으로 채운다(필터는
-    합집합, 정렬/집계/순위/비교 지표는 라벨 완전일치 교집합). domains가 비어 있으면
-    (route_query 호출 전 1라운드) 4개 도메인 전부를 기준으로 같은 알고리즘을 그대로
-    적용한다 — "ALL"이라는 별도 sentinel/폴백은 없다. 어느 쪽이든 10개 도구 전부를
-    매 라운드 그대로 노출하고 tool_choice는 항상 "auto"다 — 도구를 하나만 떼어
-    보여주거나 tool_choice를 강제 지정하면 HCX 400 Unsupported function 빈도가 크게
-    올라가는 걸 2026-08-27 세션에서 실측했다."""
     catalog = []
-    for name, model in TOOL_MODELS.items():
+    for name in TOOL_DESCRIPTIONS:
+        model = TOOL_MODELS[name]
         schema = copy.deepcopy(model.model_json_schema())
         if name in FIELD_SCOPED_TOOLS:
             schema = _patch_field_enums(schema, name, domains)
@@ -182,10 +163,6 @@ def openai_tool_catalog(domains: list[str] | None = None) -> list[dict[str, Any]
     return catalog
 
 
-# 도구별로 "field" 키가 등장하는 실제 위치가 필터 컨텍스트인지 unified 컨텍스트인지
-# 매핑한다. order_by[].field(ProductAggregateRequest)처럼 키 이름이 우연히 "field"인
-# 별칭(alias) 값은 여기 없으므로 절대 라벨 변환을 타지 않는다 — 예전 코드는 키
-# 이름만 보고 무조건 변환을 시도해서 이 값을 잘못 건드릴 수 있었다.
 _FILTER_KEYS: dict[str, tuple[str, ...]] = {
     "search_products": ("filters",),
     "aggregate_products": ("filters",),
@@ -208,7 +185,7 @@ def translate_field_labels(tool_name: str, arguments: Any, domains: list[str] | 
     처리는 동일하므로 `_resolve()` 하나를 공유한다."""
     filter_pool = list(fields_for_domains(None, domains or []))
     unified_map = shared_label_map(None, domains or [])
-    unified_pool = list(unified_map)
+    unified_pool = sorted({field for per_domain in unified_map.values() for field in per_domain.values()})
     primary_domain = domains[0] if domains else None
 
     def _resolve(value: Any, pool: list[str]) -> Any:
@@ -299,6 +276,26 @@ def resolved_domains(product_types: list[str] | None) -> list[str] | None:
         if pt in PRODUCT_TYPES and pt not in seen:
             seen.append(pt)
     return seen or None
+
+
+_JSON_ARRAY_PATTERN = re.compile(r"\[.*?\]", re.DOTALL)
+
+
+def parse_routed_domains(content: str | None) -> list[str] | None:
+    if not content:
+        return None
+    match = _JSON_ARRAY_PATTERN.search(content)
+    if match is None:
+        return None
+    raw = match.group(0)
+    try:
+        candidate = json.loads(raw)
+    except (ValueError, TypeError):
+        inner = raw.strip()[1:-1]
+        candidate = [token.strip().strip("'\"") for token in inner.split(",") if token.strip()]
+    if not isinstance(candidate, list) or not all(isinstance(item, str) for item in candidate):
+        return None
+    return resolved_domains(candidate)
 
 
 def _infer_product_types(request: Any) -> list[str] | None:

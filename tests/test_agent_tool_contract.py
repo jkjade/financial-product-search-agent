@@ -20,7 +20,10 @@ def test_tool_catalog_contains_all_phase2_tools():
     phase25 = {"resolve_ontology", "graph_lookup", "semantic_search", "federated_search"}
     assert phase25.issubset(set(TOOL_MODELS))
     catalog = openai_tool_catalog()
-    assert {item["function"]["name"] for item in catalog} == set(TOOL_MODELS)
+    # route_query는 TOOL_MODELS에는 있지만(디버그용 /tools/execute 등 범용 도구
+    # 실행 경로가 필요로 함) 메인 루프 카탈로그에는 없다 — 별도의 1회성 라우팅
+    # 호출(route_query_tool_catalog)에서만 노출된다.
+    assert {item["function"]["name"] for item in catalog} == set(TOOL_MODELS) - {"route_query"}
     assert all(item["type"] == "function" for item in catalog)
     assert all(item["function"]["parameters"]["type"] == "object" for item in catalog)
 
