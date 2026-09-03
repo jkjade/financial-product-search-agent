@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from contextlib import asynccontextmanager
-from decimal import Decimal
 from typing import Any
 
 import httpx
@@ -18,11 +17,10 @@ from ..config import database_url, load_datasets
 from ..semantic.ontology import ontology_info, resolve_query_terms, load_business_rules
 from ..query.fields import FIELD_SPECS, GROUP_FIELDS, NUMERIC_FIELDS, SORT_FIELDS
 from ..services.query_engine import (
+    VIEW_BY_PRODUCT_TYPE,
     aggregate_products,
     compare_products,
-    cross_domain_union_sql,
     get_product as service_get_product,
-    legacy_to_query,
     rank_products,
     search_products as service_search_products,
 )
@@ -34,14 +32,10 @@ from ..services.semantic_engine import (
 from .models import (
     AgentPlan,
     GetProductRequest,
-    LegacySortBy,
     ProductAggregateRequest,
     ProductCompareRequest,
     ProductQueryRequest,
     ProductRankRequest,
-    ProductSearchRequest,
-    ProductType,
-    SortOrder,
     SourceTable,
     ToolCallRequest,
     OntologyResolveRequest,
@@ -276,15 +270,63 @@ def stats() -> dict[str, Any]:
     return {"items": items, "total_count": sum(int(item["product_count"]) for item in items)}
 
 
+#  2026-09 도메인 네이티브 컬럼명 전환 이후 이 두 진단용 엔드포인트가 쓰던
+#  "공통 이름으로 4개 도메인 뷰를 UNION" 방식(cross_domain_union_sql, 삭제됨)은
+#  더 이상 성립하지 않는다 — product_info_update_date/product_name/size_amount
+#  같은 이름이 도메인마다 실제 컬럼이 다르기 때문. 응답 JSON의 필드명(사용자에게
+#  보여줄 라벨)은 그대로 유지하되, 그 아래서 각 도메인이 실제로 가진 원본 컬럼을
+#  직접 매핑해서 UNION한다 — 개념이 없는 도메인은 그냥 NULL. 이 매핑을 필요로
+#  하는 곳이 각 진단 엔드포인트 자기 자신뿐이라(다른 파일과 공유 안 함) 둘 다
+#  로컬로 둔다 — _QUALITY_COLUMNS_BY_DOMAIN도 같은 이유로 아래에 따로 있다.
+_REFERENCE_DATE_COLUMNS_BY_DOMAIN: dict[str, dict[str, str]] = {
+    "DOMESTIC_BOND": {
+        "product_info_update_date": "pd_std_info_update_domestic_bond",
+        "credit_rating_base_date": "credit_rating_base_date",
+        "issue_date": "issue_date",
+        "maturity_date": "maturity_date",
+    },
+    "DOMESTIC_ETF": {
+        "product_info_update_date": "cu_upt_dt_domestic_etf",
+        "market_data_update_date": "du_upt_dt_domestic_etf",
+        "weekly_data_update_date": "wu_upt_dt_domestic_etf",
+        "listing_date": "pd_lstg_dt_domestic_etf",
+        "trade_end_date": "trade_end_date",
+    },
+    "OVERSEAS_ETF": {
+        "product_info_update_date": "cu_upt_dt_overseas_etf",
+        "market_data_update_date": "du_upt_dt_overseas_etf",
+        "weekly_data_update_date": "wu_upt_dt_overseas_etf",
+        "listing_date": "pd_lstg_dt_overseas_etf",
+        "price_base_date": "price_base_date",
+        "size_base_date": "size_base_date",
+    },
+    "PUBLIC_FUND": {},
+}
+
+
+def _domain_mapped_union_sql(
+    column_map: dict[str, dict[str, str]], fields: list[str], sql_type: str
+) -> str:
+    blocks = []
+    for domain, domain_map in column_map.items():
+        view_name, _ = VIEW_BY_PRODUCT_TYPE[domain]
+        parts = ["product_type"]
+        for field in fields:
+            column = domain_map.get(field)
+            parts.append(f"{column} AS {field}" if column else f"NULL::{sql_type} AS {field}")
+        blocks.append(f"SELECT {', '.join(parts)} FROM {view_name}")
+    return " UNION ALL ".join(blocks)
+
+
 @app.get("/stats/reference-dates")
 def reference_date_stats() -> dict[str, Any]:
     db_pool = _get_pool()
     date_fields = [
         "product_info_update_date", "market_data_update_date", "weekly_data_update_date",
-        "price_base_date", "size_base_date", "return_base_date", "credit_rating_base_date",
+        "price_base_date", "size_base_date", "credit_rating_base_date",
         "issue_date", "listing_date", "trade_end_date", "maturity_date",
     ]
-    union_sql = cross_domain_union_sql(date_fields)
+    union_sql = _domain_mapped_union_sql(_REFERENCE_DATE_COLUMNS_BY_DOMAIN, date_fields, "date")
     count_exprs = ", ".join(f"COUNT({field}) AS {field}_count" for field in date_fields)
     with db_pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
@@ -301,12 +343,46 @@ def reference_date_stats() -> dict[str, Any]:
         }
 
 
+_QUALITY_COLUMNS_BY_DOMAIN: dict[str, dict[str, str]] = {
+    "DOMESTIC_BOND": {
+        "product_name": "pd_nm_domestic_bond",
+        "size_amount": "isu_bal_amt_domestic_bond",
+        "price": "eval_price_domestic_bond",
+    },
+    "DOMESTIC_ETF": {
+        "product_name": "pd_nm_domestic_etf",
+        "fee_rate": "cu_charge_rt_domestic_etf",
+        "size_amount": "pd_net_tamt_domestic_etf",
+        "price": "du_clpr_domestic_etf",
+    },
+    "OVERSEAS_ETF": {
+        "product_name": "pd_nm_overseas_etf",
+        "fee_rate": "cu_charge_rt_overseas_etf",
+        "size_amount": "du_last_aum_overseas_etf",
+        "price": "du_clpr_overseas_etf",
+    },
+    "PUBLIC_FUND": {
+        "product_name": "itm_nm_public_fund",
+        "size_amount": "fd_nast_suma_public_fund",
+        "price": "bns_bpr_public_fund",
+    },
+}
+
+
 @app.get("/quality/summary")
 def quality_summary() -> dict[str, Any]:
     db_pool = _get_pool()
-    union_sql = cross_domain_union_sql(
-        ["product_id", "product_name", "quality_flags", "fee_rate", "size_amount", "price"]
-    )
+    blocks = []
+    for domain, view_entry in VIEW_BY_PRODUCT_TYPE.items():
+        view_name, _ = view_entry
+        domain_map = _QUALITY_COLUMNS_BY_DOMAIN[domain]
+        parts = ["product_type", "product_id", "quality_flags"]
+        parts.append(f"{domain_map['product_name']} AS product_name")
+        for field in ("fee_rate", "size_amount", "price"):
+            column = domain_map.get(field)
+            parts.append(f"{column} AS {field}" if column else f"NULL::numeric AS {field}")
+        blocks.append(f"SELECT {', '.join(parts)} FROM {view_name}")
+    union_sql = " UNION ALL ".join(blocks)
     with db_pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
             f"""
@@ -328,52 +404,6 @@ def quality_summary() -> dict[str, Any]:
             "items": cursor.fetchall(),
             "note": "플래그는 원본값을 변경하지 않으며 검토 대상을 표시합니다.",
         }
-
-
-@app.get("/products/search")
-def search_products_legacy(
-    q: str | None = Query(default=None, max_length=200),
-    product_type: ProductType | None = None,
-    asset_class: str | None = Query(default=None, max_length=100),
-    region: str | None = Query(default=None, max_length=100),
-    risk: str | None = Query(default=None, max_length=100),
-    max_fee: Decimal | None = None,
-    min_return_1y: Decimal | None = None,
-    min_yield: Decimal | None = None,
-    min_size: Decimal | None = None,
-    sale_available: bool | None = None,
-    has_price: bool | None = None,
-    has_return_1y: bool | None = None,
-    sort_by: LegacySortBy = "size",
-    order: SortOrder = "desc",
-    limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0, le=10000),
-) -> dict[str, Any]:
-    legacy = ProductSearchRequest(
-        q=q,
-        product_type=product_type,
-        asset_class=asset_class,
-        region=region,
-        risk=risk,
-        max_fee=max_fee,
-        min_return_1y=min_return_1y,
-        min_yield=min_yield,
-        min_size=min_size,
-        sale_available=sale_available,
-        has_price=has_price,
-        has_return_1y=has_return_1y,
-        sort_by=sort_by,
-        order=order,
-        limit=limit,
-        offset=offset,
-    )
-    return service_search_products(_get_pool(), legacy_to_query(legacy), _snapshot_date())
-
-
-@app.post("/tools/search-products")
-def tool_search_products_legacy(request: ProductSearchRequest) -> dict[str, Any]:
-    """Backward-compatible v1 structured search."""
-    return service_search_products(_get_pool(), legacy_to_query(request), _snapshot_date())
 
 
 @app.post("/tools/query-products")

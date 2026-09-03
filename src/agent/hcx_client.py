@@ -16,7 +16,6 @@ from .tool_registry import (
     parse_routed_domains,
     translate_field_labels,
 )
-from ..semantic.ontology import resolve_query_terms
 
 
 @dataclass(frozen=True)
@@ -42,28 +41,6 @@ class HCXSettings:
             timeout_seconds=float(os.getenv("HCX_TIMEOUT_SECONDS", "60")),
             max_tool_rounds=int(os.getenv("AGENT_MAX_TOOL_ROUNDS", "4")),
         )
-
-
-def _build_ontology_hint(question: str) -> str | None:
-    """질문을 HCX에 보내기 전에 서버가 먼저 resolve_query_terms()를 돌려서,
-    모델이 resolve_ontology 도구를 스스로 호출하기를 기다리지 않고 인식된
-    용어를 바로 보여준다 (실험: 온톨로지 정보가 '호출해야 보이는 정보'에서
-    '항상 보이는 정보'로 바뀌면 필드 선택 정확도가 오르는지 확인)."""
-    try:
-        resolved = resolve_query_terms(question)
-    except Exception:
-        return None
-    lines = []
-    for match in resolved.get("matches", []):
-        line = f'- "{match["matched_alias"]}" → {match["canonical"]}'
-        if match.get("note"):
-            line += f' ({match["note"]})'
-        lines.append(line)
-    for item in resolved.get("ranking_semantics", []):
-        lines.append(f'- "{item["matched_alias"]}" → {item["field"]} ({item["order"]})')
-    if not lines:
-        return None
-    return "질문에서 자동으로 인식된 용어(온톨로지 기준, 참고만 하고 결과가 이상하면 재확인하세요):\n" + "\n".join(lines)
 
 
 class HCXAgentClient:
@@ -116,13 +93,10 @@ class HCXAgentClient:
         assert last_error is not None
         raise last_error
 
-    def _route_domains(
-        self, question: str, ontology_hint: str | None
-    ) -> tuple[list[str] | None, dict[str, Any]]:
-        user_content = f"{question}\n\n{ontology_hint}" if ontology_hint else question
+    def _route_domains(self, question: str) -> tuple[list[str] | None, dict[str, Any]]:
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": ROUTING_SYSTEM_PROMPT},
-            {"role": "user", "content": user_content},
+            {"role": "user", "content": question},
         ]
         response = self._request(messages)
         choices = response.get("choices") or []
@@ -139,18 +113,13 @@ class HCXAgentClient:
         question: str,
         tool_executor: Callable[[str, dict[str, Any]], dict[str, Any]],
     ) -> dict[str, Any]:
-        ontology_hint = _build_ontology_hint(question)
-        # 상품군(도메인) 판별을 메인 루프 시작 전에 독립적인 순수 텍스트 호출로 먼저
-        # 처리한다(2026-08-31) — 그 결과(domains)만 자연어 힌트로 user 메시지에 얹고,
-        # 이 호출의 messages/응답 자체는 메인 히스토리에 절대 등장하지 않는다.
-        domains, route_diagnostics = self._route_domains(question, ontology_hint)
+        domains, route_diagnostics = self._route_domains(question)
         domain_hint = (
             f"(참고: 이 질문은 다음 상품군에 해당하는 것으로 이미 파악됨: {', '.join(domains)})"
             if domains
             else None
         )
-        hint_lines = [line for line in (ontology_hint, domain_hint) if line]
-        user_content = f"{question}\n\n" + "\n".join(hint_lines) if hint_lines else question
+        user_content = f"{question}\n\n{domain_hint}" if domain_hint else question
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_content},

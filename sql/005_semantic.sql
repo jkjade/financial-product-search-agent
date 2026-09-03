@@ -62,32 +62,72 @@ CREATE TABLE semantic.external_holding (
     CHECK (as_of_date <= DATE '2026-08-21')
 );
 
--- 2026-08 뷰 분리 이후 issuer_or_manager/risk_name/base_index는 도메인마다
--- 있는 곳이 달라 공통 뷰(search.product_catalog)에는 없다. 지식그래프 관계를
--- 채우려면 4개 도메인 뷰를 이 필드 기준으로만 다시 묶어야 해서 보조 뷰를 둔다.
+-- 2026-09 도메인 네이티브 컬럼명 전환 이후 issuer_or_manager/asset_class/
+-- investment_region/currency/risk_name/base_index/size_amount/price는
+-- 도메인마다 실제 컬럼명이 다르고(예: 발행잔액 isu_bal_amt_domestic_bond vs
+-- 순자산총액 pd_net_tamt_domestic_etf), 공통 뷰(search.product_catalog)에는
+-- 아예 없다("가짜 공유" 별칭을 없애기 위해 의도적으로 뺐다). 지식그래프
+-- 관계·엔티티를 채우려면 4개 도메인 뷰를 이 개념들 기준으로 다시 묶어야
+-- 해서 보조 뷰를 둔다 — 컬럼코멘트가 완전히 같은 컬럼끼리만 묶었다(코드
+-- 상 UNION 정렬용 출력 이름일 뿐, 이 뷰 밖에서는 쓰지 않는다).
 DROP VIEW IF EXISTS search.semantic_source;
 CREATE VIEW search.semantic_source AS
 SELECT source_table, source_row_number, data_base_date,
-       issuer_or_manager, asset_class, investment_region, currency,
-       risk_name, NULL::text AS base_index
+       product_type, product_id,
+       pd_nm_domestic_bond AS product_name, pd_abrv_nm_domestic_bond AS short_name,
+       pd_pbcm_domestic_bond AS issuer_or_manager,
+       std_pd_mcls_nm_domestic_bond AS asset_class,
+       pd_ctry_cd_domestic_bond AS investment_region,
+       curr_cd_domestic_bond AS currency,
+       pd_risk_nm_domestic_bond AS risk_name,
+       NULL::text AS base_index,
+       isu_bal_amt_domestic_bond AS size_amount,
+       eval_price_domestic_bond AS price
 FROM search.domestic_bond_catalog
 UNION ALL
 SELECT source_table, source_row_number, data_base_date,
-       issuer_or_manager, asset_class, investment_region, currency,
-       risk_name, base_index
+       product_type, product_id,
+       pd_nm_domestic_etf AS product_name, pd_abrv_nm_domestic_etf AS short_name,
+       cu_fund_mgmt_co_domestic_etf AS issuer_or_manager,
+       wu_inv_ast_type_domestic_etf AS asset_class,
+       wu_inv_rgn_domestic_etf AS investment_region,
+       pd_curr_nm_domestic_etf AS currency,
+       pd_risk_nm_domestic_etf AS risk_name,
+       cu_base_index_domestic_etf AS base_index,
+       pd_net_tamt_domestic_etf AS size_amount,
+       du_clpr_domestic_etf AS price
 FROM search.domestic_etf_catalog
 UNION ALL
 SELECT source_table, source_row_number, data_base_date,
-       issuer_or_manager, asset_class, investment_region, currency,
-       NULL::text AS risk_name, base_index
+       product_type, product_id,
+       pd_nm_overseas_etf AS product_name, pd_abrv_nm_overseas_etf AS short_name,
+       cu_fund_mgmt_co_overseas_etf AS issuer_or_manager,
+       wu_inv_ast_type_overseas_etf AS asset_class,
+       wu_inv_rgn_overseas_etf AS investment_region,
+       pd_trd_ccy_overseas_etf AS currency,
+       NULL::text AS risk_name,
+       cu_base_index_overseas_etf AS base_index,
+       du_last_aum_overseas_etf AS size_amount,
+       du_clpr_overseas_etf AS price
 FROM search.overseas_etf_catalog
 UNION ALL
 SELECT source_table, source_row_number, data_base_date,
-       NULL::text AS issuer_or_manager, asset_class, investment_region, currency,
-       risk_name, base_index
+       product_type, product_id,
+       itm_nm_public_fund AS product_name, itm_abrv_nm_public_fund AS short_name,
+       NULL::text AS issuer_or_manager,
+       or_attr_desc_public_fund AS asset_class,
+       fd_ivst_rgn_desc_public_fund AS investment_region,
+       curr_cd_public_fund AS currency,
+       zrin_fd_ivst_risk_grd_nm_public_fund AS risk_name,
+       bmrk_nm_public_fund AS base_index,
+       fd_nast_suma_public_fund AS size_amount,
+       bns_bpr_public_fund AS price
 FROM search.public_fund_catalog;
 
--- Product entities use the source row as a stable identifier.
+-- Product entities use the source row as a stable identifier. search.product_catalog
+-- no longer carries size_amount/price(2026-09 "가짜 공유" 별칭 제거) 이후로는 이
+-- 파일이 만드는 search.semantic_source에서 전부 가져온다 — product_catalog 의존을
+-- 이 파일 하나로 완전히 옮겼다.
 INSERT INTO semantic.entity (
     entity_id, entity_type, canonical_name, normalized_name, aliases,
     properties, source_table, source_row_number, data_base_date
@@ -98,9 +138,6 @@ SELECT
     product_name,
     lower(btrim(product_name)),
     ARRAY_REMOVE(ARRAY[product_id, short_name], NULL),
-    -- fee_rate/return_1y/yield_rate 등은 도메인 전용 뷰로 옮겨가서(2026-08 뷰
-    -- 분리) 공통 뷰인 search.product_catalog에는 더 이상 없다. 지식그래프
-    -- 엔티티 속성은 공통 필드 범위로 유지한다.
     jsonb_strip_nulls(jsonb_build_object(
         'product_id', product_id,
         'size_amount', size_amount,
@@ -109,7 +146,7 @@ SELECT
     source_table,
     source_row_number,
     data_base_date
-FROM search.product_catalog;
+FROM search.semantic_source;
 
 -- Shared concept entities are deduplicated by normalized value and entity type.
 WITH raw_values AS (

@@ -101,3 +101,71 @@ def test_search_products_across_two_domains_executes_without_sql_error(pool):
     result = search_products(pool, request, "2026-08-21", ["DOMESTIC_BOND", "DOMESTIC_ETF"])
     assert "items" in result
     assert all(item.get("product_type") in ("DOMESTIC_BOND", "DOMESTIC_ETF") for item in result["items"])
+
+
+# 2026-09 도메인 네이티브 컬럼명 전환(sql/004_views.sql에서 size_amount 같은 "가짜
+# 공유" 별칭 제거) 이후의 회귀 가드. dur/fn_effective_duration과 같은 원리를,
+# 이번엔 예전에 진짜로 하나의 이름(size_amount)으로 뭉개져 있던 필드 계열에 대해
+# 검증한다 — 지금은 도메인마다 완전히 별개의 canonical 필드
+# (isu_bal_amt_domestic_bond/pd_net_tamt_domestic_etf/...)라 컬럼코멘트가 전부
+# 달라서 서로 절대 병합되면 안 되고, 반대로 exchange_code처럼 우연히 컬럼코멘트가
+# 같은 ETF/해외ETF 쌍은 여전히 정상적으로 병합돼야 한다.
+def test_resolve_domain_column_bridges_coincidentally_identical_split_field_names():
+    # exchange_code는 국내ETF/해외ETF 둘 다 컬럼코멘트가 "거래소코드"로 완전히 같다
+    # (2026-09 확인) — dur/fn_effective_duration과 동일한 패턴.
+    assert (
+        _resolve_domain_column(
+            "pd_exg_mkt_cd_domestic_etf", ["DOMESTIC_ETF", "OVERSEAS_ETF"], "OVERSEAS_ETF"
+        )
+        == "pd_exg_mkt_cd_overseas_etf"
+    )
+    assert (
+        _resolve_domain_column(
+            "pd_exg_mkt_cd_overseas_etf", ["DOMESTIC_ETF", "OVERSEAS_ETF"], "DOMESTIC_ETF"
+        )
+        == "pd_exg_mkt_cd_domestic_etf"
+    )
+
+
+def test_resolve_domain_column_never_merges_size_amount_family_across_domains():
+    # size_amount 계열(발행잔액/순자산총액/일간 순자산총액/펀드 순자산)은 4개
+    # 도메인 컬럼코멘트가 전부 다르다 — 절대 하나로 병합되면 안 된다(size_amount
+    # 라는 "가짜 공유" 이름 자체가 이제 존재하지 않는다는 것도 이걸로 보장된다).
+    assert (
+        _resolve_domain_column(
+            "isu_bal_amt_domestic_bond", ["DOMESTIC_BOND", "DOMESTIC_ETF"], "DOMESTIC_ETF"
+        )
+        is None
+    )
+    assert (
+        _resolve_domain_column(
+            "pd_net_tamt_domestic_etf", ["DOMESTIC_ETF", "OVERSEAS_ETF"], "OVERSEAS_ETF"
+        )
+        is None
+    )
+
+
+def test_search_products_across_domestic_and_overseas_etf_bridges_exchange_code(pool):
+    """국내ETF+해외ETF를 합쳐서 exchange_code(거래소코드)로 정렬해도 SQL 에러 없이
+    돌고, 두 도메인 행 모두 이 개념의 실제 값이 채워져야 한다(NULL 패딩이 아니라
+    진짜 컬럼코멘트 기반 동적 매핑이 적용됐다는 뜻)."""
+    from src.api.models import FilterClause, ProductQueryRequest, SortClause
+    from src.services.query_engine import search_products
+
+    request = ProductQueryRequest(
+        filters=[FilterClause(field="product_type", operator="in", values=["DOMESTIC_ETF", "OVERSEAS_ETF"])],
+        sort=[SortClause(field="pd_exg_mkt_cd_domestic_etf", order="asc")],
+        limit=200,
+    )
+    result = search_products(pool, request, "2026-08-21", ["DOMESTIC_ETF", "OVERSEAS_ETF"])
+    by_domain = {item["product_type"] for item in result["items"]}
+    assert by_domain <= {"DOMESTIC_ETF", "OVERSEAS_ETF"}
+    # 두 도메인 모두에서 최소 한 건은 값이 채워져야(NULL 아님) 동적 매핑이 실제로
+    # 작동했다고 볼 수 있다.
+    for domain in ("DOMESTIC_ETF", "OVERSEAS_ETF"):
+        rows = [item for item in result["items"] if item["product_type"] == domain]
+        if rows:
+            assert any(
+                row.get("pd_exg_mkt_cd_domestic_etf") or row.get("pd_exg_mkt_cd_overseas_etf")
+                for row in rows
+            )

@@ -30,14 +30,22 @@ def test_ontology_files_exist_and_snapshot_rule_is_fixed():
 
 
 def test_ontology_resolves_common_financial_terms_without_guessing():
-    resolved = resolve_query_terms("미국 해외 ETF 중 AUM가 크고 보수가 낮은 상품")
+    """2026-09: field_labels.py 제거 마이그레이션으로 온톨로지의 사람이 손으로 쓴
+    동의어(fp:alias)와 ranking_semantics를 전부 없앴다 — 이제 자연어 힌트는 공식
+    컬럼코멘트(rdfs:comment)가 질문 문자열 안에 그대로 들어있을 때만 매칭된다.
+    "AUM"/"보수가 낮은" 같은 예전 동의어/비교표현 매칭은 더 이상 지원하지 않는다
+    (의도된 결과 — 사람이 만든 명칭을 없애는 대신 커버리지가 줄어드는 트레이드오프)."""
+    resolved = resolve_query_terms("해외 ETF의 연간보수율이 궁금해")
     canonical = {item["canonical"] for item in resolved["matches"]}
     assert "OVERSEAS_ETF" in canonical
-    assert "size_amount" in canonical
-    assert "fee_rate" in canonical
-    ranking = {(item["field"], item["order"]) for item in resolved["ranking_semantics"]}
-    assert ("size_amount", "desc") in ranking
-    assert ("fee_rate", "asc") in ranking
+    # 2026-09 도메인 네이티브 컬럼명 전환 이후 "연간보수율"은 fee_rate라는 통합
+    # 이름이 아니라 OVERSEAS_ETF 전용 canonical 필드(cu_charge_rt_overseas_etf)로
+    # 직접 resolve된다.
+    assert "cu_charge_rt_overseas_etf" in canonical
+    fee_rate_match = next(item for item in resolved["matches"] if item["canonical"] == "cu_charge_rt_overseas_etf")
+    assert fee_rate_match["note"] == "연간보수율"
+    # ranking_semantics 데이터 자체가 삭제됐으므로 항상 빈 리스트다.
+    assert resolved["ranking_semantics"] == []
 
 
 def test_phase25_request_contracts_are_strict():

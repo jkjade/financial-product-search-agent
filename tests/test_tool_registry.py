@@ -1,3 +1,5 @@
+import pytest
+
 from src.agent.tool_registry import (
     TOOL_MODELS,
     ensure_domain_filter,
@@ -92,21 +94,54 @@ def test_translate_field_labels_resolves_unified_scalar_metric():
     # 원상복구에 실패해 매번 422로 거부됐다.
     arguments = {
         "filters": [{"field": "상품유형", "operator": "eq", "value": "DOMESTIC_ETF"}],
-        "metric": "순자산총액 / 최종AUM",
+        "metric": "순자산총액",
         "order": "desc",
     }
     result = translate_field_labels("rank_products", arguments, ["DOMESTIC_ETF"])
-    assert result["metric"] == "size_amount"
+    # 2026-09 도메인 네이티브 컬럼명 전환 이후 size_amount라는 통합 이름은
+    # 없어지고 DOMESTIC_ETF의 실제 원본 컬럼명으로 resolve된다.
+    assert result["metric"] == "pd_net_tamt_domestic_etf"
     assert result["filters"][0]["field"] == "product_type"
 
 
 def test_translate_field_labels_resolves_unified_list_group_by():
-    arguments = {"group_by": ["순자산총액 / 최종AUM"]}
+    arguments = {"group_by": ["순자산총액"]}
     result = translate_field_labels("aggregate_products", arguments, ["DOMESTIC_ETF"])
-    assert result["group_by"] == ["size_amount"]
+    assert result["group_by"] == ["pd_net_tamt_domestic_etf"]
 
 
 def test_translate_field_labels_resolves_search_products_sort():
-    arguments = {"sort": [{"field": "순자산총액 / 최종AUM", "order": "desc"}]}
+    arguments = {"sort": [{"field": "순자산총액", "order": "desc"}]}
     result = translate_field_labels("search_products", arguments, ["DOMESTIC_ETF"])
-    assert result["sort"] == [{"field": "size_amount", "order": "desc"}]
+    assert result["sort"] == [{"field": "pd_net_tamt_domestic_etf", "order": "desc"}]
+
+
+def test_translate_field_labels_rejects_canonical_name_excluded_from_unified_pool():
+    """회귀 가드(2026-09 실측): _resolve()가 예전엔 `value in FILTER_FIELDS`(전체
+    199개, 컨텍스트 무관)로 우회를 허용해서, 모델이 이전 라운드 도구 결과 JSON에서
+    본 내부 canonical 이름(size_amount)을 직접 쓰면 도메인마다 컬럼 코멘트가 달라
+    unified 선택지에서 정확히 빠져있어도 그냥 통과됐다(국내채권 발행잔액과 국내ETF
+    순자산총액을 같은 지표처럼 섞어서 정렬하는 실제 사고 재현됨). 이제는 pool에
+    없고 라벨로도 못 찾으면 에러를 내야 한다."""
+    arguments = {"metric": "size_amount", "order": "desc"}
+    with pytest.raises(ValueError):
+        translate_field_labels("rank_products", arguments, ["DOMESTIC_BOND", "DOMESTIC_ETF"])
+
+
+def test_translate_field_labels_rejects_domain_specific_label_outside_unified_pool():
+    """size_amount의 BOND 전용 라벨("발행잔액/발행금액잔액")도, ETF가 같이 선택된
+    unified 컨텍스트에서는 통과되면 안 된다 — 그 라벨은 BOND에서만 유효하고
+    ETF와는 코멘트가 다르므로 이 도메인 조합의 unified pool에 애초에 없다."""
+    arguments = {"metric": "발행잔액/발행금액잔액", "order": "desc"}
+    with pytest.raises(ValueError):
+        translate_field_labels("rank_products", arguments, ["DOMESTIC_BOND", "DOMESTIC_ETF"])
+
+
+def test_translate_field_labels_still_resolves_genuinely_shared_cross_domain_metric():
+    """dur(BOND)/fn_effective_duration(ETF) — 이름은 다르지만 컬럼 코멘트가 둘 다
+    "듀레이션"이라 이 도메인 조합의 unified pool에 정상적으로 있어야 하고, 라벨로
+    호출하면 여전히 정상 resolve돼야 한다(구멍을 막으면서 정상 케이스까지 막으면
+    안 됨)."""
+    arguments = {"metric": "듀레이션", "order": "desc"}
+    result = translate_field_labels("rank_products", arguments, ["DOMESTIC_BOND", "DOMESTIC_ETF"])
+    assert result["metric"] in ("dur", "fn_effective_duration")

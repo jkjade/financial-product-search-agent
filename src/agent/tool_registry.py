@@ -21,8 +21,7 @@ from ..api.models import (
     FederatedSearchRequest,
 )
 from ..query.field_domains import PRODUCT_TYPES, classify_field_domains, fields_for_domains, shared_label_map
-from ..query.field_labels import label_for_field, resolve_label
-from ..query.fields import FILTER_FIELDS
+from ..semantic.ontology import label_for_field, resolve_label
 
 if TYPE_CHECKING:
     from psycopg_pool import ConnectionPool
@@ -189,10 +188,30 @@ def translate_field_labels(tool_name: str, arguments: Any, domains: list[str] | 
     primary_domain = domains[0] if domains else None
 
     def _resolve(value: Any, pool: list[str]) -> Any:
-        if not isinstance(value, str) or value in FILTER_FIELDS:
+        """`pool`은 이 컨텍스트(필터=도메인 합집합, unified=코멘트 완전일치 교집합)에서
+        지금 실제로 허용된 canonical 필드 목록이다. 예전엔 `value in FILTER_FIELDS`
+        (전체 199개, 컨텍스트 무관)로 우회를 허용해서, 모델이 이전 라운드의 도구
+        결과 JSON에서 본 내부 canonical 이름(예: size_amount)을 직접 써버리면
+        unified 컨텍스트에서 컬럼 코멘트가 다른 도메인끼리도 그냥 통과됐다 — 스키마
+        enum에서 정확히 뺀 필드를 실행 단에서 우회할 수 있는 구멍이었다(2026-09
+        세션에서 실측 확인: 국내채권 발행잔액과 국내ETF 순자산총액을 size_amount로
+        섞어서 정렬함). 이제는 pool에 있을 때만 그대로 통과시키고, 라벨로도
+        pool 안에서 못 찾으면 조용히 원래 값을 돌려주지 않고 에러를 내서 모델이
+        수정해 재호출하게 한다(422 오류 처리와 같은 패턴, hcx_client.py의
+        try/except가 이미 이 예외를 잡아 모델에게 되돌려준다)."""
+        if not isinstance(value, str):
+            return value
+        if value in pool:
             return value
         resolved = resolve_label(value, pool, primary_domain)
-        return resolved if resolved is not None else value
+        if resolved is not None:
+            return resolved
+        raise ValueError(
+            f'"{value}"은(는) 지금 선택된 상품군 조합에서 쓸 수 있는 필드가 아닙니다 — '
+            "도구가 보여준 field 목록의 컬럼코멘트를 그대로 쓰세요(내부 영문 이름 아님). "
+            "여러 상품군을 함께 선택했다면 정렬/집계/순위/비교 지표는 그 상품군 전부에서 "
+            "컬럼 코멘트가 완전히 같은 필드만 쓸 수 있습니다."
+        )
 
     def _resolve_filter_clauses(clauses: Any) -> Any:
         if not isinstance(clauses, list):

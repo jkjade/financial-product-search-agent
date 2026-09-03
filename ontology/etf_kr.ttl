@@ -7,341 +7,508 @@
 
 fp:DomesticETF a owl:Class ; rdfs:subClassOf fp:ETF ; rdfs:label "국내 ETF"@ko .
 
-fp:issuerOrManager a owl:DatatypeProperty ;
+fp:productTypeDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "운용사"@ko ;
+    rdfs:comment "상품유형"@ko ;
+    fp:column "product_type" .
+
+fp:sourceTableDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "원본테이블"@ko ;
+    fp:column "source_table" .
+
+fp:productIdDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "상품번호"@ko ;
+    fp:column "product_id" .
+
+fp:productNameDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "상품명"@ko ;
+    fp:column "pd_nm_domestic_etf" .
+
+fp:shortNameDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "상품약어명"@ko ;
+    fp:column "pd_abrv_nm_domestic_etf" .
+
+fp:issuerOrManagerDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
     rdfs:comment "운용사"@ko ;
-    fp:column "issuer_or_manager" ;
-    fp:alias "운용사", "자산운용사", "발행사", "issuer", "asset manager", "manager" .
+    fp:column "cu_fund_mgmt_co_domestic_etf" .
 
-fp:riskCode a owl:DatatypeProperty ;
+fp:assetClassDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "risk_code"@en ;
+    rdfs:comment "투자자산군"@ko ;
+    fp:column "wu_inv_ast_type_domestic_etf" .
+
+fp:investmentRegionDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "투자지역"@ko ;
+    fp:column "wu_inv_rgn_domestic_etf" .
+
+fp:currencyDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "상품통화명"@ko ;
+    fp:column "pd_curr_nm_domestic_etf" .
+
+fp:pdCurrCdDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "상품통화코드"@ko ;
+    fp:column "pd_curr_cd_domestic_etf" .
+
+fp:riskCodeDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
     rdfs:comment "상품등급코드"@ko ;
-    fp:column "risk_code" .
+    fp:column "pd_risk_cd_domestic_etf" .
 
-fp:riskName a owl:DatatypeProperty ;
+fp:riskNameDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "위험등급"@ko ;
     rdfs:comment "상품등급명"@ko ;
-    fp:column "risk_name" ;
-    fp:alias "위험등급", "위험 등급", "신용등급", "신용 등급", "risk grade", "credit rating" .
+    fp:column "pd_risk_nm_domestic_etf" .
 
-fp:baseIndex a owl:DatatypeProperty ;
+fp:baseIndexDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "기초지수"@ko ;
     rdfs:comment "기초지수"@ko ;
-    fp:column "base_index" ;
-    fp:alias "기초지수", "벤치마크", "추종지수", "index", "benchmark" .
+    fp:column "cu_base_index_domestic_etf" .
 
-fp:feeRate a owl:DatatypeProperty ;
+fp:saleAvailableDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:boolean ;
+    rdfs:comment "상품판매여부"@ko ;
+    fp:column "pd_sale_yn_domestic_etf" .
+
+fp:feeRateDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "보수"@ko ;
     rdfs:comment "총보수요율"@ko ;
-    fp:column "fee_rate" ;
-    fp:alias "보수", "보수율", "운용보수", "fee", "expense ratio" .
+    fp:column "cu_charge_rt_domestic_etf" .
 
-fp:otherFeeRate a owl:DatatypeProperty ;
+fp:cuChargeEtcRt a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "other_fee_rate"@en ;
     rdfs:comment "기타비용요율"@ko ;
     fp:column "cu_charge_etc_rt" .
 
-fp:return1d a owl:DatatypeProperty ;
+fp:return1dDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "return_1d"@en ;
     rdfs:comment "수익률_1D"@ko ;
-    fp:column "return_1d" .
+    fp:column "du_er_1d_domestic_etf" .
 
-fp:return1m a owl:DatatypeProperty ;
+fp:return1mDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "return_1m"@en ;
     rdfs:comment "수익률_1M"@ko ;
-    fp:column "return_1m" .
+    fp:column "du_er_1m_domestic_etf" .
 
-fp:return3m a owl:DatatypeProperty ;
+fp:return3mDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "return_3m"@en ;
     rdfs:comment "수익률_3M"@ko ;
-    fp:column "return_3m" .
+    fp:column "du_er_3m_domestic_etf" .
 
-fp:return6m a owl:DatatypeProperty ;
+fp:return6mDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "return_6m"@en ;
     rdfs:comment "수익률_6M"@ko ;
-    fp:column "return_6m" .
+    fp:column "du_er_6m_domestic_etf" .
 
-fp:return1y a owl:DatatypeProperty ;
+fp:return1yDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "1년수익률"@ko ;
     rdfs:comment "수익률_1Y"@ko ;
-    fp:column "return_1y" ;
-    fp:alias "1년수익률", "1년 수익률", "1y return", "one year return" .
+    fp:column "du_er_1y_domestic_etf" .
 
-fp:returnYtd a owl:DatatypeProperty ;
+fp:duErYtd a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "연초대비"@ko ;
     rdfs:comment "수익률_YTD"@ko ;
-    fp:column "du_er_ytd" ;
-    fp:alias "ytd", "연초대비", "연초 대비", "연초 이후 수익률" .
+    fp:column "du_er_ytd" .
 
-fp:price a owl:DatatypeProperty ;
+fp:sizeAmountDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "가격"@ko ;
-    rdfs:comment "종가 / 현재가"@ko ;
-    fp:column "price" ;
-    fp:alias "가격", "종가", "평가가격", "price" .
+    rdfs:comment "순자산총액"@ko ;
+    fp:column "pd_net_tamt_domestic_etf" .
 
-fp:productInfoUpdateDate a owl:DatatypeProperty ;
+fp:duLastAumDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "최종AUM"@ko ;
+    fp:column "du_last_aum_domestic_etf" .
+
+fp:priceDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "종가"@ko ;
+    fp:column "du_clpr_domestic_etf" .
+
+fp:realtimePriceDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "현재가"@ko ;
+    fp:column "ru_mkt_price_domestic_etf" .
+
+fp:dataBaseDateDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
-    rdfs:label "product_info_update_date"@en ;
+    rdfs:comment "데이터기준일"@ko ;
+    fp:column "data_base_date" .
+
+fp:productInfoUpdateDateDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
     rdfs:comment "변동갱신일자"@ko ;
-    fp:column "product_info_update_date" .
+    fp:column "cu_upt_dt_domestic_etf" .
 
-fp:marketDataUpdateDate a owl:DatatypeProperty ;
+fp:marketDataUpdateDateDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
-    rdfs:label "market_data_update_date"@en ;
     rdfs:comment "일간갱신일자"@ko ;
-    fp:column "market_data_update_date" .
+    fp:column "du_upt_dt_domestic_etf" .
 
-fp:weeklyDataUpdateDate a owl:DatatypeProperty ;
+fp:weeklyDataUpdateDateDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
-    rdfs:label "weekly_data_update_date"@en ;
     rdfs:comment "주간갱신일자"@ko ;
-    fp:column "weekly_data_update_date" .
+    fp:column "wu_upt_dt_domestic_etf" .
 
-fp:listingDate a owl:DatatypeProperty ;
+fp:listingDateDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
-    rdfs:label "listing_date"@en ;
     rdfs:comment "상품거래가능일자"@ko ;
-    fp:column "listing_date" .
+    fp:column "pd_lstg_dt_domestic_etf" .
 
 fp:tradeEndDate a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
-    rdfs:label "trade_end_date"@en ;
     rdfs:comment "상품거래종료일자"@ko ;
     fp:column "trade_end_date" .
 
-fp:leverageFactor a owl:DatatypeProperty ;
+fp:leverageFactorDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "leverage_factor"@en ;
     rdfs:comment "배수"@ko ;
-    fp:column "leverage_factor" .
+    fp:column "cu_lev_fector_domestic_etf" .
 
-fp:basePrice a owl:DatatypeProperty ;
+fp:basePriceDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "base_price"@en ;
     rdfs:comment "기준가"@ko ;
-    fp:column "base_price" .
+    fp:column "du_bpr_domestic_etf" .
 
-fp:dayHigh a owl:DatatypeProperty ;
+fp:dayHighDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "day_high"@en ;
     rdfs:comment "고가"@ko ;
-    fp:column "day_high" .
+    fp:column "du_hpr_domestic_etf" .
 
-fp:dayLow a owl:DatatypeProperty ;
+fp:dayLowDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "day_low"@en ;
     rdfs:comment "시가"@ko ;
-    fp:column "day_low" .
+    fp:column "du_lpr_domestic_etf" .
 
-fp:lastNav a owl:DatatypeProperty ;
+fp:lastNavDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "last_nav"@en ;
     rdfs:comment "최종NAV"@ko ;
-    fp:column "last_nav" .
+    fp:column "du_last_nav_domestic_etf" .
 
-fp:premiumDiscountRate a owl:DatatypeProperty ;
+fp:premiumDiscountRateDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "premium_discount_rate"@en ;
     rdfs:comment "괴리율"@ko ;
-    fp:column "premium_discount_rate" .
+    fp:column "du_diff_rt_domestic_etf" .
 
-fp:tradingValue1d a owl:DatatypeProperty ;
+fp:tradingValue1dDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "trading_value_1d"@en ;
     rdfs:comment "일거래대금"@ko ;
-    fp:column "trading_value_1d" .
+    fp:column "du_val_1d_domestic_etf" .
 
-fp:tradingVolume1d a owl:DatatypeProperty ;
+fp:tradingVolume1dDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "trading_volume_1d"@en ;
     rdfs:comment "일거래량"@ko ;
-    fp:column "trading_volume_1d" .
+    fp:column "du_vol_1d_domestic_etf" .
 
-fp:exchangeCode a owl:DatatypeProperty ;
+fp:exchangeCodeDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "exchange_code"@en ;
     rdfs:comment "거래소코드"@ko ;
-    fp:column "exchange_code" .
+    fp:column "pd_exg_mkt_cd_domestic_etf" .
 
-fp:productGroupCode a owl:DatatypeProperty ;
+fp:productGroupCodeDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "product_group_code"@en ;
     rdfs:comment "상품군종류"@ko ;
-    fp:column "product_group_code" .
+    fp:column "pd_grp_no_domestic_etf" .
 
-fp:parValue a owl:DatatypeProperty ;
+fp:listedShareCountDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "par_value"@en ;
-    fp:column "pd_lst_price" .
-
-fp:listedShareCount a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "listed_share_count"@en ;
     rdfs:comment "상품상장주식수"@ko ;
-    fp:column "listed_share_count" .
+    fp:column "pd_lst_stk_cnt_domestic_etf" .
 
-fp:marketCode a owl:DatatypeProperty ;
+fp:marketCodeDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "market_code"@en ;
     rdfs:comment "상품거래시장코드"@ko ;
-    fp:column "market_code" .
+    fp:column "pd_mkt_id_domestic_etf" .
 
-fp:isCoreEtf a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "is_core_etf"@en ;
-    rdfs:comment "핵심ETF여부"@ko ;
-    fp:column "is_core_etf" .
-
-fp:etfStrategy a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "etf_strategy"@en ;
-    rdfs:comment "운용전략"@ko ;
-    fp:column "etf_strategy" .
-
-fp:trackingError a owl:DatatypeProperty ;
+fp:realtimeVolumeDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "tracking_error"@en ;
+    rdfs:comment "거래량"@ko ;
+    fp:column "ru_mkt_volume_domestic_etf" .
+
+fp:isCoreEtfDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "핵심ETF여부"@ko ;
+    fp:column "wu_core_yn_domestic_etf" .
+
+fp:etfStrategyDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "운용전략"@ko ;
+    fp:column "cu_strtegy_domestic_etf" .
+
+fp:duChasErrt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
     rdfs:comment "추적오차율"@ko ;
     fp:column "du_chas_errt" .
 
-fp:navChangeAmount a owl:DatatypeProperty ;
+fp:duNavRnfAmt a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "nav_change_amount"@en ;
     rdfs:comment "전일NAV등락금액"@ko ;
     fp:column "du_nav_rnf_amt" .
 
-fp:prevDayNav a owl:DatatypeProperty ;
+fp:duNavYday a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "prev_day_nav"@en ;
     rdfs:comment "전일NAV"@ko ;
     fp:column "du_nav_yday" .
 
-fp:tradingValueAvg1m a owl:DatatypeProperty ;
+fp:duVal1m a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "trading_value_avg_1m"@en ;
     rdfs:comment "일거래대금평균_1M"@ko ;
     fp:column "du_val_1m" .
 
-fp:tradingValueAvg5d a owl:DatatypeProperty ;
+fp:duVal5d a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "trading_value_avg_5d"@en ;
     rdfs:comment "일거래대금평균_5D"@ko ;
     fp:column "du_val_5d" .
 
-fp:tradingVolumeAvg1m a owl:DatatypeProperty ;
+fp:duVolAvg1m a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "trading_volume_avg_1m"@en ;
     rdfs:comment "거래량평균_1M"@ko ;
     fp:column "du_vol_avg_1m" .
 
-fp:tradingVolumeAvg5d a owl:DatatypeProperty ;
+fp:duVolAvg5d a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "trading_volume_avg_5d"@en ;
     rdfs:comment "거래량평균_5D"@ko ;
     fp:column "du_vol_avg_5d" .
 
-fp:circulatingNetAssetAmount a owl:DatatypeProperty ;
+fp:pdCircNetTamt a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "circulating_net_asset_amount"@en ;
     rdfs:comment "유통순자산총액"@ko ;
     fp:column "pd_circ_net_tamt" .
 
-fp:circulatingShareCount a owl:DatatypeProperty ;
+fp:pdCircStkCnt a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "circulating_share_count"@en ;
     rdfs:comment "유통주식수"@ko ;
     fp:column "pd_circ_stk_cnt" .
 
-fp:dividendPerShare a owl:DatatypeProperty ;
+fp:pdDivdAmtPshr a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "dividend_per_share"@en ;
     rdfs:comment "주당 분배금(원천 우선, 없으면 회당 추정)"@ko ;
     fp:column "pd_divd_amt_pshr" .
 
-fp:dividendYield a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "dividend_yield"@en ;
-    rdfs:comment "연환산 분배수익률"@ko ;
-    fp:column "dividend_yield" .
-
-fp:exchangeName a owl:DatatypeProperty ;
+fp:pdDvidCycl a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "exchange_name"@en ;
+    rdfs:comment "분배주기(A/Q/M/S)"@ko ;
+    fp:column "pd_dvid_cycl" .
+
+fp:dividendYieldDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "연환산 분배수익률"@ko ;
+    fp:column "pd_dvid_yield_domestic_etf" .
+
+fp:pdExgMktNm a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
     rdfs:comment "거래소명"@ko ;
     fp:column "pd_exg_mkt_nm" .
 
-fp:marketName a owl:DatatypeProperty ;
+fp:pdMktNm a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "market_name"@en ;
     rdfs:comment "상품거래시장"@ko ;
     fp:column "pd_mkt_nm" .
 
-fp:navPerShare a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "nav_per_share"@en ;
-    fp:column "nav_per_share" .
-
-fp:netAssetPerShare a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "net_asset_per_share"@en ;
-    fp:column "net_asset_per_share" .
-
-fp:netProfitPerShare a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "net_profit_per_share"@en ;
-    fp:column "net_profit_per_share" .
-
-fp:netAssetRatioPerShare a owl:DatatypeProperty ;
-    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "net_asset_ratio_per_share"@en ;
-    fp:column "net_asset_ratio_per_share" .
-
-fp:pensionRiskClass a owl:DatatypeProperty ;
+fp:pdPenRiskNm a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "pension_risk_class"@en ;
     rdfs:comment "연금거래위험구분"@ko ;
     fp:column "pd_pen_risk_nm" .
 
-fp:isPensionTradable a owl:DatatypeProperty ;
+fp:isPensionTradableDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "is_pension_tradable"@en ;
     rdfs:comment "연금거래가능여부"@ko ;
-    fp:column "is_pension_tradable" .
+    fp:column "pd_pen_tr_yn_domestic_etf" .
 
-fp:etfSectorCode a owl:DatatypeProperty ;
+fp:pdSectCd a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "etf_sector_code"@en ;
     rdfs:comment "ETF 섹터코드"@ko ;
     fp:column "pd_sect_cd" .
 
-fp:isSpac a owl:DatatypeProperty ;
+fp:pdSpacYn a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "is_spac"@en ;
     rdfs:comment "SPAC 여부"@ko ;
     fp:column "pd_spac_yn" .
 
-fp:totalShareCount a owl:DatatypeProperty ;
+fp:pdStkCnt a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
-    rdfs:label "total_share_count"@en ;
     rdfs:comment "상장주식수"@ko ;
     fp:column "pd_stk_cnt" .
 
 fp:etfKrProductCode a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
-    rdfs:label "상품번호_미래에셋"@ko ;
-    rdfs:comment "미래에셋 자체 상품코드 — 공통 product_code에서 국내ETF만 분리한 필드(도메인마다 성격이 달라 공통 유지가 부적절해 분리함)"@ko ;
-    fp:column "etf_kr_product_code" ;
-    fp:alias "상품번호_미래에셋", "미래에셋코드" .
+    rdfs:comment "상품번호_미래에셋"@ko ;
+    fp:column "etf_kr_product_code" .
+
+fp:duChasErrtBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "추적오차율 기준일"@ko ;
+    fp:column "du_chas_errt_base_dt" .
+
+fp:duDiffRtBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "괴리율 기준일"@ko ;
+    fp:column "du_diff_rt_base_dt" .
+
+fp:duVlty1m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "최근 20거래일 연환산 변동성(%)"@ko ;
+    fp:column "du_vlty_1m" .
+
+fp:duVlty1y a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "최근 252거래일 연환산 변동성(%)"@ko ;
+    fp:column "du_vlty_1y" .
+
+fp:duVlty3m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "최근 60거래일 연환산 변동성(%)"@ko ;
+    fp:column "du_vlty_3m" .
+
+fp:duVlty6m a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "최근 120거래일 연환산 변동성(%)"@ko ;
+    fp:column "du_vlty_6m" .
+
+fp:duVltyBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "변동성 산출 기준일"@ko ;
+    fp:column "du_vlty_base_dt" .
+
+fp:fnAverageCoupon a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "평균쿠폰이자율"@ko ;
+    fp:column "fn_average_coupon" .
+
+fp:fnAverageMaturity a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "평균잔존만기"@ko ;
+    fp:column "fn_average_maturity" .
+
+fp:fnAverageQuality a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "평균신용품질"@ko ;
+    fp:column "fn_average_quality" .
+
+fp:fnBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "펀더멘털 기준일"@ko ;
+    fp:column "fn_base_dt" .
+
+fp:fnEffectiveDuration a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "듀레이션"@ko ;
+    fp:column "fn_effective_duration" .
+
+fp:fnEffectiveMaturity a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "실질만기"@ko ;
+    fp:column "fn_effective_maturity" .
+
+fp:fnModifiedDuration a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "수정듀레이션"@ko ;
+    fp:column "fn_modified_duration" .
+
+fp:fnNominalMaturity a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "명목만기"@ko ;
+    fp:column "fn_nominal_maturity" .
+
+fp:fnPortfolioDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "포트폴리오 기준일"@ko ;
+    fp:column "fn_portfolio_dt" .
+
+fp:pdDivdAmtAnn a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "연간 추정 분배금"@ko ;
+    fp:column "pd_divd_amt_ann" .
+
+fp:pdDvidBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "분배정보 기준일"@ko ;
+    fp:column "pd_dvid_base_dt" .
+
+fp:pdDvidIncDist a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "원천 성과배분/분배금"@ko ;
+    fp:column "pd_dvid_inc_dist" .
+
+fp:pdDvidNav a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "분배금 계산 기준 NAV"@ko ;
+    fp:column "pd_dvid_nav" .
+
+fp:pdDvidPayCnt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:decimal ;
+    rdfs:comment "연간 지급횟수"@ko ;
+    fp:column "pd_dvid_pay_cnt" .
+
+fp:pdDvidPayMonths a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "분배 지급월"@ko ;
+    fp:column "pd_dvid_pay_months" .
+
+fp:pdDvidPrcBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "분배금 계산 NAV 기준일"@ko ;
+    fp:column "pd_dvid_prc_base_dt" .
+
+fp:pdDvidTaxBasis a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "분배 과세기준"@ko ;
+    fp:column "pd_dvid_tax_basis" .
+
+fp:pdRic a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "Refinitiv RIC"@ko ;
+    fp:column "pd_ric" .
+
+fp:pdTicker a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "Refinitiv 티커"@ko ;
+    fp:column "pd_ticker" .
+
+fp:refAstType a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "refinitiv 자산유형"@ko ;
+    fp:column "ref_ast_type" .
+
+fp:refBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "refinitiv 기준일"@ko ;
+    fp:column "ref_base_dt" .
+
+fp:refBaseIndex a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "refinitiv 벤치마크"@ko ;
+    fp:column "ref_base_index" .
+
+fp:refFundMgmtCo a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "refinitiv 운용사"@ko ;
+    fp:column "ref_fund_mgmt_co" .
+
+fp:refGeoFocus a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "refinitiv 투자지역"@ko ;
+    fp:column "ref_geo_focus" .
+
+fp:duNavBaseDtDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:date ;
+    rdfs:comment "NAV 기준일"@ko ;
+    fp:column "du_nav_base_dt_domestic_etf" .
+
+fp:pdIsinCdDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "Refinitiv ISIN"@ko ;
+    fp:column "pd_isin_cd_domestic_etf" .
+
+fp:pdTrYnDomesticEtf a owl:DatatypeProperty ;
+    rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
+    rdfs:comment "상품거래정지혀부"@ko ;
+    fp:column "pd_tr_yn_domestic_etf" .
+

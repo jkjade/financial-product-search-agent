@@ -7,175 +7,297 @@
 
 fp:Bond a owl:Class ; rdfs:subClassOf fp:Product ; rdfs:label "채권"@ko .
 
-fp:issuerOrManager a owl:DatatypeProperty ;
+fp:productTypeDomesticBond a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
-    rdfs:label "운용사"@ko ;
+    rdfs:comment "상품유형"@ko ;
+    fp:column "product_type" .
+
+fp:sourceTableDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "원본테이블"@ko ;
+    fp:column "source_table" .
+
+fp:productIdDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "상품번호/채권종목번호"@ko ;
+    fp:column "product_id" .
+
+fp:productNameDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "상품명/채권명"@ko ;
+    fp:column "pd_nm_domestic_bond" .
+
+fp:shortNameDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "상품약어명"@ko ;
+    fp:column "pd_abrv_nm_domestic_bond" .
+
+fp:issuerOrManagerDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:comment "발행기관/발행자명"@ko ;
-    fp:column "issuer_or_manager" ;
-    fp:alias "운용사", "자산운용사", "발행사", "issuer", "asset manager", "manager" .
+    fp:column "pd_pbcm_domestic_bond" .
 
-fp:riskCode a owl:DatatypeProperty ;
+fp:assetClassDomesticBond a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
-    rdfs:label "risk_code"@en ;
+    rdfs:comment "상품중분류명"@ko ;
+    fp:column "std_pd_mcls_nm_domestic_bond" .
+
+fp:investmentRegionDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "국가코드: 종목번호 앞 2자리(KR 등)"@ko ;
+    fp:column "pd_ctry_cd_domestic_bond" .
+
+fp:currencyDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "통화코드"@ko ;
+    fp:column "curr_cd_domestic_bond" .
+
+fp:riskCodeDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:comment "상품위험등급 원문 코드"@ko ;
-    fp:column "risk_code" .
+    fp:column "pd_risk_gcd_domestic_bond" .
 
-fp:riskName a owl:DatatypeProperty ;
+fp:riskNameDomesticBond a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
-    rdfs:label "위험등급"@ko ;
+    rdfs:comment "상품위험등급명"@ko ;
+    fp:column "pd_risk_nm_domestic_bond" .
+
+fp:creditRatingDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
     rdfs:comment "적용신용등급"@ko ;
-    fp:column "risk_name" ;
-    fp:alias "위험등급", "위험 등급", "신용등급", "신용 등급", "risk grade", "credit rating" .
+    fp:column "crd_grd_domestic_bond" .
 
-fp:yieldRate a owl:DatatypeProperty ;
-    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "채권수익률"@ko ;
-    rdfs:comment "매수수익률/매수금리 / 민평수익률/민평금리"@ko ;
-    fp:column "yield_rate" ;
-    fp:alias "채권수익률", "채권 수익률", "매수수익률", "yield" .
+fp:saleAvailableDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:boolean ;
+    rdfs:comment "매수가능수량"@ko ;
+    fp:column "buyable_quantity_domestic_bond" .
 
-fp:price a owl:DatatypeProperty ;
+fp:buyYieldDomesticBond a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "가격"@ko ;
+    rdfs:comment "매수수익률/매수금리"@ko ;
+    fp:column "buy_yield" .
+
+fp:appliedYieldDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "민평수익률/민평금리"@ko ;
+    fp:column "applied_yield" .
+
+fp:pdExgMkt a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "거래구분"@ko ;
+    fp:column "pd_exg_mkt" .
+
+fp:sizeAmountDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "발행잔액/발행금액잔액"@ko ;
+    fp:column "isu_bal_amt_domestic_bond" .
+
+fp:priceDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
     rdfs:comment "평가일단가/Clean Price 성격"@ko ;
-    fp:column "price" ;
-    fp:alias "가격", "종가", "평가가격", "price" .
+    fp:column "eval_price_domestic_bond" .
 
-fp:productInfoUpdateDate a owl:DatatypeProperty ;
+fp:dataBaseDateDomesticBond a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
-    rdfs:label "product_info_update_date"@en ;
+    rdfs:comment "데이터기준일"@ko ;
+    fp:column "data_base_date" .
+
+fp:productInfoUpdateDateDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:date ;
     rdfs:comment "민평정보 기준일/최근 업데이트 일자"@ko ;
-    fp:column "product_info_update_date" .
+    fp:column "pd_std_info_update_domestic_bond" .
 
 fp:creditRatingBaseDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
-    rdfs:label "credit_rating_base_date"@en ;
     rdfs:comment "신용등급 적용일자(등급 미변경 시 과거 일자로 유지될 수 있음)"@ko ;
     fp:column "credit_rating_base_date" .
 
 fp:issueDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
-    rdfs:label "issue_date"@en ;
     rdfs:comment "발행일자"@ko ;
     fp:column "issue_date" .
 
 fp:maturityDate a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:date ;
-    rdfs:label "maturity_date"@en ;
     rdfs:comment "상환일자(영구채는 1차 콜행사개시일)"@ko ;
     fp:column "maturity_date" .
 
-fp:bondKind a owl:DatatypeProperty ;
+fp:bdKnd a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
-    rdfs:label "채권종류"@ko ;
     rdfs:comment "예탁원 기준 채권종류명"@ko ;
-    fp:column "bd_knd" ;
-    fp:alias "채권종류", "채권 종류", "채권유형", "채권 유형", "채권분류", "채권 분류", "bond kind", "bond type" .
+    fp:column "bd_knd" .
 
-fp:couponRate a owl:DatatypeProperty ;
+fp:srfcIrt a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "coupon_rate"@en ;
     rdfs:comment "표면이자율/쿠폰금리"@ko ;
     fp:column "srfc_irt" .
 
 fp:corpPretaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "법인 세전 수익률"@ko ;
-    rdfs:comment "법인 투자자 기준, 세금을 떼기 전 수익률. corp_aftertax_yield(세후)와 혼동 주의."@ko ;
-    fp:column "corp_pretax_yield" ;
-    fp:alias "법인 세전 수익률", "법인세전수익률", "세전 수익률", "세전수익률" .
+    rdfs:comment "법인 세전 투자수익률"@ko ;
+    fp:column "corp_pretax_yield" .
 
-fp:corpAftertaxYield a owl:DatatypeProperty ;
+fp:corpAfterTaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "법인 세후 수익률"@ko ;
-    rdfs:comment "법인 투자자 기준, 세금을 뗀 후 수익률. corp_pretax_yield(세전)와 혼동 주의."@ko ;
-    fp:column "corp_after_tax_yield" ;
-    fp:alias "법인 세후 수익률", "법인세후수익률", "법인 세후" .
+    rdfs:comment "법인 세후 투자수익률"@ko ;
+    fp:column "corp_after_tax_yield" .
 
-fp:indivAftertaxYield a owl:DatatypeProperty ;
+fp:afterTaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "개인 세후 수익률"@ko ;
-    rdfs:comment "개인 투자자 기준, 세금을 뗀 후 수익률. corp_aftertax_yield(법인 세후)와 혼동 주의 — 법인/개인 구분."@ko ;
-    fp:column "after_tax_yield" ;
-    fp:alias "개인 세후 수익률", "개인세후수익률", "개인 세후" .
+    rdfs:comment "개인 세후 운용수익률"@ko ;
+    fp:column "after_tax_yield" .
 
-fp:preferentialTaxYield a owl:DatatypeProperty ;
+fp:prefTaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "세금우대 수익률"@ko ;
-    rdfs:comment "세금우대 계좌 등 우대세율을 적용받는 경우의 수익률."@ko ;
-    fp:column "pref_tax_yield" ;
-    fp:alias "세금우대 수익률", "세금우대수익률", "세금 우대 수익률" .
+    rdfs:comment "세금우대 세후 운용수익률"@ko ;
+    fp:column "pref_tax_yield" .
 
-fp:avgAnnualYield a owl:DatatypeProperty ;
+fp:avgAnnualTaxYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "연평균 수익률"@ko ;
-    rdfs:comment "만기까지의 수익률을 연 단위로 환산한 평균값."@ko ;
-    fp:column "avg_annual_tax_yield" ;
-    fp:alias "연평균 수익률", "연평균수익률", "연 평균 수익률" .
+    rdfs:comment "세후 연평균수익률"@ko ;
+    fp:column "avg_annual_tax_yield" .
 
-fp:depositEquivalentYield a owl:DatatypeProperty ;
+fp:depoEquivYield154 a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "예금환산 수익률"@ko ;
-    rdfs:comment "은행 예금 이자율과 비교할 수 있도록 환산한 수익률."@ko ;
-    fp:column "depo_equiv_yield_154" ;
-    fp:alias "예금환산 수익률", "예금환산수익률", "예금 환산 수익률" .
+    rdfs:comment "예금환산수익률(세율 15.4 기준)"@ko ;
+    fp:column "depo_equiv_yield_154" .
 
 fp:remainingDays a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "remaining_days"@en ;
     rdfs:comment "잔존일수"@ko ;
     fp:column "remaining_days" .
 
-fp:duration a owl:DatatypeProperty ;
+fp:dur a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "duration"@en ;
     rdfs:comment "듀레이션"@ko ;
     fp:column "dur" .
 
-fp:convexity a owl:DatatypeProperty ;
+fp:cov a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "convexity"@en ;
     rdfs:comment "컨벡시티"@ko ;
     fp:column "cov" .
 
-fp:nextDayDuration a owl:DatatypeProperty ;
+fp:ndyDur a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "next_day_duration"@en ;
     rdfs:comment "익일 듀레이션"@ko ;
     fp:column "ndy_dur" .
 
-fp:nextDayConvexity a owl:DatatypeProperty ;
+fp:ndyCov a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "next_day_convexity"@en ;
     rdfs:comment "익일 컨벡시티"@ko ;
     fp:column "ndy_cov" .
 
-fp:dirtyPrice a owl:DatatypeProperty ;
+fp:dirty a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "dirty_price"@en ;
     rdfs:comment "이자부단가/Dirty Price"@ko ;
     fp:column "dirty" .
 
-fp:nextDayEvalPrice a owl:DatatypeProperty ;
+fp:ndyEvalPrice a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "next_day_eval_price"@en ;
     rdfs:comment "익일 평가일단가"@ko ;
     fp:column "ndy_eval_price" .
 
-fp:nextDayYieldRate a owl:DatatypeProperty ;
+fp:ndyAppliedYield a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "next_day_yield_rate"@en ;
     rdfs:comment "익일 민평수익률/민평금리"@ko ;
     fp:column "ndy_applied_yield" .
 
-fp:nextDayDirtyPrice a owl:DatatypeProperty ;
+fp:ndyDirty a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
-    rdfs:label "next_day_dirty_price"@en ;
     rdfs:comment "익일 이자부단가"@ko ;
     fp:column "ndy_dirty" .
 
-fp:bondMidClass a owl:DatatypeProperty ;
+fp:stdPdSclsNm a owl:DatatypeProperty ;
     rdfs:domain fp:Bond ; rdfs:range xsd:string ;
-    rdfs:label "bond_mid_class"@en ;
     rdfs:comment "상품소분류명"@ko ;
     fp:column "std_pd_scls_nm" .
+
+fp:isPensionTradableDomesticBond a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "퇴직연금 편입 가능 여부"@ko ;
+    fp:column "pd_pen_tr_yn_domestic_bond" .
+
+fp:bdbnsAblChnlNm a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "채권매매가능채널구분명"@ko ;
+    fp:column "bdbns_abl_chnl_nm" .
+
+fp:bdbnsAblChnlTcd a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "채권매매가능채널구분코드"@ko ;
+    fp:column "bdbns_abl_chnl_tcd" .
+
+fp:bdInrtTcd a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "금리구분"@ko ;
+    fp:column "bd_inrt_tcd" .
+
+fp:bdIntpTcd a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "이자지급구분"@ko ;
+    fp:column "bd_intp_tcd" .
+
+fp:bdOfrTcd a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "모집구분"@ko ;
+    fp:column "bd_ofr_tcd" .
+
+fp:bdTisuA a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "총발행금액"@ko ;
+    fp:column "bd_tisu_a" .
+
+fp:depoEquivYield495 a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "은행환산수익률(세율 49.5 기준)"@ko ;
+    fp:column "depo_equiv_yield_495" .
+
+fp:exgClosePrice a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "장내 채권종가"@ko ;
+    fp:column "exg_close_price" .
+
+fp:exgClosePriceBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:date ;
+    rdfs:comment "장내 채권종가/종가수익률 기준일"@ko ;
+    fp:column "exg_close_price_base_dt" .
+
+fp:exgCloseYield a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "장내 종가수익률"@ko ;
+    fp:column "exg_close_yield" .
+
+fp:exrtGrteErnR a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "만기보장수익률"@ko ;
+    fp:column "exrt_grte_ern_r" .
+
+fp:exrtGrteErnRTcd a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:string ;
+    rdfs:comment "만기보장수익률구분코드"@ko ;
+    fp:column "exrt_grte_ern_r_tcd" .
+
+fp:exrtRpyR a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "만기상환율"@ko ;
+    fp:column "exrt_rpy_r" .
+
+fp:infoBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:date ;
+    rdfs:comment "판매/민평 공통 기준일"@ko ;
+    fp:column "info_base_dt" .
+
+fp:infoSeq a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "동일 종목/시장/기준일 내 판매 LOT 구분 순번"@ko ;
+    fp:column "info_seq" .
+
+fp:saleYieldBaseDt a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:date ;
+    rdfs:comment "판매수익률 기준일"@ko ;
+    fp:column "sale_yield_base_dt" .
+
+fp:tradePrice a owl:DatatypeProperty ;
+    rdfs:domain fp:Bond ; rdfs:range xsd:decimal ;
+    rdfs:comment "매매단가(표준투입단가)"@ko ;
+    fp:column "trade_price" .

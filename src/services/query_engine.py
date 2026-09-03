@@ -9,38 +9,35 @@ from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
 from ..api.models import (
-    FilterClause,
     GetProductRequest,
     ProductAggregateRequest,
     ProductCompareRequest,
     ProductQueryRequest,
     ProductRankRequest,
-    ProductSearchRequest,
-    SortClause,
 )
 from ..query.field_domains import PRODUCT_TYPES, classify_field_domains, label_field_map_for_domain
-from ..query.field_labels import label_for_field
-from ..query.fields import FIELD_SPECS, LEGACY_SORT_ALIASES
+from ..semantic.ontology import label_for_field
+from ..query.fields import FIELD_SPECS
 from ..query.sql_builder import compile_filters, compile_order, metric_expression, quote_alias
 
 COMMON_SELECT_FIELDS = """
-    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, etf_sector, fn_average_maturity, fn_effective_duration, fn_modified_duration, intraday_inav, intraday_premium_discount_rate, nav_per_share, net_asset_per_share, net_asset_ratio_per_share, net_profit_per_share, pd_dvid_inc_dist, return_1w, return_base_date
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, data_base_date
 """
 
 DOMESTIC_BOND_SELECT_FIELDS = """
-    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, avg_annual_tax_yield, bd_inrt_tcd, bd_intp_tcd, bd_ofr_tcd, bd_tisu_a, bdbns_abl_chnl_nm, bdbns_abl_chnl_tcd, bd_knd, std_pd_scls_nm, cov, corp_after_tax_yield, corp_pretax_yield, srfc_irt, credit_rating_base_date, depo_equiv_yield_495, depo_equiv_yield_154, dirty, dur, exg_close_price, exg_close_price_base_dt, exg_close_yield, exrt_grte_ern_r, exrt_grte_ern_r_tcd, exrt_rpy_r, after_tax_yield, info_base_dt, info_seq, is_pension_tradable, issue_date, issuer_or_manager, maturity_date, ndy_cov, ndy_dirty, ndy_dur, ndy_eval_price, ndy_applied_yield, pref_tax_yield, product_info_update_date, remaining_days, risk_code, risk_name, sale_yield_base_dt, trade_price, yield_rate
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, pd_nm_domestic_bond, pd_abrv_nm_domestic_bond, std_pd_mcls_nm_domestic_bond, pd_ctry_cd_domestic_bond, curr_cd_domestic_bond, buyable_quantity_domestic_bond, isu_bal_amt_domestic_bond, eval_price_domestic_bond, data_base_date, avg_annual_tax_yield, bd_inrt_tcd, bd_intp_tcd, bd_ofr_tcd, bd_tisu_a, bdbns_abl_chnl_nm, bdbns_abl_chnl_tcd, bd_knd, std_pd_scls_nm, cov, corp_after_tax_yield, corp_pretax_yield, srfc_irt, credit_rating_base_date, depo_equiv_yield_495, depo_equiv_yield_154, dirty, dur, exg_close_price, exg_close_price_base_dt, exg_close_yield, exrt_grte_ern_r, exrt_grte_ern_r_tcd, exrt_rpy_r, after_tax_yield, info_base_dt, info_seq, pd_pen_tr_yn_domestic_bond, issue_date, pd_pbcm_domestic_bond, maturity_date, ndy_cov, ndy_dirty, ndy_dur, ndy_eval_price, ndy_applied_yield, pref_tax_yield, pd_std_info_update_domestic_bond, remaining_days, pd_risk_gcd_domestic_bond, pd_risk_nm_domestic_bond, crd_grd_domestic_bond, sale_yield_base_dt, trade_price, buy_yield, applied_yield, pd_exg_mkt
 """
 
 DOMESTIC_ETF_SELECT_FIELDS = """
-    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, base_index, base_price, pd_circ_net_tamt, pd_circ_stk_cnt, day_high, day_low, pd_dvid_cycl, pd_divd_amt_pshr, dividend_yield, du_chas_errt_base_dt, du_diff_rt_base_dt, du_vlty_1m, du_vlty_1y, du_vlty_3m, du_vlty_6m, du_vlty_base_dt, etf_kr_product_code, pd_sect_cd, etf_strategy, exchange_code, pd_exg_mkt_nm, fee_rate, fn_average_coupon, fn_average_maturity, fn_average_quality, fn_base_dt, fn_effective_duration, fn_effective_maturity, fn_modified_duration, fn_nominal_maturity, fn_portfolio_dt, is_core_etf, is_pension_tradable, pd_spac_yn, issuer_or_manager, last_nav, leverage_factor, listed_share_count, listing_date, market_code, market_data_update_date, pd_mkt_nm, du_nav_rnf_amt, cu_charge_etc_rt, pd_divd_amt_ann, pd_dvid_base_dt, pd_dvid_inc_dist, pd_dvid_nav, pd_dvid_pay_cnt, pd_dvid_pay_months, pd_dvid_prc_base_dt, pd_dvid_tax_basis, pd_ric, pd_ticker, pd_pen_risk_nm, premium_discount_rate, du_nav_yday, product_group_code, product_info_update_date, realtime_volume, ref_ast_type, ref_base_dt, ref_base_index, ref_fund_mgmt_co, ref_geo_focus, return_1d, return_1m, return_1y, return_3m, return_6m, du_er_ytd, risk_code, risk_name, pd_stk_cnt, du_chas_errt, trade_end_date, trading_value_1d, du_val_1m, du_val_5d, trading_volume_1d, du_vol_avg_1m, du_vol_avg_5d, weekly_data_update_date
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, pd_nm_domestic_etf, pd_abrv_nm_domestic_etf, wu_inv_ast_type_domestic_etf, wu_inv_rgn_domestic_etf, pd_curr_nm_domestic_etf, pd_curr_cd_domestic_etf, pd_sale_yn_domestic_etf, pd_net_tamt_domestic_etf, du_last_aum_domestic_etf, du_clpr_domestic_etf, ru_mkt_price_domestic_etf, data_base_date, cu_base_index_domestic_etf, du_bpr_domestic_etf, pd_circ_net_tamt, pd_circ_stk_cnt, du_hpr_domestic_etf, du_lpr_domestic_etf, pd_dvid_cycl, pd_divd_amt_pshr, pd_dvid_yield_domestic_etf, du_chas_errt_base_dt, du_diff_rt_base_dt, du_vlty_1m, du_vlty_1y, du_vlty_3m, du_vlty_6m, du_vlty_base_dt, etf_kr_product_code, pd_sect_cd, cu_strtegy_domestic_etf, pd_exg_mkt_cd_domestic_etf, pd_exg_mkt_nm, cu_charge_rt_domestic_etf, fn_average_coupon, fn_average_maturity, fn_average_quality, fn_base_dt, fn_effective_duration, fn_effective_maturity, fn_modified_duration, fn_nominal_maturity, fn_portfolio_dt, wu_core_yn_domestic_etf, pd_pen_tr_yn_domestic_etf, pd_spac_yn, cu_fund_mgmt_co_domestic_etf, du_last_nav_domestic_etf, cu_lev_fector_domestic_etf, pd_lst_stk_cnt_domestic_etf, pd_lstg_dt_domestic_etf, pd_mkt_id_domestic_etf, du_upt_dt_domestic_etf, pd_mkt_nm, du_nav_rnf_amt, cu_charge_etc_rt, pd_divd_amt_ann, pd_dvid_base_dt, pd_dvid_inc_dist, pd_dvid_nav, pd_dvid_pay_cnt, pd_dvid_pay_months, pd_dvid_prc_base_dt, pd_dvid_tax_basis, pd_ric, pd_ticker, pd_pen_risk_nm, du_diff_rt_domestic_etf, du_nav_yday, pd_grp_no_domestic_etf, cu_upt_dt_domestic_etf, ru_mkt_volume_domestic_etf, ref_ast_type, ref_base_dt, ref_base_index, ref_fund_mgmt_co, ref_geo_focus, du_er_1d_domestic_etf, du_er_1m_domestic_etf, du_er_1y_domestic_etf, du_er_3m_domestic_etf, du_er_6m_domestic_etf, du_er_ytd, pd_risk_cd_domestic_etf, pd_risk_nm_domestic_etf, pd_stk_cnt, du_chas_errt, trade_end_date, du_val_1d_domestic_etf, du_val_1m, du_val_5d, du_vol_1d_domestic_etf, du_vol_avg_1m, du_vol_avg_5d, wu_upt_dt_domestic_etf, du_nav_base_dt_domestic_etf, pd_isin_cd_domestic_etf, pd_tr_yn_domestic_etf
 """
 
 OVERSEAS_ETF_SELECT_FIELDS = """
-    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, du_base_dt_match_yn, base_index, base_price, du_clpr_src, day_high, day_low, du_opr, etf_gl_product_code, etf_strategy, exchange_code, fee_rate, cu_index_repl_mthd, is_core_etf, cu_etn_yn, cu_index_tracking_yn, cu_inverse_short_yn, issuer_or_manager, last_nav, leverage_factor, pd_lipper_id, listed_share_count, listing_date, market_code, market_data_update_date, pd_lst_price, premium_discount_rate, price_base_date, product_group_code, product_info_update_date, realtime_volume, return_1d, size_base_date, trading_value_1d, trading_volume_1d, pd_us_cik, weekly_data_update_date
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, pd_nm_overseas_etf, pd_abrv_nm_overseas_etf, wu_inv_ast_type_overseas_etf, wu_inv_rgn_overseas_etf, pd_trd_ccy_overseas_etf, pd_curr_cd_overseas_etf, pd_sale_yn_overseas_etf, du_last_aum_overseas_etf, du_clpr_overseas_etf, ru_mkt_price_overseas_etf, data_base_date, du_base_dt_match_yn, cu_base_index_overseas_etf, du_bpr_overseas_etf, du_clpr_src, du_hpr_overseas_etf, du_lpr_overseas_etf, du_opr, pd_itm_no_ma_overseas_etf, pd_isin_cd_overseas_etf, cu_strtegy_overseas_etf, pd_exg_mkt_cd_overseas_etf, cu_charge_rt_overseas_etf, cu_index_repl_mthd, wu_core_yn_overseas_etf, cu_etn_yn, cu_index_tracking_yn, cu_inverse_short_yn, cu_fund_mgmt_co_overseas_etf, du_last_nav_overseas_etf, cu_lev_fector_overseas_etf, pd_lipper_id, pd_lst_stk_cnt_overseas_etf, pd_lstg_dt_overseas_etf, pd_mkt_id_overseas_etf, du_upt_dt_overseas_etf, pd_lst_price, du_diff_rt_overseas_etf, price_base_date, pd_grp_no_overseas_etf, cu_upt_dt_overseas_etf, ru_mkt_volume_overseas_etf, du_er_1d_overseas_etf, size_base_date, du_val_1d_overseas_etf, du_vol_1d_overseas_etf, pd_us_cik, wu_upt_dt_overseas_etf, pd_tr_yn_overseas_etf
 """
 
 PUBLIC_FUND_SELECT_FIELDS = """
-    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, product_name, short_name, asset_class, investment_region, currency, sale_available, size_amount, price, data_base_date, base_index, dividend_yield, fd_daily_bas_dt, fd_last_dstb_actg_bss_dt, fd_last_dstb_actg_eot_dt, fd_price_bas_dt, fd_prsv_r, fd_sbpr, fss_itm_no, prfd_attr_cds, fd_estb_ctry_cd, fd_set_pcd, fund_standard_code, han_clas_fee_type, han_clas_nm, han_clas_policies, han_clas_sales_channel, pers_corp_desc, int_dvd_desc, exchdg_yn, frc_bpr_itm_yn, hdge_fd_yn, ofsfd_yn, kofia_fd_ccd, or_co_xtn_itt_cd, mtco_itm_no, ofwk_trus_rwrd_r, or_co_rwrd_r, prfd_attr_cnt, prfd_attr_search_text, prvo_fd_desc, pfiv_sale_cntl_tcd, prvo_pbff_desc, rptt_ksd_itm_no, fd_mm18_ern_r, return_1m, return_1y, fd_yr2_ern_r, return_3m, fd_yr3_ern_r, fd_yr5_ern_r, return_6m, risk_code, risk_name, sale_co_rwrd_r, trusc_rwrd_r, trusc_xtn_itt_cd, zrin_attr_nms, zrin_btyp_cd, zrin_btyp_nm, zrin_dmst_bd_cmst_rt, zrin_dmst_stk_cmst_rt, zrin_etc_ast_cmst_rt, zrin_fd_cmst_rt, zrin_liqt_cmst_rt, zrin_ovrs_bd_cmst_rt, zrin_ovrs_stk_cmst_rt, zrin_pcd, zrin_ptn_nm
+    source_row_number, source_file, quality_flags, reference_date_note, search_text, reference_dates, product_type, source_table, product_id, itm_nm_public_fund, itm_abrv_nm_public_fund, or_attr_desc_public_fund, fd_ivst_rgn_desc_public_fund, ovrs_fd_desc_public_fund, curr_cd_public_fund, thco_sale_yn_public_fund, sale_yn_public_fund, fd_nast_suma_public_fund, bns_bpr_public_fund, data_base_date, bmrk_nm_public_fund, bmrk_eng_nm_public_fund, fd_last_dstb_r_public_fund, fd_daily_bas_dt, fd_last_dstb_actg_bss_dt, fd_last_dstb_actg_eot_dt, fd_price_bas_dt, fd_prsv_r, fd_sbpr, fss_itm_no, prfd_attr_cds, fd_estb_ctry_cd, fd_set_pcd, std_itm_no_public_fund, ksd_itm_no_public_fund, han_clas_fee_type, han_clas_nm, han_clas_policies, han_clas_sales_channel, pers_corp_desc, int_dvd_desc, exchdg_yn, frc_bpr_itm_yn, hdge_fd_yn, ofsfd_yn, kofia_fd_ccd, or_co_xtn_itt_cd, mtco_itm_no, ofwk_trus_rwrd_r, or_co_rwrd_r, prfd_attr_cnt, prfd_attr_search_text, prvo_fd_desc, pfiv_sale_cntl_tcd, prvo_pbff_desc, rptt_ksd_itm_no, fd_mm18_ern_r, fd_wk1_ern_r, fd_mm1_ern_r_public_fund, fd_yr1_ern_r_public_fund, fd_yr2_ern_r, fd_mm3_ern_r_public_fund, fd_yr3_ern_r, fd_yr5_ern_r, fd_mm6_ern_r_public_fund, zrin_fd_ivst_risk_gcd_public_fund, zrin_fd_ivst_risk_grd_nm_public_fund, sale_co_rwrd_r, trusc_rwrd_r, trusc_xtn_itt_cd, zrin_attr_nms, zrin_btyp_cd, zrin_btyp_nm, zrin_dmst_bd_cmst_rt, zrin_dmst_stk_cmst_rt, zrin_etc_ast_cmst_rt, zrin_fd_cmst_rt, zrin_liqt_cmst_rt, zrin_ovrs_bd_cmst_rt, zrin_ovrs_stk_cmst_rt, zrin_pcd, zrin_ptn_nm
 """
 
 VIEW_BY_PRODUCT_TYPE: dict[str, tuple[str, str]] = {
@@ -57,6 +54,25 @@ TABLE_TO_PRODUCT_TYPE: dict[str, str] = {
     "PREF02N001": "OVERSEAS_ETF",
     "PRFD01N001": "PUBLIC_FUND",
 }
+
+# 2026-09 도메인 네이티브 컬럼명 전환 이후 product_name은 더 이상 단일 canonical
+# 이름이 아니다(도메인마다 실제 컬럼이 다름). compare_products가 비교 결과에
+# "이 값이 어느 상품 건지" 상품명을 표시할 때만 이 매핑으로 도메인별 실제 컬럼을
+# 찾는다 — 필드 병합 판단(코멘트 완전일치)과는 무관한, 순수 표시용 참조. 이걸
+# 필요로 하는 곳이 여기 하나뿐이라 로컬로 둔다(공유 딕셔너리로 안 뺌).
+_PRODUCT_NAME_BY_DOMAIN: dict[str, str] = {
+    "DOMESTIC_BOND": "pd_nm_domestic_bond",
+    "DOMESTIC_ETF": "pd_nm_domestic_etf",
+    "OVERSEAS_ETF": "pd_nm_overseas_etf",
+    "PUBLIC_FUND": "itm_nm_public_fund",
+}
+
+
+def _product_name_of(item: dict[str, Any]) -> Any:
+    """도메인별 뷰 결과(item)에서 상품명을 뽑는다 — product_type을 모르는
+    COMMON_VIEW 폴백 케이스에서는 그 뷰가 그대로 유지하는 product_name 키를 쓴다."""
+    column = _PRODUCT_NAME_BY_DOMAIN.get(item.get("product_type"), "product_name")
+    return item.get(column)
 
 
 def _resolve_domain_column(field: str, domains: list[str], target_domain: str) -> str | None:
@@ -135,21 +151,6 @@ def view_for_product_type(product_type: str | None) -> tuple[str, str]:
 _SQL_TYPE_BY_KIND = {"text": "text", "numeric": "numeric", "date": "date", "boolean": "boolean"}
 
 
-def cross_domain_union_sql(fields: list[str]) -> str:
-    blocks = []
-    for view_name, select_fields in VIEW_BY_PRODUCT_TYPE.values():
-        available = {name.strip() for name in select_fields.split(",")}
-        parts = ["product_type"]
-        for field in fields:
-            if field in available:
-                parts.append(field)
-            else:
-                sql_type = _SQL_TYPE_BY_KIND[FIELD_SPECS[field].kind]
-                parts.append(f"NULL::{sql_type} AS {field}")
-        blocks.append(f"SELECT {', '.join(parts)} FROM {view_name}")
-    return " UNION ALL ".join(blocks)
-
-
 
 def evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
     return {
@@ -161,42 +162,6 @@ def evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
             "반환하고, 결측값은 추정하지 않습니다. 집계 함수는 SQL 표준에 따라 null을 제외합니다."
         ),
     }
-
-
-def legacy_to_query(request: ProductSearchRequest) -> ProductQueryRequest:
-    filters: list[FilterClause] = []
-    if request.product_type:
-        filters.append(FilterClause(field="product_type", operator="eq", value=request.product_type))
-    if request.asset_class and request.asset_class.strip():
-        filters.append(FilterClause(field="asset_class", operator="contains", value=request.asset_class.strip()))
-    if request.region and request.region.strip():
-        filters.append(FilterClause(field="investment_region", operator="contains", value=request.region.strip()))
-    if request.risk and request.risk.strip():
-        # risk_name is the user-facing field. risk_code can still be queried through v2 generic filters.
-        filters.append(FilterClause(field="risk_name", operator="contains", value=request.risk.strip()))
-    if request.max_fee is not None:
-        filters.append(FilterClause(field="fee_rate", operator="lte", value=request.max_fee))
-    if request.min_return_1y is not None:
-        filters.append(FilterClause(field="return_1y", operator="gte", value=request.min_return_1y))
-    if request.min_yield is not None:
-        filters.append(FilterClause(field="yield_rate", operator="gte", value=request.min_yield))
-    if request.min_size is not None:
-        filters.append(FilterClause(field="size_amount", operator="gte", value=request.min_size))
-    if request.sale_available is not None:
-        filters.append(FilterClause(field="sale_available", operator="eq", value=request.sale_available))
-    if request.has_price is not None:
-        filters.append(FilterClause(field="price", operator="not_null" if request.has_price else "is_null"))
-    if request.has_return_1y is not None:
-        filters.append(
-            FilterClause(field="return_1y", operator="not_null" if request.has_return_1y else "is_null")
-        )
-    return ProductQueryRequest(
-        q=request.q,
-        filters=filters,
-        sort=[SortClause(field=LEGACY_SORT_ALIASES[request.sort_by], order=request.order)],
-        limit=request.limit,
-        offset=request.offset,
-    )
 
 
 def search_products(
@@ -327,15 +292,12 @@ def rank_products(
     partitions = [FIELD_SPECS[str(field)].column for field in request.partition_by]
     partition_sql = f"PARTITION BY {', '.join(partitions)} " if partitions else ""
     if request.method == "row_number":
-        window_order = (
-            f"{metric_column} {direction} NULLS LAST, product_name ASC, "
-            "source_table ASC, source_row_number ASC"
-        )
+        window_order = f"{metric_column} {direction} NULLS LAST, source_table ASC, source_row_number ASC"
     else:
         window_order = f"{metric_column} {direction} NULLS LAST"
     rank_function = request.method.upper()
 
-    final_order_parts = [*partitions, "rank_position ASC", "product_name ASC", "source_table ASC", "source_row_number ASC"]
+    final_order_parts = [*partitions, "rank_position ASC", "source_table ASC", "source_row_number ASC"]
     query = f"""
         WITH ranked AS (
             SELECT
@@ -442,7 +404,7 @@ def compare_products(
                             "source_table": item["source_table"],
                             "source_row_number": item["source_row_number"],
                             "product_id": item["product_id"],
-                            "product_name": item["product_name"],
+                            "product_name": _product_name_of(item),
                         }
                         for item in matches[:20]
                     ],
@@ -487,7 +449,7 @@ def compare_products(
                 "source_table": item["source_table"],
                 "source_row_number": item["source_row_number"],
                 "product_id": item["product_id"],
-                "product_name": item["product_name"],
+                "product_name": _product_name_of(item),
                 "value": item.get(columns[index]) if columns[index] else None,
                 "rank": ranks.get(index),
             }
@@ -498,7 +460,7 @@ def compare_products(
             key=lambda row: (
                 row["rank"] is None,
                 row["rank"] if row["rank"] is not None else 10**9,
-                row["product_name"] or "",
+                (row["source_table"], row["source_row_number"]),
             ),
         )
 

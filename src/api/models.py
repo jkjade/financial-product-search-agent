@@ -8,6 +8,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from ..query.fields import (
+    BOOLEAN_FIELDS_SET,
     DATE_FIELDS_SET,
     FILTER_FIELDS,
     GROUP_FIELDS,
@@ -120,7 +121,7 @@ def _coerce_filter_value(field: str, value: ScalarValue) -> ScalarValue:
             return date.fromisoformat(raw[:10])
         except ValueError as exc:
             raise ValueError(f"Invalid ISO date value for {field}: {value!r}") from exc
-    if field == "sale_available":
+    if field in BOOLEAN_FIELDS_SET:
         if isinstance(value, bool):
             return value
         normalized = str(value).strip().lower()
@@ -189,36 +190,14 @@ class SortClause(StrictModel):
 class ProductQueryRequest(StrictModel):
     q: str | None = Field(default=None, max_length=300)
     filters: list[FilterClause] = Field(default_factory=list, max_length=30)
-    sort: list[SortClause] = Field(
-        default_factory=lambda: [SortClause(field="size_amount", order="desc")],
-        max_length=5,
-    )
+    # 2026-09 도메인 네이티브 컬럼명 전환 이후 size_amount 같은 단일 canonical
+    # 기본 정렬 필드가 더 이상 없다(도메인마다 실제 컬럼이 다름). 실제 정렬 기준은
+    # 모델이 질문에서 항상 뽑아 명시적으로 넘기므로, 정렬을 안 주면
+    # compile_order()(sql_builder.py)가 source_table/source_row_number만으로
+    # 항상 결정적인 기본 정렬을 만든다(도메인별 상품명 폴백은 불필요해서 제거함).
+    sort: list[SortClause] = Field(default_factory=list, max_length=5)
     limit: int = Field(default=20, ge=1, le=200)
     offset: int = Field(default=0, ge=0, le=100000)
-
-
-LegacySortBy = Literal["fee", "return_1y", "size", "yield", "maturity", "name"]
-
-
-class ProductSearchRequest(StrictModel):
-    """v1-compatible search request retained for existing callers."""
-
-    q: str | None = Field(default=None, max_length=200)
-    product_type: ProductType | None = None
-    asset_class: str | None = Field(default=None, max_length=100)
-    region: str | None = Field(default=None, max_length=100)
-    risk: str | None = Field(default=None, max_length=100)
-    max_fee: Decimal | None = None
-    min_return_1y: Decimal | None = None
-    min_yield: Decimal | None = None
-    min_size: Decimal | None = None
-    sale_available: bool | None = None
-    has_price: bool | None = None
-    has_return_1y: bool | None = None
-    sort_by: LegacySortBy = "size"
-    order: SortOrder = "desc"
-    limit: int = Field(default=20, ge=1, le=100)
-    offset: int = Field(default=0, ge=0, le=10000)
 
 
 class AggregateMetric(StrictModel):
@@ -236,7 +215,7 @@ class AggregateMetric(StrictModel):
             raise ValueError(f"{self.operation} requires field")
         if self.operation in {"sum", "avg"} and self.field not in NUMERIC_FIELDS_SET:
             raise ValueError(f"{self.operation} requires a numeric field")
-        if self.operation in {"min", "max"} and self.field == "sale_available":
+        if self.operation in {"min", "max"} and self.field in BOOLEAN_FIELDS_SET:
             raise ValueError(f"{self.operation} is not supported for boolean fields")
         return self
 
@@ -337,13 +316,7 @@ class ComparisonMetric(StrictModel):
 class ProductCompareRequest(StrictModel):
     products: list[ProductSelector] = Field(min_length=2, max_length=20)
     metrics: list[ComparisonMetric] = Field(
-        default_factory=lambda: [
-            ComparisonMetric(field="fee_rate", order="asc"),
-            ComparisonMetric(field="return_1y", order="desc"),
-            ComparisonMetric(field="size_amount", order="desc"),
-            ComparisonMetric(field="yield_rate", order="desc"),
-        ],
-        min_length=1,
+        default_factory=list,
         max_length=12,
     )
 

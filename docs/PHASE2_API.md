@@ -1,5 +1,16 @@
 # Phase 2 검색·필터·집계·순위 API
 
+> **2026-09 도메인 네이티브 컬럼명 전환**: SQL 뷰가 `size_amount`/`price`/
+> `asset_class` 등 "가짜 공유" 필드명을 더 이상 노출하지 않고 도메인별 원본
+> 컬럼명을 그대로 쓴다(`sql/004_views.sql`). 이 문서의 예시 JSON은 마이그레이션
+> 이전 이름을 그대로 쓰고 있어 최신화되지 않았다 — 실제 field 값은 도구 응답이
+> 그 라운드에 보여주는 field 목록(컬럼코멘트)을 확인할 것. 레거시 v1
+> `GET /products/search`/`POST /tools/search-products`(`legacy_to_query()`,
+> `ProductSearchRequest`)는 `/answer`가 호출하지 않는 별도 REST 엔드포인트였고,
+> 이걸 뒷받침하던 도메인별 매핑 외에는 아무도 안 쓰던 상태라 2026-09에 API·요청
+> 모델·변환 함수를 통째로 제거했다. 아래 도구들은 모두 `POST /tools/*`(Phase 2)
+> 경로로만 접근한다.
+
 ## 1. 범용 검색 `POST /tools/query-products`
 
 ```json

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from psycopg_pool import ConnectionPool
 
-from .field_labels import label_for_field
+from ..semantic.ontology import label_for_field
 from .fields import FIELD_SPECS
 
 PRODUCT_TYPES = ("DOMESTIC_BOND", "DOMESTIC_ETF", "OVERSEAS_ETF", "PUBLIC_FUND")

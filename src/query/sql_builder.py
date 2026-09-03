@@ -88,14 +88,14 @@ def compile_filters(q: str | None, filters: Iterable[Any]) -> tuple[str, list[An
     return " AND ".join(conditions), parameters
 
 
-def compile_order(sort_items: Iterable[Any], *, fallback: str = "product_name ASC") -> str:
+def compile_order(sort_items: Iterable[Any]) -> str:
     fragments: list[str] = []
     for item in sort_items:
         field = str(item.field)
         direction = "ASC" if str(item.order) == "asc" else "DESC"
         nulls = "NULLS FIRST" if getattr(item, "nulls", "last") == "first" else "NULLS LAST"
         fragments.append(f"{FIELD_SPECS[field].column} {direction} {nulls}")
-    fragments.extend([fallback, "source_table ASC", "source_row_number ASC"])
+    fragments.extend(["source_table ASC", "source_row_number ASC"])
     return ", ".join(fragments)
 
 

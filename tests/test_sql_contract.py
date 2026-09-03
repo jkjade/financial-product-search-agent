@@ -49,7 +49,10 @@ def test_catalog_union_selects_have_same_column_count():
         assert match is not None
         counts.append(_count_top_level_select_items(match.group(1)))
 
-    assert counts == [31, 31, 31, 31]
+    # 2026-09 도메인 네이티브 컬럼명 전환: product_catalog(통합 뷰)에서
+    # size_amount/price/sale_available/asset_class/investment_region/currency
+    # "가짜 공유" 6개 필드 + 항상 NULL이던 죽은 컬럼 13개를 제거했다(12개만 남음).
+    assert counts == [12, 12, 12, 12]
 
 
 def test_catalog_has_provenance_quality_and_core_indexes():
