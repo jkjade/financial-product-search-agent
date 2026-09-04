@@ -2,7 +2,7 @@
   "project": "financial-product-agent",
   "version": "2.5.1",
   "release": "phase2.5-final-phase3-immediate-handoff-dockerfix",
-  "data_base_date": "2026-08-21",
+  "data_base_date": "2026-08-24",
   "expected_total_rows": 53375,
   "phase_1": {
     "status": "complete",
@@ -38,7 +38,7 @@
       "PostgreSQL pgvector external evidence store",
       "federated RDB/graph/semantic retrieval",
       "external ETF holdings import contract",
-      "2026-08-21 external evidence cutoff constraints",
+      "2026-08-24 external evidence cutoff constraints",
       "answer validation and evidence extraction"
     ]
   },
@@ -65,7 +65,7 @@
     "no secrets in repository",
     "no non-HyperCLOVA final-answer fallback",
     "no-evidence answers are converted to 확인할 수 없음",
-    "external facts after 2026-08-21 are rejected by DB constraints"
+    "external facts after 2026-08-24 are rejected by DB constraints"
   ],
   "datasets": [
     {

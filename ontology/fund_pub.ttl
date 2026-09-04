@@ -232,6 +232,20 @@ fp:truscXtnIttCd a owl:DatatypeProperty ;
     rdfs:comment "수탁회사대외기관코드"@ko ;
     fp:column "trusc_xtn_itt_cd" .
 
+fp:price a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "기준가"@ko ;
+    rdfs:comment "매매기준가(2026-08-24 재배포본부터 bns_bpr로 신규 제공, 그 전에는 공모펀드 price가 항상 NULL이었음)"@ko ;
+    fp:column "price" ;
+    fp:alias "기준가", "매매기준가", "가격", "price" .
+
+fp:dividendYield a owl:DatatypeProperty ;
+    rdfs:domain fp:PublicFund ; rdfs:range xsd:decimal ;
+    rdfs:label "최근 분배율"@ko ;
+    rdfs:comment "최근 분배율(2026-08-24 재배포본부터 fd_last_dstb_r로 신규 제공, 그 전에는 공모펀드 dividend_yield가 항상 NULL이었음)"@ko ;
+    fp:column "dividend_yield" ;
+    fp:alias "분배율", "최근 분배율", "분배수익률", "dividend yield" .
+
 fp:stdItmNoPublicFund a owl:DatatypeProperty ;
     rdfs:domain fp:PublicFund ; rdfs:range xsd:string ;
     rdfs:comment "표준종목번호"@ko ;

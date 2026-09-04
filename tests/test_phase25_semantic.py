@@ -22,8 +22,8 @@ def test_ontology_files_exist_and_snapshot_rule_is_fixed():
         "ontology/fund_pub.ttl",
     ]
     rules = load_business_rules()
-    assert rules["dataset_snapshot_date"] == "2026-08-21"
-    assert rules["external_evidence_cutoff"] == "2026-08-21"
+    assert rules["dataset_snapshot_date"] == "2026-08-24"
+    assert rules["external_evidence_cutoff"] == "2026-08-24"
     ttl = "\n".join((ROOT / f).read_text(encoding="utf-8") for f in info["ontology_files"])
     for token in ("fp:Product", "fp:ETF", "fp:managedBy", "fp:tracksIndex"):
         assert token in ttl
@@ -71,7 +71,7 @@ def test_semantic_sql_has_graph_and_cutoff_constraint():
     assert "CREATE TABLE semantic.entity" in sql
     assert "CREATE TABLE semantic.relation" in sql
     assert "CREATE TABLE semantic.document_chunk" in sql
-    assert "as_of_date <= DATE '2026-08-21'" in sql
+    assert "as_of_date <= DATE '2026-08-24'" in sql
     assert "'manages'" in sql
 
 

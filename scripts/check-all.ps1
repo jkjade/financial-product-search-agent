@@ -162,7 +162,7 @@ try {
     }
 
     $capabilities = Invoke-RestMethod -Uri "$BaseUrl/capabilities" -TimeoutSec 10
-    if (@($capabilities.product_types).Count -eq 4 -and $capabilities.data_base_date -eq "2026-07-11") {
+    if (@($capabilities.product_types).Count -eq 4 -and $capabilities.data_base_date -eq "2026-08-24") {
         Write-Pass "상품군 4종 및 Agent 연동 스키마 정상"
     }
     else {
@@ -175,10 +175,10 @@ catch {
 
 Write-Step "6. 상품군별 적재 건수"
 $expectedCounts = @{
-    "DOMESTIC_BOND" = 42394
-    "DOMESTIC_ETF" = 1734
-    "OVERSEAS_ETF" = 5646
-    "PUBLIC_FUND" = 95619
+    "DOMESTIC_BOND" = 21882
+    "DOMESTIC_ETF" = 1780
+    "OVERSEAS_ETF" = 6037
+    "PUBLIC_FUND" = 23676
 }
 try {
     $stats = Invoke-RestMethod -Uri "$BaseUrl/stats" -TimeoutSec 20
@@ -196,13 +196,13 @@ try {
         else {
             Write-Fail "$productType : 예상 $expected 건 / 실제 $actual 건"
         }
-        if ($item.data_base_date -ne "2026-07-11") {
+        if ($item.data_base_date -ne "2026-08-24") {
             Write-Fail "$productType 기준일 이상: $($item.data_base_date)"
         }
     }
 
-    if ([int]$stats.total_count -eq 145393) {
-        Write-Pass "전체 적재 건수 145,393건 일치"
+    if ([int]$stats.total_count -eq 53375) {
+        Write-Pass "전체 적재 건수 53,375건 일치"
     }
     else {
         Write-Fail "전체 적재 건수 이상: $($stats.total_count)"
@@ -225,7 +225,7 @@ try {
     $manifestPath = ".\data\reports\manifest.json"
     if (Test-Path $manifestPath) {
         $manifest = Get-Content $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($manifest.total_rows_processed -eq 145393 -and $manifest.all_expected_rows_match) {
+        if ($manifest.total_rows_processed -eq 53375 -and $manifest.all_expected_rows_match) {
             Write-Pass "전처리 manifest 총건수 및 재현성 정보 정상"
         }
         else {
@@ -309,13 +309,13 @@ catch {
 
 Write-Step "10. 원본 근거·개별 기준일"
 try {
-    $voo = Invoke-RestMethod -Uri "$BaseUrl/products/PREF02N001/589" -TimeoutSec 20
+    $voo = Invoke-RestMethod -Uri "$BaseUrl/products/PREF02N001/5996" -TimeoutSec 20
     if (
         $voo.product_id -eq "VOO" -and
-        $voo.source_file -eq "PREF02N001_datarows.xlsx" -and
-        $voo.price_base_date -eq "2026-06-16" -and
-        $voo.size_base_date -eq "2026-06-14" -and
-        $voo.reference_dates.dataset_snapshot_date -eq "2026-07-11"
+        $voo.source_file -eq "pref02n001_data.xlsx" -and
+        $voo.price_base_date -eq "2026-08-21" -and
+        $voo.size_base_date -eq "2026-08-22" -and
+        $voo.reference_dates.dataset_snapshot_date -eq "2026-08-24"
     ) {
         Write-Pass "VOO 원본 행·파일·가격/AUM 기준일 회귀검사 통과"
     }
@@ -451,7 +451,7 @@ try {
     foreach ($row in $aggregateRows) {
         $aggregateTotal += [int]$row.product_count
     }
-    if ($aggregateRows.Count -eq 4 -and $aggregateTotal -eq 145393) {
+    if ($aggregateRows.Count -eq 4 -and $aggregateTotal -eq 53375) {
         Write-Pass "COUNT·AVG·MAX 및 상품군 GROUP BY 정상"
     }
     else {
@@ -578,7 +578,11 @@ catch {
 Write-Step "19. Phase 2.5 온톨로지·지식 그래프"
 try {
     $ontology = Invoke-RestMethod -Uri "$BaseUrl/ontology" -TimeoutSec 20
-    if ($ontology.dataset_snapshot_date -eq "2026-07-11" -and $ontology.ontology_file -eq "ontology/financial_product_ontology.ttl") {
+    if (
+        $ontology.dataset_snapshot_date -eq "2026-08-24" -and
+        @($ontology.ontology_files).Count -eq 5 -and
+        @($ontology.ontology_files) -contains "ontology/common.ttl"
+    ) {
         Write-Pass "Ontology TTL·용어맵·비즈니스 규칙 로드 정상"
     }
     else {
@@ -594,13 +598,13 @@ try {
     }
     $predicates = @($graphStats.relations | ForEach-Object { $_.predicate })
     if (
-        $productEntityCount -eq 145393 -and
+        $productEntityCount -eq 53375 -and
         $predicates -contains "managedBy" -and
         $predicates -contains "manages" -and
         $predicates -contains "hasAssetClass" -and
         $predicates -contains "investsInRegion"
     ) {
-        Write-Pass "상품 145,393건 지식 그래프 엔티티·핵심 관계 정상"
+        Write-Pass "상품 53,375건 지식 그래프 엔티티·핵심 관계 정상"
     }
     else {
         Write-Fail "지식 그래프 엔티티 또는 관계 이상"
@@ -637,9 +641,9 @@ try {
         Write-Fail "Federated 검색 결과 이상"
     }
 
-    $cutoffConstraintRaw = docker compose exec -T postgres psql -U $DbUser -d $DbName -t -A -c "SELECT COUNT(*) FROM pg_constraint c JOIN pg_class t ON c.conrelid=t.oid JOIN pg_namespace n ON t.relnamespace=n.oid WHERE n.nspname='semantic' AND t.relname IN ('document_chunk','external_holding') AND pg_get_constraintdef(c.oid) LIKE '%2026-07-11%';"
+    $cutoffConstraintRaw = docker compose exec -T postgres psql -U $DbUser -d $DbName -t -A -c "SELECT COUNT(*) FROM pg_constraint c JOIN pg_class t ON c.conrelid=t.oid JOIN pg_namespace n ON t.relnamespace=n.oid WHERE n.nspname='semantic' AND t.relname IN ('document_chunk','external_holding') AND pg_get_constraintdef(c.oid) LIKE '%2026-08-24%';"
     if ([int]($cutoffConstraintRaw.Trim()) -ge 2) {
-        Write-Pass "외부 문서·구성종목 2026-07-11 이후 적재 차단 DB 제약 존재"
+        Write-Pass "외부 문서·구성종목 2026-08-24 이후 적재 차단 DB 제약 존재"
     }
     else {
         Write-Fail "외부 근거 기준일 차단 제약 누락"

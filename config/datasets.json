@@ -39,7 +39,7 @@
       },
       "data_file": "data/raw/prbd01n001_data.xlsx",
       "schema_file": "data/raw/prbd01n001_schema.xlsx",
-      "data_base_date": "2026-08-21",
+      "data_base_date": "2026-08-24",
       "columns": [
         {
           "name": "after_tax_yield",
@@ -621,7 +621,7 @@
       },
       "data_file": "data/raw/pref01n001_data.xlsx",
       "schema_file": "data/raw/pref01n001_schema.xlsx",
-      "data_base_date": "2026-08-21",
+      "data_base_date": "2026-08-24",
       "columns": [
         {
           "name": "cu_base_index",
@@ -1545,7 +1545,7 @@
       },
       "data_file": "data/raw/pref02n001_data.xlsx",
       "schema_file": "data/raw/pref02n001_schema.xlsx",
-      "data_base_date": "2026-08-21",
+      "data_base_date": "2026-08-24",
       "columns": [
         {
           "name": "cu_base_index",
@@ -2031,7 +2031,7 @@
       },
       "data_file": "data/raw/prfd01n001_data.xlsx",
       "schema_file": "data/raw/prfd01n001_schema.xlsx",
-      "data_base_date": "2026-08-21",
+      "data_base_date": "2026-08-24",
       "columns": [
         {
           "name": "bmrk_eng_nm",

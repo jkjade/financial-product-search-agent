@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 import json
 from typing import Any
 
@@ -19,10 +21,10 @@ from .query_engine import search_products
 
 def _dataset_evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
     return {
-        "source": "semantic layer built from search.product_catalog",
+        "source": "semantic.entity / semantic.relation",
         "operation": operation,
         "data_base_date": snapshot_date,
-        "note": "Graph facts inherit the supplied master-data source row and snapshot date; no missing relation is invented.",
+        "note": "HOST master data has priority; official external graph relations preserve their own provenance and no missing relation is invented.",
     }
 
 
@@ -30,25 +32,182 @@ def ontology_resolve(query: str) -> dict[str, Any]:
     return resolve_query_terms(query)
 
 
+
+_GRAPH_ENTITY_QUERY_ALIASES = {
+    "\ucea0\ube0c\ub9ac\ucf58": "cambricon",
+    "cambricon": "cambricon",
+    "\uc5d0\ucf54\ud504\ub85c": "ecopro",
+    "ecopro": "ecopro",
+}
+
+
+def _normalize_graph_entity_term(term: str) -> str:
+    cleaned = term.strip()
+    lowered = cleaned.lower()
+
+    for alias, canonical_search_term in _GRAPH_ENTITY_QUERY_ALIASES.items():
+        if alias.lower() in lowered:
+            return canonical_search_term
+
+    return cleaned
+
+
+def _extract_relation_subject(query: str) -> str:
+    relation_words = (
+        "\ud3b8\uc785",  # ??
+        "\ubcf4\uc720",  # ??
+        "\ub2f4\uace0",  # ??
+        "\ub2f4\uc740",  # ??
+    )
+
+    subject = query.strip()
+
+    for word in relation_words:
+        index = subject.find(word)
+        if index >= 0:
+            subject = subject[:index].strip()
+            break
+
+    # Korean subject/object particles:
+    # ?, ?, ?, ?, ?, ?
+    particles = (
+        "\uc774",
+        "\uac00",
+        "\uc740",
+        "\ub294",
+        "\uc744",
+        "\ub97c",
+    )
+
+    subject = subject.rstrip()
+
+    for particle in particles:
+        if subject.endswith(particle):
+            subject = subject[:-len(particle)].rstrip()
+            break
+
+    return subject
+
+
+def _graph_request_from_federated_query(
+    request: FederatedSearchRequest,
+) -> GraphLookupRequest:
+    query = request.query.strip()
+    lowered = query.lower()
+
+    if request.graph_predicate:
+        return GraphLookupRequest(
+            term=query,
+            predicate=request.graph_predicate,
+            direction="both",
+            limit=request.graph_limit,
+        )
+
+    relation_words = (
+        "\ud3b8\uc785",  # ??
+        "\ubcf4\uc720",  # ??
+        "\ub2f4\uace0",  # ??
+        "\ub2f4\uc740",  # ??
+    )
+
+    if any(word in query for word in relation_words):
+        entity_term = _extract_relation_subject(query)
+
+        return GraphLookupRequest(
+            term=_normalize_graph_entity_term(entity_term or query),
+            entity_type="CONSTITUENT_SECURITY",
+            predicate="heldBy",
+            direction="out",
+            limit=request.graph_limit,
+        )
+
+    # ??
+    exposure_word = "\ub178\ucd9c"
+
+    if exposure_word in query:
+        # ?
+        if "\uae08" in query or "gold" in lowered:
+            return GraphLookupRequest(
+                term="GOLD_BULLION",
+                entity_type="COMMODITY",
+                predicate="commodityExposureOf",
+                direction="out",
+                limit=request.graph_limit,
+            )
+
+        # ?
+        if "\uc740" in query or "silver" in lowered:
+            return GraphLookupRequest(
+                term="SILVER_BULLION",
+                entity_type="COMMODITY",
+                predicate="commodityExposureOf",
+                direction="out",
+                limit=request.graph_limit,
+            )
+
+    return GraphLookupRequest(
+        term=query,
+        predicate=None,
+        direction="both",
+        limit=request.graph_limit,
+    )
+
+
+
 def graph_lookup(
     pool: ConnectionPool,
     request: GraphLookupRequest,
     snapshot_date: str,
 ) -> dict[str, Any]:
-    params: list[Any] = [request.term, f"%{request.term}%"]
+    search_term = _normalize_graph_entity_term(request.term)
+    pattern = f"%{search_term}%"
+
+    params: list[Any] = [
+        search_term,
+        pattern,
+        pattern,
+        pattern,
+    ]
+
     entity_type_clause = ""
     if request.entity_type:
         entity_type_clause = " AND e.entity_type = %s"
         params.append(request.entity_type)
+
+    match_threshold = 0.50 if request.entity_type else 0.20
+    params.append(match_threshold)
     params.append(10)
 
     seed_query = f"""
-        SELECT e.*,
-               GREATEST(similarity(e.canonical_name, %s),
-                        CASE WHEN e.canonical_name ILIKE %s THEN 1.0 ELSE 0.0 END) AS match_score
-        FROM semantic.entity e
-        WHERE TRUE {entity_type_clause}
-        ORDER BY match_score DESC, e.canonical_name ASC
+        WITH scored AS (
+            SELECT
+                e.*,
+                GREATEST(
+                    similarity(e.canonical_name, %s),
+                    CASE
+                        WHEN e.canonical_name ILIKE %s THEN 1.0
+                        ELSE 0.0
+                    END,
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM unnest(COALESCE(e.aliases, ARRAY[]::text[])) AS alias
+                            WHERE alias ILIKE %s
+                        ) THEN 1.0
+                        ELSE 0.0
+                    END,
+                    CASE
+                        WHEN e.properties::text ILIKE %s THEN 0.95
+                        ELSE 0.0
+                    END
+                ) AS match_score
+            FROM semantic.entity e
+            WHERE TRUE {entity_type_clause}
+        )
+        SELECT *
+        FROM scored
+        WHERE match_score >= %s
+        ORDER BY match_score DESC, canonical_name ASC
         LIMIT %s
     """
 
@@ -91,12 +250,13 @@ def graph_lookup(
                 o.canonical_name AS object_name,
                 r.source_table,
                 r.source_row_number,
-                r.data_base_date
+                r.data_base_date,
+                 r.properties
             FROM semantic.relation r
             JOIN semantic.entity s ON s.entity_id = r.subject_id
             JOIN semantic.entity o ON o.entity_id = r.object_id
             WHERE ({' OR '.join(direction_clauses)}) {predicate_clause}
-            ORDER BY r.predicate, s.canonical_name, o.canonical_name
+            ORDER BY r.data_base_date DESC NULLS LAST, r.predicate, s.canonical_name, o.canonical_name
             LIMIT %s
         """
         cursor.execute(relation_query, relation_params)
@@ -280,29 +440,237 @@ def _fuzzy_product_candidates(
     snapshot_date: str,
     limit: int,
 ) -> dict[str, Any]:
+    # Remove generic finance/product words and keep the most informative term.
+    generic_terms = {
+        "etf",
+        "fund",
+        "\ud380\ub4dc",
+        "\uc0c1\ud488",
+        "\ud22c\uc790",
+    }
+
+    tokens = [
+        token.strip(" ,.;:/()[]{}")
+        for token in query.strip().split()
+        if token.strip(" ,.;:/()[]{}")
+    ]
+
+    focus_tokens = [
+        token for token in tokens
+        if token.lower() not in generic_terms
+    ]
+
+    focus_query = " ".join(focus_tokens).strip() or query.strip()
+    focus_pattern = f"%{focus_query}%"
+
+    union_sql = cross_domain_union_sql(
+        [
+            "source_table", "source_row_number", "source_file", "data_base_date",
+            "product_id", "product_name", "short_name", "issuer_or_manager",
+            "asset_class", "investment_region", "currency", "risk_name", "base_index",
+            "fee_rate", "return_1y", "du_er_ytd", "yield_rate", "size_amount", "price",
+            "reference_dates", "quality_flags", "search_text",
+        ]
+    )
+
     with pool.connection() as connection, connection.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
-            """
-            SELECT *, similarity(search_text, %s) AS semantic_text_score
-            FROM search.product_catalog
-            WHERE similarity(search_text, %s) > 0.05
+            f"""
+            SELECT *,
+                   GREATEST(
+                       CASE
+                           WHEN issuer_or_manager ILIKE %s THEN 1.00
+                           ELSE 0.0
+                       END,
+                       CASE
+                           WHEN product_name ILIKE %s THEN 0.95
+                           ELSE 0.0
+                       END,
+                       CASE
+                           WHEN short_name ILIKE %s THEN 0.90
+                           ELSE 0.0
+                       END,
+                       similarity(search_text, %s)
+                   ) AS semantic_text_score
+            FROM ({union_sql}) AS unioned
+            WHERE issuer_or_manager ILIKE %s
                OR product_name ILIKE %s
-            ORDER BY semantic_text_score DESC, product_name ASC
+               OR short_name ILIKE %s
+               OR similarity(search_text, %s) > 0.05
+            ORDER BY
+                semantic_text_score DESC,
+                product_name ASC
             LIMIT %s
             """,
-            (query, query, f"%{query}%", limit),
+            (
+                focus_pattern,
+                focus_pattern,
+                focus_pattern,
+                focus_query,
+                focus_pattern,
+                focus_pattern,
+                focus_pattern,
+                focus_query,
+                limit,
+            ),
         )
         items = cursor.fetchall()
+
     return {
         "returned_count": len(items),
         "items": items,
+        "query_focus": focus_query,
         "evidence": {
             "source": "search.product_catalog",
-            "operation": "fuzzy_candidate_search",
+            "operation": "focused_fuzzy_candidate_search",
             "data_base_date": snapshot_date,
         },
     }
 
+
+
+
+_GRAPH_RESULT_FACETS = {
+    # ?? / ??? / China
+    "\uc911\uad6d": (
+        "\uc911\uad6d",
+        "\ucc28\uc774\ub098",
+        "china",
+        "chinese",
+    ),
+
+    # ??? / semiconductor
+    "\ubc18\ub3c4\uccb4": (
+        "\ubc18\ub3c4\uccb4",
+        "semiconductor",
+    ),
+
+    # ?? / US
+    "\ubbf8\uad6d": (
+        "\ubbf8\uad6d",
+        "united states",
+        "u.s.",
+        " us ",
+    ),
+
+    # AI / ????
+    "ai": (
+        "ai",
+        "\uc778\uacf5\uc9c0\ub2a5",
+    ),
+
+    # ??
+    "\ub85c\ubd07": (
+        "\ub85c\ubd07",
+        "robot",
+        "robotics",
+    ),
+}
+
+
+def _filter_graph_results_by_query(
+    query: str,
+    graph: dict[str, Any],
+) -> dict[str, Any]:
+    """Apply explicit secondary query conditions to Graph candidates."""
+    items = graph.get("items", [])
+
+    if not items:
+        return graph
+
+    # Only post-filter ETF candidates returned from holding relations.
+    if not any(item.get("predicate") == "heldBy" for item in items):
+        return graph
+
+    q = query.strip().lower()
+
+    active_facets: list[tuple[str, tuple[str, ...]]] = []
+
+    for facet, aliases in _GRAPH_RESULT_FACETS.items():
+        if facet.lower() in q:
+            active_facets.append((facet, aliases))
+
+    if not active_facets:
+        return graph
+
+    filtered: list[dict[str, Any]] = []
+
+    for item in items:
+        if item.get("predicate") != "heldBy":
+            continue
+
+        candidate_text = " ".join(
+            str(value or "")
+            for value in (
+                item.get("object_name"),
+                item.get("subject_name"),
+            )
+        ).lower()
+
+        matches_all = True
+
+        for _, aliases in active_facets:
+            if not any(alias.lower() in candidate_text for alias in aliases):
+                matches_all = False
+                break
+
+        if matches_all:
+            filtered.append(item)
+
+    # Avoid losing valid graph evidence when the product name alone
+    # cannot express an otherwise valid secondary condition.
+    if not filtered:
+        return graph
+
+    result = dict(graph)
+    result["items"] = filtered
+    result["returned_count"] = len(filtered)
+    result["post_filter"] = {
+        "applied": True,
+        "facets": [facet for facet, _ in active_facets],
+    }
+
+    return result
+
+
+
+def _select_federated_route(query: str) -> str:
+    """Select the primary retrieval path for a natural-language query."""
+    q = query.strip().lower()
+
+    # ???? ?? ??: ?? / ?? / ?? / ??
+    holding_words = (
+        "\ud3b8\uc785",
+        "\ubcf4\uc720",
+        "\ub2f4\uc740",
+        "\ub2f4\uace0",
+    )
+    if any(word in q for word in holding_words):
+        return "graph"
+
+    # ??? ?? ?? ??
+    exposure_word = "\ub178\ucd9c"
+    commodity_words = (
+        "\uae08",
+        "\uc740",
+        "gold",
+        "silver",
+    )
+    if exposure_word in q and any(word in q for word in commodity_words):
+        return "graph"
+
+    # ?? ?? ??: ?? / ?? / ??
+    semantic_words = (
+        "\ud14c\ub9c8",
+        "\uc804\ub7b5",
+        "\uc704\ud5d8",
+        "\ub9ac\uc2a4\ud06c",
+        "\uc6b0\uc8fc\ud56d\uacf5",
+    )
+    if any(word in q for word in semantic_words):
+        return "semantic"
+
+    return "rdb"
 
 def federated_search(
     pool: ConnectionPool,
@@ -310,39 +678,60 @@ def federated_search(
     snapshot_date: str,
 ) -> dict[str, Any]:
     ontology = resolve_query_terms(request.query)
+    search_route = _select_federated_route(request.query)
 
     if request.structured_query is not None:
         structured_request = request.structured_query.model_copy(update={"limit": request.product_limit})
         products = search_products(pool, structured_request, snapshot_date)
         product_mode = "structured_rdb"
-    else:
+    elif search_route == "rdb":
         products = _fuzzy_product_candidates(pool, request.query, snapshot_date, request.product_limit)
         product_mode = "fuzzy_rdb_candidates"
+    else:
+        products = {
+            "returned_count": 0,
+            "items": [],
+            "evidence": _dataset_evidence(snapshot_date, "route_skipped_rdb"),
+        }
+        product_mode = "route_skipped"
 
-    graph = graph_lookup(
-        pool,
-        GraphLookupRequest(
-            term=request.query,
-            predicate=request.graph_predicate,
-            direction="both",
-            limit=request.graph_limit,
-        ),
-        snapshot_date,
-    )
+    if search_route == "graph":
+        graph_request = _graph_request_from_federated_query(request)
+        graph = graph_lookup(
+            pool,
+            graph_request,
+            snapshot_date,
+        )
+        graph = _filter_graph_results_by_query(
+            request.query,
+            graph,
+        )
+    else:
+        graph = {
+            "returned_count": 0,
+            "seed_entities": [],
+            "items": [],
+            "evidence": _dataset_evidence(snapshot_date, "route_skipped_graph"),
+        }
 
     documents: dict[str, Any]
-    if request.include_external_documents:
+    if request.include_external_documents and search_route == "semantic":
         documents = semantic_search_documents(
             pool,
             SemanticSearchRequest(query=request.query, limit=request.document_limit),
             snapshot_date,
         )
     else:
-        documents = {"returned_count": 0, "items": [], "retrieval_mode": "disabled"}
+        documents = {
+            "returned_count": 0,
+            "items": [],
+            "retrieval_mode": "route_skipped",
+        }
 
     return {
         "query": request.query,
         "route": {
+            "selected": search_route,
             "ontology": True,
             "rdb": True,
             "graph": True,

@@ -47,10 +47,16 @@ GRAPH_PREDICATE_LABELS: dict[str, str] = {
     "tracksIndex": "상품 -> 추종지수/벤치마크 방향",
     "holdsSecurity": "ETF -> 구성종목 방향 (이 ETF가 무엇을 보유하는지)",
     "heldBy": "구성종목 -> ETF 방향 (이 종목을 어느 ETF가 보유하는지, holdsSecurity의 역방향)",
+    "belongsToSector": "구성종목 -> 섹터 방향",
+    "sectorContainsSecurity": "섹터 -> 구성종목 방향 (belongsToSector의 역방향)",
+    "exposedToCommodity": "ETF -> 원자재 노출 방향",
+    "commodityExposureOf": "원자재 -> ETF 방향 (exposedToCommodity의 역방향)",
 }
 GraphPredicate = Literal[
     "managedBy", "manages", "hasAssetClass", "investsInRegion",
     "denominatedIn", "hasRiskGrade", "tracksIndex", "holdsSecurity", "heldBy",
+    "belongsToSector", "sectorContainsSecurity",
+    "exposedToCommodity", "commodityExposureOf",
 ]
 
 GRAPH_DIRECTION_LABELS: dict[str, str] = {

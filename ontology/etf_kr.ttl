@@ -511,4 +511,3 @@ fp:pdTrYnDomesticEtf a owl:DatatypeProperty ;
     rdfs:domain fp:DomesticETF ; rdfs:range xsd:string ;
     rdfs:comment "상품거래정지혀부"@ko ;
     fp:column "pd_tr_yn_domestic_etf" .
-

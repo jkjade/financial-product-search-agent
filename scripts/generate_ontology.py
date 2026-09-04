@@ -5,7 +5,7 @@ ontology/term_map.json(별칭)을 조합해서 ontology/{common,bond_kr,etf_kr,
 etf_gl,fund_pub}.ttl 5개를 최초 생성했다.
 
 이후 term_map.json은 삭제됐고(ttl 파일 자체가 유일한 소스), ttl 5개에는
-그 뒤로 rdfs:comment 보강(2026-08-21 스냅샷의 공식 컬럼코멘트 반영 등)과
+그 뒤로 rdfs:comment 보강(2026-08-24 재배포본의 공식 컬럼코멘트 반영 등)과
 alias 수동 추가가 계속 쌓였다. 그래서 이 스크립트를 그대로 재실행하면
 term_map.json이 없어 즉시 실패하고, 설령 입력을 복원해도 그간 손으로
 누적한 rdfs:comment/fp:alias가 전부 덮어써진다 — 재실행 금지.

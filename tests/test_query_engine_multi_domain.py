@@ -98,7 +98,7 @@ def test_search_products_across_two_domains_executes_without_sql_error(pool):
         sort=[SortClause(field="dur", order="asc")],
         limit=5,
     )
-    result = search_products(pool, request, "2026-08-21", ["DOMESTIC_BOND", "DOMESTIC_ETF"])
+    result = search_products(pool, request, "2026-08-24", ["DOMESTIC_BOND", "DOMESTIC_ETF"])
     assert "items" in result
     assert all(item.get("product_type") in ("DOMESTIC_BOND", "DOMESTIC_ETF") for item in result["items"])
 

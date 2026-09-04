@@ -48,7 +48,7 @@ def clarification_from_results(tool_results: list[dict[str, Any]]) -> str | None
             if ambiguities:
                 return "상품 식별 결과가 여러 개입니다. 상품명 또는 상품 ID를 더 구체적으로 지정해 주세요."
             if missing:
-                return "지정한 상품을 2026-08-21 기준 제공 데이터에서 확인할 수 없습니다."
+                return "지정한 상품을 2026-08-24 기준 제공 데이터에서 확인할 수 없습니다."
     return None
 
 

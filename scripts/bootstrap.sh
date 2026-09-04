@@ -27,11 +27,22 @@ echo "[4/7] Validate, preprocess, load, index, and build knowledge graph"
 docker compose --profile tools run --rm etl
 
 echo "[5/7] Restore optional historical external evidence"
-if [[ -f external_data/holdings.jsonl ]]; then
-  docker compose --profile tools run --rm etl python -m src.semantic.ingest_holdings /app/external_data/holdings.jsonl
+for holdings_file in external_data/external_product_holdings_*.jsonl; do
+  [[ -f "$holdings_file" ]] || continue
+  docker compose --profile tools run --rm etl python -m src.semantic.ingest_holdings "/app/$holdings_file"
+done
+
+if [[ -f external_data/external_security_sector_strict.jsonl ]]; then
+  docker compose --profile tools run --rm etl python -m src.semantic.ingest_relations sector /app/external_data/external_security_sector_strict.jsonl
 fi
-if [[ -f external_data/documents.jsonl ]]; then
-  docker compose --profile tools run --rm etl python -m src.semantic.ingest /app/external_data/documents.jsonl
+
+if [[ -f external_data/external_product_commodity_exposures_strict.jsonl ]]; then
+  docker compose --profile tools run --rm etl python -m src.semantic.ingest_relations commodity /app/external_data/external_product_commodity_exposures_strict.jsonl
+fi
+
+if [[ -f external_data/external_semantic_incremental_strict.jsonl ]]; then
+  docker compose --profile tools run --rm etl python -m src.semantic.ingest /app/external_data/external_semantic_incremental_strict.jsonl
+file tools run --rm etl python -m src.semantic.ingest /app/external_data/documents.jsonl
 fi
 
 echo "[6/7] Start API"

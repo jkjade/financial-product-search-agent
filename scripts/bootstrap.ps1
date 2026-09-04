@@ -48,10 +48,10 @@ if (-not (Test-Path ".env")) {
 }
 
 $requiredFiles = @(
-    "data\raw\PRBD01N001_datarows.xlsx",
-    "data\raw\PREF01N001_datarows.xlsx",
-    "data\raw\PREF02N001_datarows.xlsx",
-    "data\raw\PRFD01N001_datarows.xlsx",
+    "data\raw\prbd01n001_data.xlsx",
+    "data\raw\pref01n001_data.xlsx",
+    "data\raw\pref02n001_data.xlsx",
+    "data\raw\prfd01n001_data.xlsx",
     "data\raw\CHECKSUMS.sha256"
 )
 foreach ($file in $requiredFiles) {
@@ -69,7 +69,7 @@ docker compose --profile tools build api etl
 Assert-LastExitCode "Docker 이미지 빌드에 실패했습니다."
 
 Write-Host "[3/7] 기존 API 중지 및 PostgreSQL 실행"
-docker compose stop api *> $null
+cmd /c "docker compose stop api >nul 2>&1"
 docker compose up -d postgres
 Assert-LastExitCode "PostgreSQL 실행에 실패했습니다."
 
@@ -77,16 +77,36 @@ Write-Host "[4/7] 원본 검증·전처리·PostgreSQL 적재·색인·지식그
 docker compose --profile tools run --rm etl
 Assert-LastExitCode "ETL 파이프라인 실행에 실패했습니다."
 
-Write-Host "[5/7] 선택적 historical 외부 근거 재적재"
-if (Test-Path ".\external_data\holdings.jsonl") {
-    docker compose --profile tools run --rm etl python -m src.semantic.ingest_holdings /app/external_data/holdings.jsonl
-    Assert-LastExitCode "ETF 구성종목 외부 데이터 적재에 실패했습니다."
-    Write-Host "[외부근거] holdings.jsonl 적재 완료"
+Write-Host "[5/7] 선택적 official external strict 근거 재적재"
+
+$holdingFiles = Get-ChildItem ".\external_data\external_product_holdings_*.jsonl" -ErrorAction SilentlyContinue |
+    Sort-Object Name
+foreach ($holdingFile in $holdingFiles) {
+    $containerPath = "/app/external_data/$($holdingFile.Name)"
+    docker compose --profile tools run --rm etl python -m src.semantic.ingest_holdings $containerPath
+    Assert-LastExitCode "ETF 구성종목 외부 데이터 적재에 실패했습니다: $($holdingFile.Name)"
+    Write-Host "[외부근거] holdings 적재 완료: $($holdingFile.Name)"
 }
-if (Test-Path ".\external_data\documents.jsonl") {
-    docker compose --profile tools run --rm etl python -m src.semantic.ingest /app/external_data/documents.jsonl
-    Assert-LastExitCode "외부 문서 데이터 적재에 실패했습니다."
-    Write-Host "[외부근거] documents.jsonl 적재 완료 (embedding은 별도 --embed 실행)"
+
+$sectorFile = ".\external_data\external_security_sector_strict.jsonl"
+if (Test-Path $sectorFile) {
+    docker compose --profile tools run --rm etl python -m src.semantic.ingest_relations sector /app/external_data/external_security_sector_strict.jsonl
+    Assert-LastExitCode "Security sector 외부 데이터 적재에 실패했습니다."
+    Write-Host "[외부근거] sector 적재 완료"
+}
+
+$commodityFile = ".\external_data\external_product_commodity_exposures_strict.jsonl"
+if (Test-Path $commodityFile) {
+    docker compose --profile tools run --rm etl python -m src.semantic.ingest_relations commodity /app/external_data/external_product_commodity_exposures_strict.jsonl
+    Assert-LastExitCode "Commodity exposure 외부 데이터 적재에 실패했습니다."
+    Write-Host "[외부근거] commodity 적재 완료"
+}
+
+$semanticFile = ".\external_data\external_semantic_incremental_strict.jsonl"
+if (Test-Path $semanticFile) {
+    docker compose --profile tools run --rm etl python -m src.semantic.ingest /app/external_data/external_semantic_incremental_strict.jsonl
+    Assert-LastExitCode "외부 semantic strict 데이터 적재에 실패했습니다."
+    Write-Host "[외부근거] semantic strict 적재 완료 (embedding은 별도 --embed 실행)"
 }
 
 Write-Host "[6/7] API 실행"

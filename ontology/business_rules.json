@@ -1,10 +1,10 @@
 {
-  "dataset_snapshot_date": "2026-08-21",
+  "dataset_snapshot_date": "2026-08-24",
   "answer_generation_model_rule": "HyperCLOVA X only",
   "single_turn": true,
-  "unsupported_answer_text": "제공된 데이터의 2026-08-21 기준으로 확인할 수 없습니다.",
+  "unsupported_answer_text": "제공된 데이터의 2026-08-24 기준으로 확인할 수 없습니다.",
   "evidence_required": true,
-  "external_evidence_cutoff": "2026-08-21",
+  "external_evidence_cutoff": "2026-08-24",
   "never_infer_missing_values": true,
   "prohibited_answer_patterns": [
     "무조건 좋",
@@ -23,7 +23,7 @@
   "ytd_rule": {
     "label": "YTD",
     "period_start": "2026-01-01",
-    "period_end": "2026-08-21",
+    "period_end": "2026-08-24",
     "note": "평가 기준일을 고정하여 해석한다. 데이터에 YTD 값이 없으면 계산 근거 없이는 생성하지 않는다."
   },
   "routing_policy": {

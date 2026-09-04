@@ -73,4 +73,3 @@ fp:heldBy a owl:ObjectProperty ;
     rdfs:domain fp:ConstituentSecurity ; rdfs:range fp:ETF ;
     rdfs:label "편입된 ETF"@ko ;
     fp:alias "편입한 etf", "포함하는 etf", "held by" .
-

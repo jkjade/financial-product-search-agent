@@ -189,7 +189,7 @@ def ontology_info() -> dict[str, Any]:
     rules = load_business_rules()
     term_map = load_term_map()
     return {
-        "ontology_files": [str((ONTOLOGY_DIR / f).relative_to(PROJECT_ROOT)) for f in ONTOLOGY_TTL_FILES],
+        "ontology_files": [(ONTOLOGY_DIR / f).relative_to(PROJECT_ROOT).as_posix() for f in ONTOLOGY_TTL_FILES],
         "business_rules_file": str(BUSINESS_RULES_PATH.relative_to(PROJECT_ROOT)),
         "dataset_snapshot_date": rules["dataset_snapshot_date"],
         "product_type_concepts": len(term_map.get("product_types", [])),
