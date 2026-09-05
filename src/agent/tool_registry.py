@@ -71,7 +71,7 @@ TOOL_DESCRIPTIONS = {
     "resolve_ontology": "자연어 금융 용어를 온톨로지의 상품군·필드·관계명으로 표준화합니다. 값 자체를 추측하지 않습니다.",
     "graph_lookup": "상품-운용사-자산군-지역-위험등급-지수와 ETF-구성종목-섹터-원자재 관계를 지식 그래프에서 양방향 탐색합니다.",
     "semantic_search": "2026-08-24 이전 기준으로 적재된 공식 외부 비정형 근거 문서를 의미/텍스트 검색합니다.",
-    "federated_search": "온톨로지 그라운딩, RDB 후보검색, 지식 그래프, 외부 의미검색을 한 번에 실행해 근거를 통합합니다.",
+    "federated_search": "사용자의 원 질문 전체를 query에 그대로 넣어 RDB·Graph·외부 비정형 근거 중 적절한 검색 경로를 선택합니다. 구성종목·편입·보유관계·원자재 노출 질문에서는 query를 핵심 단어로 축약하지 마세요. structured_query와 graph_predicate는 기본적으로 생략하고, 질문에 없는 필터나 관계를 추측해서 만들지 마세요.",
 }
 
 
@@ -213,14 +213,175 @@ def translate_field_labels(tool_name: str, arguments: Any, domains: list[str] | 
             "컬럼 코멘트가 완전히 같은 필드만 쓸 수 있습니다."
         )
 
+    def _normalize_filter_shorthand(clause: Any) -> list[Any]:
+        """HCX가 FilterClause를 축약형으로 생성한 경우 정식 형식으로 보정한다.
+
+        예:
+        {"미국 CIK": "IS NOT NULL"}
+          -> {"field": "미국 CIK", "operator": "not_null"}
+
+        {"연간보수율": {"$lte": 0.1}}
+          -> {"field": "연간보수율", "operator": "lte", "value": 0.1}
+
+        {"미국 ETF RIC": {"$exists": True}, "상품군종류": "ETF"}
+          -> 두 개의 FilterClause
+        """
+        if not isinstance(clause, dict):
+            return [clause]
+
+        # 정식 FilterClause 형식이어도 HCX가 기호 연산자를 생성할 수 있으므로
+        # 실제 스키마에서 사용하는 canonical operator로 보정한다.
+        if "field" in clause or "operator" in clause:
+            normalized_clause = dict(clause)
+            raw_operator = normalized_clause.get("operator")
+
+            if isinstance(raw_operator, str):
+                operator_aliases = {
+                    "=": "eq",
+                    "==": "eq",
+                    "eq": "eq",
+                    "!=": "ne",
+                    "<>": "ne",
+                    "ne": "ne",
+                    ">": "gt",
+                    "gt": "gt",
+                    ">=": "gte",
+                    "gte": "gte",
+                    "<": "lt",
+                    "lt": "lt",
+                    "<=": "lte",
+                    "lte": "lte",
+                    "in": "in",
+                    "not in": "not_in",
+                    "not_in": "not_in",
+                    "between": "between",
+                    "contains": "contains",
+                    "starts_with": "starts_with",
+                    "is null": "is_null",
+                    "is_null": "is_null",
+                    "is not null": "not_null",
+                    "not_null": "not_null",
+                }
+
+                key = raw_operator.strip().lower()
+                normalized_clause["operator"] = operator_aliases.get(
+                    key,
+                    raw_operator,
+                )
+
+            return [normalized_clause]
+
+        operator_map = {
+            "$eq": "eq",
+            "$ne": "ne",
+            "$gt": "gt",
+            "$gte": "gte",
+            "$lt": "lt",
+            "$lte": "lte",
+            "$in": "in",
+            "$nin": "not_in",
+            "$contains": "contains",
+            "$starts_with": "starts_with",
+        }
+
+        normalized: list[Any] = []
+
+        for field, condition in clause.items():
+            if isinstance(condition, dict):
+                if set(condition) == {"$exists"}:
+                    exists = condition["$exists"]
+                    if not isinstance(exists, bool):
+                        raise ValueError(
+                            f"{field}의 $exists 값은 true/false여야 합니다."
+                        )
+                    normalized.append(
+                        {
+                            "field": field,
+                            "operator": "not_null" if exists else "is_null",
+                        }
+                    )
+                    continue
+
+                if len(condition) != 1:
+                    raise ValueError(
+                        f"{field}의 축약 필터 형식을 해석할 수 없습니다: {condition}"
+                    )
+
+                raw_operator, value = next(iter(condition.items()))
+                operator = operator_map.get(raw_operator)
+
+                if operator is None:
+                    raise ValueError(
+                        f"지원하지 않는 축약 필터 연산자입니다: {raw_operator}"
+                    )
+
+                if operator in {"in", "not_in"}:
+                    values = value if isinstance(value, list) else [value]
+                    normalized.append(
+                        {
+                            "field": field,
+                            "operator": operator,
+                            "values": values,
+                        }
+                    )
+                else:
+                    normalized.append(
+                        {
+                            "field": field,
+                            "operator": operator,
+                            "value": value,
+                        }
+                    )
+                continue
+
+            if isinstance(condition, str):
+                upper = condition.strip().upper()
+
+                if upper in {"IS NOT NULL", "NOT NULL"}:
+                    normalized.append(
+                        {"field": field, "operator": "not_null"}
+                    )
+                    continue
+
+                if upper in {"IS NULL", "NULL"}:
+                    normalized.append(
+                        {"field": field, "operator": "is_null"}
+                    )
+                    continue
+
+            # 단순 값은 equality 조건으로 해석한다.
+            normalized.append(
+                {
+                    "field": field,
+                    "operator": "eq",
+                    "value": condition,
+                }
+            )
+
+        return normalized
+
     def _resolve_filter_clauses(clauses: Any) -> Any:
         if not isinstance(clauses, list):
             return clauses
+
         result = []
+
         for clause in clauses:
-            if isinstance(clause, dict) and isinstance(clause.get("field"), str):
-                clause = {**clause, "field": _resolve(clause["field"], filter_pool)}
-            result.append(clause)
+            for normalized_clause in _normalize_filter_shorthand(clause):
+                if (
+                    isinstance(normalized_clause, dict)
+                    and isinstance(normalized_clause.get("field"), str)
+                ):
+                    normalized_clause = {
+                        **normalized_clause,
+                        "field": _resolve(
+                            normalized_clause["field"],
+                            filter_pool,
+                        ),
+                    }
+
+                result.append(normalized_clause)
+
         return result
 
     if not isinstance(arguments, dict):

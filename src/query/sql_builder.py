@@ -44,6 +44,27 @@ def compile_filters(q: str | None, filters: Iterable[Any]) -> tuple[str, list[An
             conditions.append("search_text ILIKE %s ESCAPE '\\'")
             parameters.append(f"%{_escape_like(token)}%")
 
+        # "중국/차이나/China"를 긍정적으로 찾는 질문에서
+        # 상품명에 exChina가 명시된 상품이 부가 메타데이터의 "중국" 문자열 때문에
+        # 오탐되는 것을 방지한다.
+        q_lower = q.strip().lower()
+        q_compact = q_lower.replace(" ", "")
+
+        china_requested = (
+            "중국" in q
+            or "차이나" in q
+            or "china" in q_lower
+        )
+        china_exclusion_requested = (
+            "exchina" in q_compact
+            or "중국제외" in q_compact
+            or "차이나제외" in q_compact
+        )
+
+        if china_requested and not china_exclusion_requested:
+            conditions.append("search_text NOT ILIKE %s")
+            parameters.append("%exchina%")
+
     for clause in filters:
         field = str(clause.field)
         operator = str(clause.operator)

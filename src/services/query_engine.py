@@ -164,6 +164,30 @@ def evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
     }
 
 
+
+def _normalize_product_search_query(
+    q: str | None,
+    product_types: list[str] | None,
+) -> str | None:
+    """구조화된 상품유형으로 이미 표현된 일반 검색어를 q에서 제거한다."""
+    if not q or not q.strip():
+        return q
+
+    domains = set(product_types or [])
+
+    # 검색 범위가 ETF로 이미 한정된 경우 "ETF" 자체는 검색어가 아니라
+    # 상품유형 조건이므로 search_text AND 토큰에서 제외한다.
+    if domains and domains <= {"DOMESTIC_ETF", "OVERSEAS_ETF"}:
+        tokens = [
+            token
+            for token in q.strip().split()
+            if token.lower() != "etf"
+        ]
+        return " ".join(tokens).strip() or None
+
+    return q
+
+
 def search_products(
     pool: ConnectionPool,
     request: ProductQueryRequest,
@@ -172,7 +196,8 @@ def search_products(
 ) -> dict[str, Any]:
     unified_fields = {str(clause.field) for clause in request.filters} | {str(item.field) for item in request.sort}
     view_name, select_fields = resolve_catalog_source(product_types, unified_fields)
-    where_sql, parameters = compile_filters(request.q, request.filters)
+    normalized_q = _normalize_product_search_query(request.q, product_types)
+    where_sql, parameters = compile_filters(normalized_q, request.filters)
     order_sql = compile_order(request.sort)
     count_query = f"SELECT COUNT(*) AS count FROM {view_name} WHERE {where_sql}"
     data_query = f"""
