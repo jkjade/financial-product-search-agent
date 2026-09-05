@@ -55,21 +55,79 @@ def clarification_from_results(tool_results: list[dict[str, Any]]) -> str | None
     return None
 
 
+_PRODUCT_NAME_FIELDS = {
+    "DOMESTIC_BOND": "pd_nm_domestic_bond",
+    "DOMESTIC_ETF": "pd_nm_domestic_etf",
+    "OVERSEAS_ETF": "pd_nm_overseas_etf",
+    "PUBLIC_FUND": "itm_nm_public_fund",
+}
+
+
+def _evidence_product_name(item: dict[str, Any]) -> Any:
+    canonical = item.get("product_name")
+    if canonical:
+        return canonical
+
+    native_field = _PRODUCT_NAME_FIELDS.get(item.get("product_type"))
+    return item.get(native_field) if native_field else None
+
+
 def _product_evidence(item: dict[str, Any]) -> dict[str, Any] | None:
     source_table = item.get("source_table")
     source_row = item.get("source_row_number")
-    if source_table is None or source_row is None or not (item.get("product_name") or item.get("product_id")):
+    product_name = _evidence_product_name(item)
+
+    if source_table is None or source_row is None or not (product_name or item.get("product_id")):
         return None
-    return {
+
+    entry = {
         "kind": "MASTER_DATA",
         "source_table": source_table,
         "source_file": item.get("source_file"),
         "source_row_number": source_row,
         "data_base_date": str(item.get("data_base_date")) if item.get("data_base_date") else None,
+        "product_type": item.get("product_type"),
         "product_id": item.get("product_id"),
-        "product_name": item.get("product_name"),
+        "product_name": product_name,
         "reference_dates": item.get("reference_dates"),
         "quality_flags": item.get("quality_flags"),
+    }
+
+    if item.get("rank_position") is not None:
+        entry["rank_position"] = item.get("rank_position")
+
+    if item.get("rank_metric_value") is not None:
+        entry["rank_metric_value"] = item.get("rank_metric_value")
+
+    return entry
+
+
+
+def _graph_relation_evidence(item: dict[str, Any]) -> dict[str, Any] | None:
+    predicate = item.get("predicate")
+    subject_name = item.get("subject_name")
+    object_name = item.get("object_name")
+
+    if not predicate or not subject_name or not object_name:
+        return None
+
+    return {
+        "kind": "GRAPH_RELATION",
+        "predicate": predicate,
+        "subject_id": item.get("subject_id"),
+        "subject_type": item.get("subject_type"),
+        "subject_name": subject_name,
+        "object_id": item.get("object_id"),
+        "object_type": item.get("object_type"),
+        "object_name": object_name,
+        "source_table": item.get("source_table"),
+        "source_row_number": item.get("source_row_number"),
+        "data_base_date": (
+            str(item.get("data_base_date"))
+            if item.get("data_base_date")
+            else None
+        ),
+        "properties": item.get("properties"),
     }
 
 
@@ -96,8 +154,19 @@ def collect_evidence(tool_results: list[dict[str, Any]], max_items: int = 30) ->
             return
         if entry["kind"] == "MASTER_DATA":
             key = (entry["kind"], entry.get("source_table"), entry.get("source_row_number"))
-        else:
+        elif entry["kind"] == "EXTERNAL_DOCUMENT":
             key = (entry["kind"], entry.get("doc_id"))
+        elif entry["kind"] == "GRAPH_RELATION":
+            key = (
+                entry["kind"],
+                entry.get("predicate"),
+                entry.get("subject_id") or entry.get("subject_name"),
+                entry.get("object_id") or entry.get("object_name"),
+                entry.get("source_table"),
+                entry.get("source_row_number"),
+            )
+        else:
+            return
         if key not in seen:
             seen.add(key)
             collected.append(entry)
@@ -108,6 +177,7 @@ def collect_evidence(tool_results: list[dict[str, Any]], max_items: int = 30) ->
         if isinstance(value, dict):
             add(_product_evidence(value))
             add(_document_evidence(value))
+            add(_graph_relation_evidence(value))
             for key, nested in value.items():
                 if key in {"retrieved_context", "think_trace"}:
                     continue
@@ -120,6 +190,85 @@ def collect_evidence(tool_results: list[dict[str, Any]], max_items: int = 30) ->
     walk(tool_results)
     return collected
 
+
+
+def _normalize_importance_claims(
+    answer: str,
+    tool_results: list[dict[str, Any]],
+) -> str:
+    """비중·순위 근거가 없는 구성종목을 '주요/핵심 종목'으로 과장하지 않는다."""
+
+    matched_products: dict[str, bool] = {}
+
+    def positive_weight(properties: dict[str, Any]) -> bool:
+        source = properties.get("ranking_weight_source")
+        if source in {None, "", "UNAVAILABLE"}:
+            return False
+
+        for key in ("ranking_weight_pct", "weight_pct_official_source"):
+            value = properties.get(key)
+            try:
+                if value is not None and float(value) > 0:
+                    return True
+            except (TypeError, ValueError):
+                pass
+
+        return False
+
+    def walk(value: Any) -> None:
+        if isinstance(value, dict):
+            predicate = value.get("predicate")
+
+            if predicate in {"holdsSecurity", "heldBy"}:
+                product_name = None
+
+                if value.get("subject_type") in {"DOMESTIC_ETF", "OVERSEAS_ETF"}:
+                    product_name = value.get("subject_name")
+                elif value.get("object_type") in {"DOMESTIC_ETF", "OVERSEAS_ETF"}:
+                    product_name = value.get("object_name")
+
+                if product_name and product_name in answer:
+                    properties = value.get("properties")
+                    supported = (
+                        positive_weight(properties)
+                        if isinstance(properties, dict)
+                        else False
+                    )
+                    matched_products[product_name] = (
+                        matched_products.get(product_name, False) or supported
+                    )
+
+            for nested in value.values():
+                if isinstance(nested, (dict, list)):
+                    walk(nested)
+
+        elif isinstance(value, list):
+            for nested in value:
+                walk(nested)
+
+    walk(tool_results)
+
+    # 답변에 언급된 상품 모두에 명시적인 비중 근거가 있는 경우에만
+    # 중요도 표현을 그대로 허용한다.
+    if matched_products and all(matched_products.values()):
+        return answer
+
+    replacements = (
+        ("주요 종목으로 포함되어", "구성종목으로 편입되어"),
+        ("핵심 종목으로 포함되어", "구성종목으로 편입되어"),
+        ("대표 종목으로 포함되어", "구성종목으로 편입되어"),
+        ("비중이 높은 종목으로 포함되어", "구성종목으로 편입되어"),
+        ("주요 종목", "구성종목"),
+        ("핵심 종목", "구성종목"),
+        ("대표 종목", "구성종목"),
+        ("비중이 높은 종목", "구성종목"),
+    )
+
+    normalized = answer
+    for old, new in replacements:
+        normalized = normalized.replace(old, new)
+
+    return normalized
 
 def validate_answer_text(answer: str) -> dict[str, Any]:
     rules = load_business_rules()
@@ -158,6 +307,7 @@ def finalize_grounded_answer(
             "validation": {"passed": True, "reason": "no_grounded_result"},
         }
 
+    answer = _normalize_importance_claims(answer, tool_results)
     text_validation = validate_answer_text(answer)
     if not text_validation["passed"]:
         return {
