@@ -16,8 +16,11 @@ def _nonempty_result(result: dict[str, Any]) -> bool:
         value = result.get(key)
         if isinstance(value, list) and len(value) > 0:
             return True
-    # get_product returns the product row directly.
-    if result.get("product_name") and result.get("source_table"):
+    if (
+        result.get("source_table") is not None
+        and result.get("source_row_number") is not None
+        and (result.get("product_name") or result.get("product_id"))
+    ):
         return True
     # Federated result nests factual retrievers.
     for key in ("products", "graph", "documents"):

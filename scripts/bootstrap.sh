@@ -42,7 +42,6 @@ fi
 
 if [[ -f external_data/external_semantic_incremental_strict.jsonl ]]; then
   docker compose --profile tools run --rm etl python -m src.semantic.ingest /app/external_data/external_semantic_incremental_strict.jsonl
-file tools run --rm etl python -m src.semantic.ingest /app/external_data/documents.jsonl
 fi
 
 echo "[6/7] Start API"

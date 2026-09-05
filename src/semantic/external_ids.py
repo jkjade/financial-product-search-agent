@@ -128,13 +128,24 @@ def resolve_host_product(
     # external product_id = HOST pd_ticker
     # --------------------------------------------------------
     if source_table == "PREF01N001":
+        # search.domestic_etf_catalog (도메인 전용 뷰)에는 product_name이 없다 —
+        # 2026-09 canonical 필드명을 원본 컬럼명으로 통일한 리팩터 이후 공통
+        # product_name은 search.product_catalog(교차도메인 뷰)에서만 나온다.
+        # overseas ETF 경로(아래)와 같은 패턴으로 core 테이블(raw pd_ticker)과
+        # product_catalog(product_name)를 source_row_number 기준으로 조인한다.
         cursor.execute(
             """
-            SELECT source_table, source_row_number, product_name, product_type
-            FROM search.domestic_etf_catalog
-            WHERE source_table = 'PREF01N001'
-              AND LOWER(BTRIM(pd_ticker)) = LOWER(BTRIM(%s))
-            ORDER BY source_row_number
+            SELECT
+                p.source_table,
+                p.source_row_number,
+                p.product_name,
+                p.product_type
+            FROM search.product_catalog p
+            JOIN core.domestic_etfs h
+              ON h._source_row_number = p.source_row_number
+            WHERE p.source_table = 'PREF01N001'
+              AND LOWER(BTRIM(h.pd_ticker)) = LOWER(BTRIM(%s))
+            ORDER BY p.source_row_number
             """,
             (product_id,),
         )

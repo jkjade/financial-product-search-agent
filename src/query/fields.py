@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Literal
 
@@ -310,4 +311,117 @@ NUMERIC_FIELDS_SET: frozenset[str] = frozenset(NUMERIC_FIELDS)
 DATE_FIELDS_SET: frozenset[str] = frozenset(DATE_FIELDS)
 TEXT_FIELDS_SET: frozenset[str] = frozenset(TEXT_FIELDS)
 BOOLEAN_FIELDS_SET: frozenset[str] = frozenset(BOOLEAN_FIELDS)
-NON_COMPARABLE_FIELDS_SET: frozenset[str] = TEXT_FIELDS_SET | BOOLEAN_FIELDS_SET
+
+ORDINAL_TEXT_FIELDS: frozenset[str] = frozenset({
+    "pd_risk_nm_domestic_bond",
+    "pd_risk_nm_domestic_etf",
+    "zrin_fd_ivst_risk_grd_nm_public_fund",
+    "crd_grd_domestic_bond",
+})
+
+CREDIT_RATING_RANKS: dict[str, int] = {
+    "AAA": 22, "AA+": 21, "AA0": 20, "AA-": 19, "A+": 18, "A0": 17, "A-": 16,
+    "BBB+": 15, "BBB0": 14, "BBB-": 13, "BB+": 12, "BB0": 11, "BB-": 10,
+    "B+": 9, "B0": 8, "B-": 7, "CCC+": 6, "CCC0": 5, "CCC-": 4,
+    "CC": 3, "C0": 2, "D": 1,
+}
+
+NON_COMPARABLE_FIELDS_SET: frozenset[str] = (TEXT_FIELDS_SET - ORDINAL_TEXT_FIELDS) | BOOLEAN_FIELDS_SET
+
+YN_TEXT_FIELDS: frozenset[str] = frozenset({
+    "wu_core_yn_domestic_etf",
+    "wu_core_yn_overseas_etf",
+    "pd_pen_tr_yn_domestic_bond",
+    "pd_pen_tr_yn_domestic_etf",
+    "pd_spac_yn",
+    "pd_tr_yn_domestic_etf",
+    "pd_tr_yn_overseas_etf",
+    "cu_etn_yn",
+    "cu_index_tracking_yn",
+    "cu_inverse_short_yn",
+    "du_base_dt_match_yn",
+    "exchdg_yn",
+    "frc_bpr_itm_yn",
+    "hdge_fd_yn",
+    "ofsfd_yn",
+})
+
+YN_TRUE_RAW_VALUES: tuple[str, ...] = ("y", "1")
+YN_FALSE_RAW_VALUES: tuple[str, ...] = ("n", "0")
+
+
+def resolve_yn_intent(raw_value: object) -> bool | None:
+    """true/false, y/n, yes/no, 1/0(문자열 또는 bool) 등 다양한 표기를 참/거짓으로
+    정규화한다. 해석할 수 없으면 None(호출부가 원문을 그대로 둔다)."""
+    if isinstance(raw_value, bool):
+        return raw_value
+    normalized = str(raw_value).strip().lower()
+    if normalized in {"true", "1", "yes", "y"}:
+        return True
+    if normalized in {"false", "0", "no", "n"}:
+        return False
+    return None
+
+
+def yn_raw_candidates(intent: bool) -> list[str]:
+    """resolve_yn_intent()가 정규화한 참/거짓 값을, 실제 컬럼에 저장돼 있을 수 있는
+    raw 인코딩(Y/N 또는 1/0) 후보 목록으로 되돌린다."""
+    return list(YN_TRUE_RAW_VALUES if intent else YN_FALSE_RAW_VALUES)
+
+
+_GRADE_NUM_PATTERN = re.compile(r"(\d)\s*등급")
+
+_RISK_LABEL_RANKS: dict[str, dict[str, int]] = {
+    "pd_risk_nm_domestic_bond": {
+        "매우높은위험": 1, "높은위험": 2, "다소높은위험": 3,
+        "보통위험": 4, "낮은위험": 5, "매우낮은위험": 6,
+    },
+    "pd_risk_nm_domestic_etf": {
+        "매우높은위험": 1, "높은위험": 2, "다소높은위험": 3,
+        "보통위험": 4, "낮은위험": 5, "매우낮은위험": 6,
+    },
+    "zrin_fd_ivst_risk_grd_nm_public_fund": {
+        "매우높은위험": 1, "높은위험": 2, "다소높은위험": 3,
+        "보통위험": 4, "낮은위험": 5, "매우낮은위험": 6,
+    },
+}
+
+
+RISK_GRADE_TEXT_FIELDS: frozenset[str] = frozenset(_RISK_LABEL_RANKS)
+
+
+def resolve_risk_grade(field: str, raw_value: object) -> int | None:
+    text = str(raw_value).strip()
+    stripped = text.replace(" ", "")
+    if not stripped:
+        return None
+    try:
+        numeric = float(stripped)
+    except ValueError:
+        numeric = None
+    if numeric is not None and numeric.is_integer():
+        n = int(numeric)
+        return n if 1 <= n <= 6 else None
+    match = _GRADE_NUM_PATTERN.search(stripped)
+    if match:
+        n = int(match.group(1))
+        return n if 1 <= n <= 6 else None
+    label_only = re.sub(r"\(?\d등급\)?", "", stripped)
+    return _RISK_LABEL_RANKS.get(field, {}).get(label_only)
+
+
+_BARE_CREDIT_TIER_ALIASES: dict[str, str] = {
+    "AA": "AA0", "A": "A0", "BBB": "BBB0", "BB": "BB0", "B": "B0", "CCC": "CCC0",
+}
+
+
+def resolve_credit_rating(raw_value: object) -> int | None:
+    """crd_grd_domestic_bond 필터 값을 신용등급 순위로 해석한다 — 모델이 원본 표기
+    ("AA-" 등)를 그대로 보내면 되므로 기본은 대소문자/공백만 정규화해서 조회하고,
+    +/0/- 수정자를 빼고 등급대만 말한 경우("AA")는 중간(0) 등급 별칭으로 한 번 더
+    조회한다."""
+    normalized = str(raw_value).strip().upper()
+    if normalized in CREDIT_RATING_RANKS:
+        return CREDIT_RATING_RANKS[normalized]
+    aliased = _BARE_CREDIT_TIER_ALIASES.get(normalized)
+    return CREDIT_RATING_RANKS.get(aliased) if aliased else None

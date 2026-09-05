@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import difflib
+import re
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
@@ -15,8 +16,14 @@ from ..query.fields import (
     NON_COMPARABLE_FIELDS_SET,
     NUMERIC_FIELDS,
     NUMERIC_FIELDS_SET,
+    RISK_GRADE_TEXT_FIELDS,
     TEXT_FIELDS_SET,
+    YN_TEXT_FIELDS,
+    resolve_credit_rating,
+    resolve_risk_grade,
+    resolve_yn_intent,
 )
+from ..semantic.ontology import label_for_field
 from ..agent.vocab import (
     AGGREGATE_OPERATION_LABELS,
     FILTER_OPERATOR_LABELS,
@@ -101,14 +108,49 @@ class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
-def _coerce_filter_value(field: str, value: ScalarValue) -> ScalarValue:
+_COMPARABLE_OPERATORS = {"gt", "gte", "lt", "lte", "between"}
+
+
+def _risk_grade_error(field: str, value: ScalarValue) -> str:
+    return (
+        f"'{value}'는 {label_for_field(field)}에서 이해할 수 없는 위험등급 값입니다 — "
+        "등급 숫자(1~6), \"N등급\"이 포함된 문자열, 또는 등급 라벨"
+        "(예: 매우높은위험/높은위험/다소높은위험/보통위험/낮은위험/매우낮은위험)"
+        "만 이 연산자에서 쓸 수 있습니다."
+    )
+
+
+_CURRENCY_DECORATION_PATTERN = re.compile(r"(원|KRW|₩)+$", re.IGNORECASE)
+
+
+def _coerce_filter_value(field: str, value: ScalarValue, operator: str) -> ScalarValue:
+    if operator in _COMPARABLE_OPERATORS and field == "crd_grd_domestic_bond":
+        rank = resolve_credit_rating(value)
+        if rank is None:
+            raise ValueError(
+                f"'{value}'는 {label_for_field(field)}에서 이해할 수 없는 신용등급 "
+                "표기입니다 — AAA/AA+/AA0/AA-/A+/A0/A-/BBB+/BBB0/BBB-/BB+/BB0/BB-/"
+                "B+/B0/B-/CCC+/CCC0/CCC-/CC/C0/D 중 하나를 쓰세요."
+            )
+        return rank
+    if field in YN_TEXT_FIELDS and operator in {"eq", "ne", "in", "not_in"}:
+        intent = resolve_yn_intent(value)
+        if intent is not None:
+            # 실제 컬럼 인코딩(Y/N 또는 1/0)은 필드마다 달라 여기서 고정하지 않고,
+            # bool을 그대로 통과시켜 sql_builder가 두 인코딩을 모두 후보로 비교하게 한다.
+            return intent
     if field in NUMERIC_FIELDS_SET:
         if isinstance(value, bool):
-            raise ValueError(f"Boolean is not a valid numeric value for {field}")
+            raise ValueError(f"Boolean is not a valid numeric value for {label_for_field(field)}")
+        # 모델이 "1000억원"을 "100000000000원"처럼 통화 단위(원/₩/KRW)를 남기거나
+        # 천단위 구분자(,)를 붙여 보내는 경우가 있어, 자릿수 환산은 모델을 신뢰하되
+        # 파싱 전에 통화기호·단위·구분자·공백만 제거한다.
+        cleaned = _CURRENCY_DECORATION_PATTERN.sub("", str(value).strip())
+        cleaned = cleaned.replace(",", "").replace(" ", "").replace("₩", "")
         try:
-            return Decimal(str(value))
+            return Decimal(cleaned)
         except (InvalidOperation, ValueError) as exc:
-            raise ValueError(f"Invalid numeric value for {field}: {value!r}") from exc
+            raise ValueError(f"Invalid numeric value for {label_for_field(field)}: {value!r}") from exc
     if field in DATE_FIELDS_SET:
         if isinstance(value, datetime):
             return value.date()
@@ -120,7 +162,7 @@ def _coerce_filter_value(field: str, value: ScalarValue) -> ScalarValue:
                 return datetime.strptime(raw, "%Y%m%d").date()
             return date.fromisoformat(raw[:10])
         except ValueError as exc:
-            raise ValueError(f"Invalid ISO date value for {field}: {value!r}") from exc
+            raise ValueError(f"Invalid ISO date value for {label_for_field(field)}: {value!r}") from exc
     if field in BOOLEAN_FIELDS_SET:
         if isinstance(value, bool):
             return value
@@ -129,7 +171,7 @@ def _coerce_filter_value(field: str, value: ScalarValue) -> ScalarValue:
             return True
         if normalized in {"false", "0", "no", "n"}:
             return False
-        raise ValueError(f"Invalid boolean value for {field}: {value!r}")
+        raise ValueError(f"Invalid boolean value for {label_for_field(field)}: {value!r}")
     return str(value)
 
 
@@ -166,12 +208,31 @@ class FilterClause(StrictModel):
         if self.operator in text_ops and self.field not in TEXT_FIELDS_SET:
             raise ValueError(f"{self.operator} is only valid for text fields")
         if self.operator in comparable_ops and self.field in NON_COMPARABLE_FIELDS_SET:
-            raise ValueError(f"{self.operator} is not valid for field {self.field}")
+            raise ValueError(f"{self.operator} is not valid for field {label_for_field(self.field)}")
+
+        if self.operator in comparable_ops and self.field in RISK_GRADE_TEXT_FIELDS:
+            _flip_operator = {"gt": "lt", "gte": "lte", "lt": "gt", "lte": "gte"}
+            if self.value is not None:
+                rank = resolve_risk_grade(self.field, self.value)
+                if rank is None:
+                    raise ValueError(_risk_grade_error(self.field, self.value))
+                self.value = rank
+                if self.operator in _flip_operator:
+                    self.operator = _flip_operator[self.operator]  # type: ignore[assignment]
+            if self.values is not None:
+                ranks = []
+                for item in self.values:
+                    rank = resolve_risk_grade(self.field, item)
+                    if rank is None:
+                        raise ValueError(_risk_grade_error(self.field, item))
+                    ranks.append(rank)
+                self.values = sorted(ranks) if self.operator == "between" else ranks
+            return self
 
         if self.value is not None:
-            self.value = _coerce_filter_value(self.field, self.value)
+            self.value = _coerce_filter_value(self.field, self.value, self.operator)
         if self.values is not None:
-            self.values = [_coerce_filter_value(self.field, item) for item in self.values]
+            self.values = [_coerce_filter_value(self.field, item, self.operator) for item in self.values]
         if self.operator == "between" and self.values is not None and self.values[0] > self.values[1]:
             raise ValueError("between values must be ordered from lower to upper")
         return self
