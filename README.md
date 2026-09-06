@@ -5,8 +5,8 @@ AI Festival 2026 - 미래셋터
 
 미래에셋증권 AI Festival 금융상품 Agent 프로젝트입니다.
 
-현재 **1차 데이터 전처리·적재·색인**, **2차 검색·필터·집계·순위**,  
-그리고 3차 HyperCLOVA X 연동을 위한 **Ontology·Knowledge Graph·Federated Search 기반 구조**까지 구현되어 있습니다.
+데이터 전처리·적재·색인, 검색·필터·집계·순위, 그리고 HyperCLOVA X 연동을 위한
+**Ontology·Knowledge Graph·Federated Search 기반 구조**까지 전부 구현되어 있습니다.
 
 이 프로젝트는 AI가 엑셀을 직접 읽고 계산하는 방식이 아니라,
 
@@ -21,119 +21,91 @@ AI Festival 2026 - 미래셋터
 
 즉, **수치와 조건은 DB에서 정확하게 처리하고, LLM은 질문을 이해하고 답변을 만드는 역할에 집중**하도록 나눴습니다.
 
----
 
-## 1. 데이터
+## 1. 실제 동작 API
+
+HyperCLOVA X가 실제로 연결된 인스턴스가 서버에 배포되어 있어, 로컬 설치 없이 바로 확인할 수 있습니다.
+
+```text
+Swagger 문서:  http://101.79.17.204/docs
+상태 확인:     http://101.79.17.204/health
+Agent 준비 상태: http://101.79.17.204/agent/health
+```
+
+질문에 대한 답변은 `GET /answer`(Swagger 문서의 `answer_answer_get`)로 받습니다.  
+Swagger 문서 페이지에서 `answer` 항목을 펼치고 **Try it out**에 `question_id`(임의 문자열)와 `question`(질문)을 입력해 바로 호출해볼 수 있고, 아래처럼 직접 호출할 수도 있습니다.
+
+```bash
+curl -sG "http://101.79.17.204/answer" \
+  --data-urlencode "question_id=demo-1" \
+  --data-urlencode "question=국내 상장 ETF 중 총보수요율이 가장 낮은 상품 3개 알려줘"
+```
+
+실제 응답 예시(`answer` 필드):
+
+```text
+국내 상장 ETF 중 총보수요율이 가장 낮은 상품 3개는 다음과 같습니다:
+
+1. 키움 KIWOOM KRX100 상장지수증권투자신탁[주식] (KR7100910009)
+2. 미래에셋 TIGER 금속선물 특별자산상장지수투자신탁(금속-파생형) (KR7139310007)
+3. 미래에셋 TIGER S&P500선물 증권상장지수투자신탁(주식-파생형) (KR7143850006)
+
+이 세 상품 모두 총보수요율이 동일하게 0%입니다. 따라서 총보수요율 기준으로 모두 공동 1위입니다.
+```
+
+응답의 `retrieved_context`에는 근거(원본 파일·행 번호·기준일)가, `think_trace`에는 실제로 어떤 도구를(`rank_products` 등) 어떤 인자로 호출했는지가 함께 담깁니다.  
+진단용으로 라운드별 전체 호출 내역까지 보고 싶으면 같은 파라미터로 `GET /pre_answer`를 호출하면 됩니다.
+
+직접 Docker로 띄워서 확인하고 싶다면 **8. 실행 방법**을 참고하세요.
+
+## 2. 데이터
 
 주최 측에서 제공한 금융상품 데이터는 4종입니다.
 
 | 상품군 | 테이블 | 건수 |
 |---|---|---:|
-| 국내채권 | PRBD01N001 | 42,394 |
-| 국내 ETF | PREF01N001 | 1,734 |
-| 해외 ETF | PREF02N001 | 5,646 |
-| 공모펀드 | PRFD01N001 | 95,619 |
-| **전체** |  | **145,393** |
+| 국내채권 | PRBD01N001 | 21,882 |
+| 국내 ETF | PREF01N001 | 1,780 |
+| 해외 ETF | PREF02N001 | 6,037 |
+| 공모펀드 | PRFD01N001 | 23,676 |
+| **전체** |  | **53,375** |
 
-상품군마다 실제 데이터 파일인 `datarows.xlsx`와 컬럼 설명 파일인 `schema.xlsx`가 한 쌍씩 있어  
-**원본 데이터 4개 + schema 4개 = 총 XLSX 8개**입니다.
 
-데이터셋 기준일은 **2026-07-11**입니다.
+상품군마다 실제 데이터 파일(`<table_id>_data.xlsx`, 소문자)과 컬럼 설명 파일(`<table_id>_schema.xlsx`)이  
+한 쌍씩 있어 **원본 데이터 4개 + schema 4개 = 총 XLSX 8개**입니다.
 
----
+데이터셋 기준일은 **2026-08-24**입니다.
 
-## 2. 현재 구현 범위
 
-### 1차 — 데이터셋 분석 및 적재·전처리·색인
-
-원본 데이터를 바로 검색에 쓰지 않고, 먼저 구조와 품질을 확인한 뒤 PostgreSQL에 적재했습니다.
-
-구현 내용:
-
-- 원본 XLSX / schema 검증
-- SHA-256 체크섬 검증
-- 컬럼 정규화 및 전처리
-- PostgreSQL 적재
-- 4개 상품군을 한 번에 조회할 수 있는 통합 `product_catalog` 구성
-- 검색·정렬용 DB 인덱스 생성
-- 원본 파일명 / 원본 행 번호 저장
-- 데이터셋 기준일 및 상품별 개별 기준일 관리
-- 필수값 누락 / 중복 행 검증
-
-### 2차 — 검색·필터링 로직
-
-사용자가 조건을 여러 개 주더라도 DB에서 정확하게 계산할 수 있도록 검색 로직을 구현했습니다.
-
-구현 내용:
-
-- 복합 조건 검색
-- 다중 정렬
-- 페이지네이션
-- `COUNT`, `COUNT DISTINCT`, `SUM`, `AVG`, `MIN`, `MAX`
-- `GROUP BY`
-- `row_number`, `rank`, `dense_rank`
-- 그룹별 Top-N
-- 상품 비교
-- 상품군 교차 검색
-
-예를 들어 아래 조건을 한 번에 처리할 수 있습니다.
-
-```text
-해외 ETF
-+ 미국 투자
-+ 보수 0.05 이하
-+ AUM 내림차순
-+ 상위 5개
-```
-
-### 2.5차 — 3차 Agent 연동 준비
-
-설명회 내용을 반영해 SQL 검색만 사용하는 구조에서  
-**Ontology + Knowledge Graph + RDB + Semantic Search**를 함께 사용할 수 있도록 확장했습니다.
-
-구현 내용:
-
-- 금융상품 Ontology TTL
-- 자연어 금융 용어 표준화
-- Knowledge Graph
-- PostgreSQL + Graph + Semantic Search 결합
-- pgvector 기반 외부 문서 의미검색 구조
-- ETF 구성종목 외부 데이터 적재 구조
-- 외부 데이터 기준일 검증
-- Answer Validation
-- HyperCLOVA X Function Calling용 Tool 정의
-- Agent Plan Schema
-- LLM 없이도 Tool 호출 경로를 확인할 수 있는 실행 구조
-
----
-
-## 3. 최종 목표 구조
+## 3. 모델 구조
 
 ```text
 사용자 질문
 예: "미국 해외 ETF 중 AUM가 크고 보수가 낮은 상품 5개 알려줘"
         │
         ▼
-HyperCLOVA X
-질문의 의도와 필요한 조건을 해석
+도메인 라우팅 (도구 없이 1회 호출)
+질문이 어느 상품군(1~4개)에 해당하는지만 먼저 판별
         │
         ▼
-Ontology Grounding
-"해외 ETF", "AUM", "보수", "미국" 등의 의미를 시스템 용어로 변환
-        │
-        ▼
-Query / Tool Router
-질문에 맞는 검색 방법 선택
+HyperCLOVA X — Function Calling 루프 (최대 N라운드)
+판별된 상품군에 맞게 좁혀진 함수 목록(9종)에서
+필요한 함수를 스스로 선택·호출, 결과를 보고 다음 함수를 또 호출할 수 있음
         │
         ├───────────────┬────────────────┬─────────────────┐
         ▼               ▼                ▼                 ▼
- PostgreSQL/RDB    Knowledge Graph   Semantic Search    필요 시 통합
- 정확한 수치·조건    상품 간 관계 탐색    외부 문서 의미 검색  Federated Search
+ PostgreSQL/RDB    Knowledge Graph   Semantic Search    Federated Search
+ (search_products,  (graph_lookup)   (semantic_search)  (여러 소스 한 번에
+  aggregate_products,                                     통합 호출)
+  rank_products,
+  compare_products,
+  get_product)
         │               │                │                 │
         └───────────────┴────────────────┴─────────────────┘
                                 │
                                 ▼
-                       검색 결과 + 근거 통합
+                  결과(또는 오류)가 대화 맥락에 재주입
+                  → 더 호출할 함수가 없으면 답변 초안 작성
                                 │
                                 ▼
                        Answer Validation
@@ -143,12 +115,11 @@ Query / Tool Router
                     - 근거 없는 추천/전망인가?
                                 │
                                 ▼
-                         HyperCLOVA X
-                         최종 답변 생성
-                                │
-                                ▼
                       답변 + evidence(근거)
 ```
+
+`resolve_ontology`는 필드/용어를 확인할 때 이 루프 중 추가로 호출되는 함수 중 하나이고,  
+상품군 판별(도메인 라우팅)은 이 함수 목록과 별개로 매 질문마다 한 번만 실행됩니다.
 
 각 검색 방식은 역할을 나눠서 사용합니다.
 
@@ -170,36 +141,34 @@ Query / Tool Router
 처리 과정:
 
 ```text
-1. HyperCLOVA X가 질문을 해석
-   - 상품군: 해외 ETF
-   - 지역: 미국
-   - 비교 기준: AUM, 보수
-   - 결과 개수: 5개
+1. 도메인 라우팅(사전 호출) — 질문이 해외 ETF에 해당한다고 판별
 
-2. Ontology Grounding
-   - 해외 ETF → OVERSEAS_ETF
-   - AUM → size_amount
-   - 보수 → fee_rate
-   - 미국 → United States 관련 투자지역
+2. HyperCLOVA X에게 해외 ETF 상품군에 맞게 좁혀진 함수 목록 제공
+   (필드 이름은 전부 컬럼코멘트/한글 라벨로만 노출 — 내부 DB 컬럼명은 노출 안 함)
 
-3. Tool Router가 RDB 검색이 적합하다고 판단
+3. HyperCLOVA X가 rank_products를 직접 호출하며 조건을 라벨로 채움
+   - 상품유형: OVERSEAS_ETF
+   - 필터: 투자지역 = 미국
+   - 정렬 기준(metric): "일간 순자산총액" 내림차순, 상위 5개
+   - (보수가 낮은 순서도 같이 보려면 두 번째 호출이나 정렬 기준 추가 필요)
 
-4. PostgreSQL에서
-   - 해외 ETF 필터
-   - 미국 투자지역 필터
-   - AUM / 보수 조건 적용
-   - 정렬 및 Top-5 계산
+   ※ HyperCLOVA X는 내부 DB 컬럼명을 전혀 모릅니다 — 도구가 보여준 컬럼코멘트로만
+      조건을 채우고, 실제 컬럼명(상품군마다 다를 수 있음)으로의 역변환은 시스템이 담당합니다.
 
-5. 조회된 상품의 원본 파일·행 번호·기준일을 근거로 수집
+4. 시스템이 라벨을 내부 컬럼명으로 되돌리고 조건을 검증한 뒤 PostgreSQL(`search.overseas_etf_catalog` 뷰)에서
+   - 해외 ETF · 미국 투자지역 필터
+   - 일간 순자산총액 기준 정렬 및 Top-5 계산
+   을 실행
 
-6. Answer Validation에서 근거와 기준일 확인
+5. 조회된 상품의 원본 파일·행 번호·기준일을 근거로 수집, 결과가 다시 대화 맥락에 전달됨
 
-7. HyperCLOVA X가 조회 결과를 바탕으로 최종 답변 생성
+6. HyperCLOVA X가 더 호출할 함수가 없다고 판단하면 답변 초안 작성
+
+7. Answer Validation에서 근거·기준일·금지 표현 확인 후 최종 답변 확정
 ```
 
 이 구조의 핵심은 **LLM이 임의로 숫자를 계산하거나 상품을 만들어내지 않게 하는 것**입니다.
 
----
 
 ## 4. 사용 기술
 
@@ -214,7 +183,7 @@ Query / Tool Router
 | LLM | HyperCLOVA X | 질의 의도 해석, Tool 선택, 최종 답변 생성 |
 | Embedding | CLOVA Embedding / bge-m3 연동 구조 | 외부 문서를 vector로 변환 |
 | Container | Docker / Docker Compose | 팀원마다 같은 환경에서 실행 |
-| Test | pytest / PowerShell | 기능 및 전체 파이프라인 자동 검증 |
+| Test | pytest / bash (`.sh`) · PowerShell (`.ps1`) | 기능 및 전체 파이프라인 자동 검증(Mac·Linux/Windows 둘 다 지원) |
 
 ### 왜 DB, Graph, Vector를 모두 사용하는지
 
@@ -233,7 +202,6 @@ Query / Tool Router
 
 따라서 질문에 따라 적합한 검색 방식을 선택하고, 필요한 경우 결과를 합칩니다.
 
----
 
 ## 5. 프로젝트 폴더 구조
 
@@ -241,94 +209,103 @@ Query / Tool Router
 financial-product-agent/
 │
 ├─ README.md                      # 지금 보고 있는 전체 안내 문서
-├─ START_HERE.txt                 # 아주 짧은 실행 안내
-├─ docker-compose.yml             # PostgreSQL / API / ETL 컨테이너 구성
-├─ Dockerfile                     # Python API·ETL 실행 이미지
+├─ Makefile                       # 주요 명령 단축 실행(bootstrap/check/test 등)
+├─ VERSION                        # 릴리스 버전
+├─ docker-compose.yml             # PostgreSQL / API / ETL(tools 프로필) 컨테이너 구성
+├─ Dockerfile                     # Python 3.11 API·ETL 실행 이미지
 ├─ requirements.txt               # Python 라이브러리
+├─ pytest.ini                     # pytest 설정
 ├─ .env.example                   # DB / HyperCLOVA X 환경변수 예시
 │
 ├─ data/
-│  ├─ raw/                        # 주최 측 원본 XLSX 8개
-│  │  ├─ PRBD01N001_datarows.xlsx
-│  │  ├─ PRBD01N001_schema.xlsx
-│  │  ├─ PREF01N001_datarows.xlsx
-│  │  ├─ PREF01N001_schema.xlsx
-│  │  ├─ PREF02N001_datarows.xlsx
-│  │  ├─ PREF02N001_schema.xlsx
-│  │  ├─ PRFD01N001_datarows.xlsx
-│  │  └─ PRFD01N001_schema.xlsx
+│  ├─ raw/                        # 주최 측 원본 XLSX 8개 (소문자 파일명)
+│  │  ├─ prbd01n001_data.xlsx / prbd01n001_schema.xlsx
+│  │  ├─ pref01n001_data.xlsx / pref01n001_schema.xlsx
+│  │  ├─ pref02n001_data.xlsx / pref02n001_schema.xlsx
+│  │  ├─ prfd01n001_data.xlsx / prfd01n001_schema.xlsx
+│  │  └─ CHECKSUMS.sha256
 │  │
 │  ├─ processed/                  # 전처리 결과 저장 위치
-│  └─ reports/                    # 데이터 분석/검증 결과 저장 위치
+│  └─ reports/                    # 데이터 프로파일링(품질 통계) 결과 저장 위치
 │
 ├─ config/
-│  └─ datasets.json               # 4개 데이터셋 설정과 컬럼 매핑
+│  └─ datasets.json               # 4개 데이터셋 설정·컬럼 매핑·기준일(data_base_date)
 │
 ├─ ontology/
-│  ├─ financial_product_ontology.ttl # 금융상품 개념·관계 정의
-│  ├─ term_map.json                  # 자연어 금융 용어 표준화
-│  └─ business_rules.json            # 기준일·YTD·답변 검증 규칙
+│  ├─ common.ttl                  # 4개 상품군 공통 클래스·관계(운용사/자산군/지역/위험등급 등)
+│  ├─ bond_kr.ttl                 # 국내채권 전용 필드 정의(컬럼코멘트 포함)
+│  ├─ etf_kr.ttl                  # 국내 ETF 전용 필드 정의
+│  ├─ etf_gl.ttl                  # 해외 ETF 전용 필드 정의
+│  ├─ fund_pub.ttl                # 공모펀드 전용 필드 정의
+│  └─ business_rules.json         # 기준일·YTD·금지 표현·답변 검증 규칙
 │
 ├─ external_data/
-│  ├─ external_holdings.example.jsonl   # ETF 구성종목 입력 형식 예시
-│  └─ external_documents.example.jsonl  # 외부 문서 입력 형식 예시
+│  ├─ README.md                                        
+│  ├─ external_product_holdings_domestic_krx.jsonl      
+│  ├─ external_product_holdings_overseas_ishares_01/02.jsonl  
+│  ├─ external_product_holdings_overseas_sec.jsonl      
+│  ├─ external_product_holdings_overseas_vanguard.jsonl 
+│  ├─ external_security_sector_strict.jsonl             
+│  ├─ external_product_commodity_exposures_strict.jsonl 
+│  ├─ external_corporate_relations.jsonl                
+│  └─ external_semantic_incremental_strict.jsonl / external_policy_documents.jsonl / external_etf_documents.jsonl
+│                                                        
 │
 ├─ sql/
-│  ├─ 000_reset.sql               # DB 초기화
-│  ├─ 001_extensions.sql          # PostgreSQL extension(pgvector 등)
-│  ├─ 002_schema.sql              # 기본 DB 테이블
+│  ├─ 000_reset.sql               # DB 초기화(schema 전체 드롭)
+│  ├─ 001_extensions.sql          # PostgreSQL extension(pgvector, pg_trgm 등)
+│  ├─ 002_schema.sql              # 상품군별 원본 테이블(core.*)
 │  ├─ 003_indexes.sql             # 검색·정렬 인덱스
-│  ├─ 004_views.sql               # 통합 product_catalog view
-│  └─ 005_semantic.sql            # Knowledge Graph / 외부 근거 / vector 테이블
+│  ├─ 004_views.sql               # search.product_catalog(공통) + 상품군별 전용 뷰 4개(materialized view)
+│  └─ 005_semantic.sql            # Knowledge Graph(semantic.entity/relation) / 외부 근거 / vector 테이블
 │
 ├─ src/
-│  ├─ pipeline.py                 # 전체 ETL 파이프라인
+│  ├─ pipeline.py                 # 전체 ETL 파이프라인(적재+검증)
 │  ├─ cleaning.py                 # 데이터 전처리
 │  ├─ profiling.py                # 데이터 프로파일링
 │  ├─ source_validation.py        # 원본/schema/checksum 검증
+│  ├─ config.py                   # datasets.json 로더, DB 접속 URL 구성
+│  ├─ cli.py                      # `python -m src.cli` 진입점(pipeline/validate 등)
 │  │
 │  ├─ query/
-│  │  ├─ fields.py                # 검색 가능한 필드 정의
-│  │  └─ sql_builder.py           # 조건을 안전한 SQL로 변환
+│  │  ├─ fields.py                # 검색 가능한 필드(약 280개) 자료형·정렬/그룹 가능 여부 정의
+│  │  ├─ field_domains.py         # 필드별 소속 상품군 분류, 다중 도메인 라벨 매핑
+│  │  └─ sql_builder.py           # 조건을 파라미터화된 SQL로 변환
 │  │
 │  ├─ services/
-│  │  ├─ query_engine.py          # 검색·집계·순위·비교 실행
+│  │  ├─ query_engine.py          # 검색·집계·순위·비교 실행(뷰 대상)
 │  │  └─ semantic_engine.py       # Graph·Semantic·Federated 검색
 │  │
 │  ├─ semantic/
-│  │  ├─ ontology.py              # Ontology/용어 Grounding
-│  │  ├─ ingest.py                # 외부 문서 적재
-│  │  └─ ingest_holdings.py       # ETF 구성종목 적재
+│  │  ├─ ontology.py              
+│  │  ├─ external_ids.py          
+│  │  ├─ ingest.py                
+│  │  ├─ ingest_holdings.py       
+│  │  └─ ingest_relations.py      
 │  │
 │  ├─ agent/
-│  │  ├─ tool_registry.py         # HyperCLOVA X가 사용할 Function 목록
-│  │  ├─ hcx_client.py            # HyperCLOVA X API 연결
+│  │  ├─ tool_registry.py         # HyperCLOVA X 함수 목록·라벨 스코핑·라벨↔필드 역변환
+│  │  ├─ hcx_client.py            # HyperCLOVA X API 연결, 도메인 라우팅 + tool-calling 루프
+│  │  ├─ prompts.py               # 시스템 프롬프트(도구 선택·값 규칙·답변 원칙)
+│  │  ├─ vocab.py                 # 연산자/집계/그래프 관계 등 한글 라벨 정의
 │  │  ├─ embedding_client.py      # 외부 문서 embedding 생성
-│  │  ├─ prompts.py               # Agent 시스템 프롬프트
-│  │  └─ answer_validation.py     # 최종 답변·근거 검증
+│  │  ├─ ncp_client.py            # NCP/HyperCLOVA X 인증 헤더 공통 처리
+│  │  └─ answer_validation.py     # 최종 답변 그라운딩·근거·금지 표현 검증
 │  │
 │  └─ api/
 │     ├─ main.py                  # FastAPI endpoint
-│     └─ models.py                # API 요청/응답 데이터 형식
+│     └─ models.py                # API 요청/응답 Pydantic 모델(필드·값 검증 포함)
 │
 ├─ scripts/
-│  ├─ bootstrap.ps1              # Windows 전체 구축 + 검증
-│  ├─ check-all.ps1              # 전체 기능만 다시 검증
-│  ├─ reset-and-run.ps1           # DB 초기화 후 재실행
-│  └─ *_smoke_test.py             # 주요 기능 빠른 검사
+│  ├─ bootstrap.sh / bootstrap.ps1        # 전체 구축(빌드→적재→외부데이터 복원→API→검증)
+│  ├─ check-all.sh / check-all.ps1        # 전체 기능만 다시 검증
+│  ├─ reset-and-run.ps1                   # DB 초기화 후 재실행(Windows)
+│  ├─ generate_ontology.py                # 온톨로지 TTL 생성/갱신 스크립트
+│  └─ *_smoke_test.py                     # 주요 기능 빠른 검사
 │
 ├─ tests/                         # pytest 자동 테스트
 │
 └─ docs/
-   ├─ ARCHITECTURE.md             # 시스템 아키텍처
-   ├─ DATASET_ANALYSIS.md         # 데이터셋 분석
-   ├─ DATA_QUALITY.md             # 데이터 품질
-   ├─ PREPROCESSING_RULES.md      # 전처리 규칙
-   ├─ REFERENCE_DATE_MAPPING.md   # 상품별 기준일 매핑
-   ├─ PHASE2_API.md               # 2차 검색 API 설명
-   ├─ PHASE3_HANDOFF.md           # 3차 개발 인계 문서
-   ├─ SESSION_REQUIREMENTS.md     # 설명회 요구사항 반영 내용
-   └─ VALIDATION.md               # 검증 방법
 ```
 
 ### 폴더를 간단히 보면
@@ -343,7 +320,6 @@ financial-product-agent/
 - `tests/` : 자동 테스트
 - `docs/` : 구현 세부 내용 정리
 
----
 
 ## 6. 주요 코드가 하는 일
 
@@ -370,39 +346,61 @@ src/pipeline.py
 ### 검색
 
 ```text
+src/api/models.py
+```
+
+Agent가 보낸 검색 조건(filters/sort/metrics 등)의 형식과 값을 검증합니다.  
+연산자별 필수 값 확인, 등급형 값(신용등급·위험등급) 순위 변환, 통화 단위·날짜·Y/N 값 정규화까지 여기서 처리합니다.
+
+```text
+src/query/fields.py
+```
+
+검색 가능한 필드(약 280개) 각각의 자료형·정렬 가능 여부·그룹 가능 여부를 정의하는 단일 기준입니다.
+
+```text
 src/query/sql_builder.py
 ```
 
-Agent가 전달한 검색 조건을 SQL로 변환합니다.  
-허용된 필드와 연산자만 사용하도록 제한합니다.
+검증된 검색 조건을 파라미터화된 SQL로 변환합니다.  
+값은 전부 바인드 파라미터로 전달해 SQL 인젝션을 막습니다.
 
 ```text
 src/services/query_engine.py
 ```
 
-검색, 필터, 정렬, 집계, 순위, 상품 비교를 실제 DB에서 실행합니다.
+검색, 필터, 정렬, 집계, 순위, 상품 비교를 `search.*_catalog` 뷰(원본 4개 테이블을 상품군별로 통합·정제해서 만든 조회 전용 뷰) 대상으로 실행합니다.
 
 ### Ontology / Graph / Semantic Search
 
 ```text
-ontology/financial_product_ontology.ttl
+ontology/common.ttl
+ontology/bond_kr.ttl · etf_kr.ttl · etf_gl.ttl · fund_pub.ttl
 ```
 
-ETF, 펀드, 채권, 운용사, 지역 등 금융상품의 개념과 관계를 정의합니다.
+ETF, 펀드, 채권, 운용사, 지역 등 금융상품의 개념·관계를 정의합니다.  
+공통 개념(`common.ttl`)과 상품군별 필드 정의(도메인별 4개 파일)를 분리해서,  
+같은 개념이라도 상품군마다 다른 컬럼코멘트(한글 라벨)를 가질 수 있게 했습니다.
 
 ```text
-ontology/term_map.json
+src/semantic/ontology.py
 ```
 
-사용자가 쓰는 표현을 내부 표준 용어로 연결합니다.
+위 TTL 전체를 읽어 필드 ↔ 컬럼코멘트(라벨)를 양방향으로 변환하고,  
+사용자가 쓰는 자연어 표현을 표준 용어로 연결합니다.
 
 예:
 
 ```text
-AUM → size_amount
-보수 → fee_rate
+AUM → "일간 순자산총액" (상품군별 공식 컬럼코멘트)
 해외 ETF → OVERSEAS_ETF
 ```
+
+```text
+src/semantic/external_ids.py · ingest_holdings.py · ingest_relations.py
+```
+
+외부 데이터(ETF 구성종목, 종목-섹터/원자재 관계 등)의 상품 식별자를 HOST 상품 행에 매칭해 적재합니다.
 
 ```text
 src/services/semantic_engine.py
@@ -416,21 +414,26 @@ Knowledge Graph 검색, 외부 문서 검색, Federated Search를 담당합니�
 src/agent/tool_registry.py
 ```
 
-HyperCLOVA X가 호출할 수 있는 Tool 목록과 입력 형식을 정의합니다.
+HyperCLOVA X가 호출할 수 있는 Tool 목록과 입력 형식을 정의합니다.  
+필드 관련 항목은 내부 이름 대신 온톨로지 라벨로 치환해서 보여주고, 모델이 라벨로 응답하면 다시 내부 필드로 되돌립니다.
 
 ```text
 src/agent/hcx_client.py
 ```
 
-HyperCLOVA X API 연결을 담당합니다.
+HyperCLOVA X API 연결, 도메인 라우팅(사전 1회 호출), tool-calling 루프(최대 N라운드)를 담당합니다.
+
+```text
+src/agent/prompts.py
+```
+
+Agent 시스템 프롬프트 — 도구 선택 기준, 값 표기 규칙, 답변 원칙, 도구별 인자 형식을 정의합니다.
 
 ```text
 src/agent/answer_validation.py
 ```
 
 최종 답변이 실제 데이터 근거를 가지고 있는지 확인합니다.
-
----
 
 ## 7. Agent에서 사용할 주요 Tool
 
@@ -452,52 +455,61 @@ Tool 목록과 JSON Schema는 API 실행 후 아래에서 확인할 수 있습�
 GET /tools/catalog
 ```
 
----
 
 ## 8. 실행 방법
 
 ### 준비
 
-1. Docker Desktop 실행
-2. 프로젝트 압축 해제
-3. 프로젝트 폴더에서 PowerShell 실행
+1. Docker Desktop(또는 Docker Engine) 실행
+2. 프로젝트 폴더로 이동
+3. Windows는 PowerShell, Mac/Linux는 터미널(bash) 사용
 
 ### 전체 구축 + 검증
 
+```bash
+# Mac / Linux
+bash scripts/bootstrap.sh
+```
+
 ```powershell
+# Windows
 powershell -ExecutionPolicy Bypass -File ".\scripts\bootstrap.ps1"
 ```
 
-`bootstrap.ps1`을 실행하면 아래 과정이 자동으로 진행됩니다.
+`bootstrap.sh`/`bootstrap.ps1`을 실행하면 아래 과정이 자동으로 진행됩니다.
 
 ```text
-원본 파일 검증
-→ 데이터 전처리
-→ PostgreSQL 적재
-→ product_catalog 생성
-→ Knowledge Graph 생성
-→ 검색/집계/순위 인덱스 생성
-→ API 실행
-→ 전체 테스트
-```
-
-정상 완료 기준:
-
-```text
-전체 검증 결과: 모두 정상
-1·2차와 온톨로지·지식그래프·Federated 검색·Answer Validation까지 모두 통과했습니다.
+이미지 빌드
+→ PostgreSQL 기동
+→ 원본 파일 검증 · 전처리 · DB 적재(core.*)
+→ 인덱스 · product_catalog 등 조회 전용 뷰(search.*) 생성
+→ Knowledge Graph(semantic.*) 생성
+→ 외부 데이터(ETF 구성종목·문서 등) 복원
+→ API 기동
+→ 전체 검증(check-all)
 ```
 
 ### 이미 구축된 상태에서 검사만 다시 할 경우
 
+```bash
+bash scripts/check-all.sh          # Mac / Linux
+```
 ```powershell
-powershell -ExecutionPolicy Bypass -File ".\scripts\check-all.ps1"
+powershell -ExecutionPolicy Bypass -File ".\scripts\check-all.ps1"   # Windows
 ```
 
-### DB를 초기화하고 처음부터 다시 실행할 경우
+> `check-all.sh`/`.ps1`는 예전 API 응답 형태를 기준으로 작성된 부분이 있어 마지막 검증 단계가
+> 실패할 수 있습니다 — 그 앞의 데이터 적재·API 기동 자체가 실패한 게 아니라면
+> `curl http://localhost:8000/stats`로 직접 확인하는 편이 더 정확합니다.
 
+### DB를 초기화하고 볼륨까지 완전히 새로 만들 경우
+
+```bash
+docker compose down -v --remove-orphans   # Mac / Linux — Postgres 볼륨까지 삭제
+bash scripts/bootstrap.sh
+```
 ```powershell
-powershell -ExecutionPolicy Bypass -File ".\scripts\reset-and-run.ps1"
+powershell -ExecutionPolicy Bypass -File ".\scripts\reset-and-run.ps1"   # Windows
 ```
 
 ### API 확인
@@ -514,152 +526,53 @@ http://localhost:8000/docs
 http://localhost:8000/health
 ```
 
----
 
 ## 9. HyperCLOVA X 설정
 
-3차 개발부터 `.env`에 API 키를 설정합니다.
+Agent가 HyperCLOVA X를 호출하려면 `.env`에 API 키를 설정해야 합니다.
 
 ```dotenv
 HCX_API_KEY=
 HCX_BASE_URL=https://clovastudio.stream.ntruss.com/v1/openai
 HCX_MODEL=HCX-005
 HCX_TIMEOUT_SECONDS=60
-AGENT_MAX_TOOL_ROUNDS=4
+AGENT_MAX_TOOL_ROUNDS=6
 
 HCX_EMBEDDING_BASE_URL=https://clovastudio.stream.ntruss.com
 HCX_EMBEDDING_MODEL=bge-m3
 ```
 
-API 키가 없어도 현재 1·2·2.5차 기능은 실행 및 검증할 수 있습니다.
+`AGENT_MAX_TOOL_ROUNDS`는 `/answer`·`/pre_answer` 한 번의 질문 안에서 HyperCLOVA X가
+함수를 반복 호출할 수 있는 최대 라운드 수입니다(코드 기본값은 4, `.env.example`은 6으로 설정).
+
+API 키가 없어도 데이터 적재·RDB 검색·Knowledge Graph·Semantic Search 자체는 API로 직접 검증할 수 있습니다.  
+HyperCLOVA X 연동이 필요한 것은 `/answer`, `/pre_answer`, `/agent/health`뿐입니다.
 
 외부 문서를 embedding해서 Vector Search에 사용하는 경우에는 HyperCLOVA X/CLOVA 관련 API 설정이 필요합니다.
 
----
 
-## 10. 외부 데이터 — ETF 구성종목
-
-주최 측에서 제공한 4종 데이터에는 ETF 구성종목 정보가 포함되어 있지 않습니다.
-
-구성종목 관련 질문에 대응할 수 있도록 **외부 데이터를 추가할 수 있는 DB 구조와 적재 로직**은 만들어둔 상태입니다.
-
-다만 평가 기준에 맞추기 위해 외부 데이터의 기준일도 반드시 아래 조건을 만족해야 합니다.
-
-```text
-as_of_date <= 2026-07-11
-```
-
-예시 입력 파일:
-
-```text
-external_data/external_holdings.example.jsonl
-external_data/external_documents.example.jsonl
-```
-
-ETF 구성종목 적재:
-
-```powershell
-docker compose exec -T api python -m src.semantic.ingest_holdings /app/external_data/holdings.jsonl
-```
-
-외부 문서 적재:
-
-```powershell
-docker compose exec -T api python -m src.semantic.ingest /app/external_data/documents.jsonl
-```
-
-외부 문서 적재 + embedding 생성:
-
-```powershell
-docker compose exec -T api python -m src.semantic.ingest /app/external_data/documents.jsonl --embed
-```
-
-현재 프로젝트에는 출처와 기준일이 확인되지 않은 외부 데이터를 임의로 넣지 않고, 입력 구조와 로더만 준비되어 있습니다.
-
----
-
-## 11. Answer Validation
+## 10. Answer Validation
 
 최종 답변은 LLM이 생성한 내용을 그대로 반환하지 않고 한 번 더 검증합니다.
 
-확인하는 내용:
+확인하는 내용(`src/agent/answer_validation.py: finalize_grounded_answer`):
 
-- 실제 조회된 근거가 있는지
-- 데이터 기준일이 `2026-07-11`을 넘지 않는지
-- 존재하지 않는 상품을 답변하지 않았는지
-- 근거 없는 투자 추천이나 수익률 전망을 하지 않는지
+1. **명확화 우선** — 상품 식별이 모호하거나 존재하지 않으면 임의로 답하지 않고 안내 문구로 대체
+2. **그라운딩 확인** — 실제 조회된 근거가 하나도 없으면 강제로 "확인할 수 없음"으로 대체
+3. **금지 표현 검사** — 근거 없는 투자 추천·수익률 전망 등(`ontology/business_rules.json`의 `prohibited_answer_patterns`)이 있으면 안전한 문구로 치환
+
+데이터 기준일(`ontology/business_rules.json`의 `dataset_snapshot_date`, 현재 `2026-08-24`) 이후 정보는 애초에 근거로 채택되지 않습니다.
 
 근거를 확인할 수 없는 경우:
 
 ```text
-제공된 데이터의 2026-07-11 기준으로 확인할 수 없습니다.
+제공된 데이터의 2026-08-24 기준으로 확인할 수 없습니다.
 ```
 
 로 처리합니다.
 
 답변에는 사용한 원본 파일, 원본 행, 기준일 또는 외부 문서 출처를 `evidence`로 함께 반환할 수 있도록 구성했습니다.
 
----
 
-## 12. 현재 검증 상태
 
-현재 로컬 전체 검증 결과:
 
-```text
-44 passed
-
-전체 검증 결과: 모두 정상
-1·2차와 온톨로지·지식그래프·Federated 검색·Answer Validation까지 모두 통과했습니다.
-```
-
-확인된 항목:
-
-- 원본 XLSX 8개 / schema / SHA-256 일치
-- 금융상품 4종 총 145,393건 적재
-- 필수값 누락 없음
-- 원본 행 중복 없음
-- 검색 / 필터 / 다중 정렬
-- 집계 / GROUP BY
-- 순위 / Top-N
-- 상품 비교
-- 검색·집계·순위용 DB 인덱스
-- Ontology TTL / 용어맵 / 비즈니스 규칙
-- Knowledge Graph
-- Federated Search
-- 외부 데이터 기준일 차단
-- Answer Validation
-- HyperCLOVA X Tool Catalog / Agent Plan Schema
-- LLM 없이 Agent Plan → Tool 실행 경로
-
----
-
-## 13. 다음 작업 — Phase 3
-
-다음 단계에서는 실제 HyperCLOVA X를 연결해 Agent 파이프라인을 완성할 예정입니다.
-
-현재까지는 **Agent가 사용할 데이터와 검색 도구를 준비한 상태**이고,  
-3차에서는 HyperCLOVA X가 사용자의 질문에 따라 이 도구들을 직접 선택하고 호출하도록 연결합니다.
-
-```text
-질문 입력
-→ HyperCLOVA X 질의 의도 파싱
-→ Ontology Grounding
-→ 필요한 Tool 선택
-→ Tool 실행
-→ 검색 결과 및 근거 통합
-→ Answer Validation
-→ HyperCLOVA X 최종 답변 생성
-→ 답변 + evidence 반환
-```
-
-3차 개발 관련 내용:
-
-```text
-docs/PHASE3_HANDOFF.md
-```
-
-설명회 요구사항 반영 내용:
-
-```text
-docs/SESSION_REQUIREMENTS.md
-```
