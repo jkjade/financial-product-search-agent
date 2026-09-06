@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from dataclasses import dataclass
 from typing import Any, Callable
@@ -43,6 +44,47 @@ class HCXSettings:
         )
 
 
+def _recent_period_bounds(question: str) -> tuple[str, str] | None:
+    """Return deterministic date bounds for recent N months/years."""
+
+    import calendar
+    import re
+    from datetime import date
+
+    match = re.search(
+        r"\ucd5c\uadfc\s*(\d+)\s*(\uac1c\uc6d4|\ub2ec|\ub144)",
+        question,
+    )
+    if not match:
+        return None
+
+    amount = int(match.group(1))
+    unit = match.group(2)
+
+    if amount <= 0:
+        return None
+
+    months = amount * 12 if unit == "\ub144" else amount
+
+    # Competition master-data cutoff.
+    end = date(2026, 8, 24)
+
+    total_month = end.year * 12 + (end.month - 1) - months
+    year, zero_based_month = divmod(total_month, 12)
+    month = zero_based_month + 1
+
+    if year < 1:
+        return None
+
+    day = min(
+        end.day,
+        calendar.monthrange(year, month)[1],
+    )
+    start = date(year, month, day)
+
+    return start.isoformat(), end.isoformat()
+
+
 def _apply_question_constraints(
     tool_name: str,
     arguments: dict[str, Any],
@@ -55,6 +97,14 @@ def _apply_question_constraints(
     주최 측 데이터의 실제 시장/상품구분 필드를 사용한다.
     """
     normalized = dict(arguments)
+
+    # Federated retrieval must preserve the user's complete question.
+    # The model may shorten a composite request and accidentally remove
+    # ranking, risk, time, or other constraints needed by the internal
+    # multi-source retrieval plan.
+    if tool_name == "federated_search":
+        normalized["query"] = question
+        return normalized
 
     # semantic_search의 document_type은 모델이 임의로 추정할 수 있다.
     # 사용자가 실제 질문에서 문서 유형을 명시한 경우에만 필터로 사용하고,
@@ -73,6 +123,86 @@ def _apply_question_constraints(
             if not explicitly_requested:
                 normalized.pop("document_type", None)
 
+        period_bounds = _recent_period_bounds(question)
+        if period_bounds:
+            as_of_from, as_of_to = period_bounds
+
+            # User-stated relative time range takes precedence over
+            # model-generated date arguments.
+            normalized["as_of_from"] = as_of_from
+            normalized["as_of_to"] = as_of_to
+
+        return normalized
+
+    # Preserve explicit structured constraints for domestic-bond queries.
+    # These map directly to organizer-provided PRBD01N001 fields.
+    if tool_name == "search_products" and "DOMESTIC_BOND" in domains:
+        filters = [
+            dict(item)
+            for item in (normalized.get("filters") or [])
+            if isinstance(item, dict)
+        ]
+
+        def upsert_filter(
+            field: str,
+            operator: str,
+            value: Any,
+        ) -> None:
+            nonlocal filters
+            filters = [
+                item
+                for item in filters
+                if item.get("field") != field
+            ]
+            filters.append(
+                {
+                    "field": field,
+                    "operator": operator,
+                    "value": value,
+                }
+            )
+
+        compact_question = question.replace(" ", "")
+
+        # Explicit KRW-denominated bond request.
+        if "\uc6d0\ud654" in question:
+            upsert_filter(
+                "curr_cd_domestic_bond",
+                "eq",
+                "KRW",
+            )
+
+        # Explicit currently-buyable / sale-available request.
+        if (
+            "\ud310\ub9e4\uac00\ub2a5" in compact_question
+            or "\ub9e4\uc218\uac00\ub2a5" in compact_question
+        ):
+            upsert_filter(
+                "buyable_quantity_domestic_bond",
+                "eq",
+                True,
+            )
+
+        # Credit-rating ordering is handled by CREDIT_RATING_RANKS
+        # in the query layer.
+        rating_match = re.search(
+            r"(AAA|AA\+|AA0|AA-|AA|A\+|A0|A-|BBB\+|BBB0|BBB-|BBB|"
+            r"BB\+|BB0|BB-|BB|B\+|B0|B-|CCC\+|CCC0|CCC-|CCC|CC|C0|D)"
+            r"\s*(\uc774\uc0c1|\uc774\ud558)",
+            question,
+            re.IGNORECASE,
+        )
+        if rating_match:
+            rating = rating_match.group(1).upper()
+            direction = rating_match.group(2)
+
+            upsert_filter(
+                "crd_grd_domestic_bond",
+                "gte" if direction == "\uc774\uc0c1" else "lte",
+                rating,
+            )
+
+        normalized["filters"] = filters
         return normalized
 
     if tool_name != "rank_products":
@@ -222,25 +352,130 @@ def _compact_for_final(
 def _final_tool_context(
     tool_results: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """HCX final 단계에 전달할 검색 결과만 축약한다."""
+    """HCX final 단계에 전달할 검색 근거를 축약한다."""
 
-    return [
-        {
-            "tool": item.get("tool"),
+    from .answer_validation import collect_evidence
+
+    contexts: list[dict[str, Any]] = []
+
+    for item in tool_results:
+        if item.get("round", 0) <= 0:
+            continue
+
+        result = item.get("result", {})
+        if isinstance(result, dict) and result.get("error"):
+            continue
+
+        tool_name = item.get("tool")
+
+        context: dict[str, Any] = {
+            "tool": tool_name,
             "arguments": _compact_for_final(
                 item.get("arguments", {})
             ),
-            "result": _compact_for_final(
-                item.get("result", {})
-            ),
         }
-        for item in tool_results
-        if item.get("round", 0) > 0
-        and not (
-            isinstance(item.get("result"), dict)
-            and item["result"].get("error")
+
+        # 랭킹 답변에서는 사용자에게 반환되는 retrieved_context와
+        # 동일한 근거만 HCX가 볼 수 있도록 제한한다.
+        if tool_name == "rank_products":
+            context["result"] = {
+                "evidence": collect_evidence([item], max_items=20)
+            }
+        else:
+            context["result"] = _compact_for_final(result)
+
+        contexts.append(context)
+
+    return contexts
+
+
+def _history_event_effective_date(
+    item: dict[str, Any],
+) -> str | None:
+    """Extract actual event date from HISTORY_EVENT text."""
+
+    if item.get("document_type") != "HISTORY_EVENT":
+        return None
+
+    import re
+    from datetime import date
+
+    content = str(item.get("text_content") or "")
+
+    labels = (
+        "\uc801\uc6a9\uc2dc\uc791\uc77c",
+        "\ubc1c\uc0dd\uc77c",
+        "\ud6a8\ub825\uc77c",
+        "\uc2dc\ud589\uc77c",
+        "\ubcc0\uacbd\uc77c",
+    )
+
+    pattern = (
+        r"(?:"
+        + "|".join(re.escape(label) for label in labels)
+        + r")\s*[:\uff1a]?\s*"
+        + r"(\d{4}[-./]\d{1,2}[-./]\d{1,2})"
+    )
+
+    match = re.search(pattern, content)
+    if not match:
+        return None
+
+    raw = match.group(1).replace(".", "-").replace("/", "-")
+    parts = raw.split("-")
+
+    try:
+        parsed = date(
+            int(parts[0]),
+            int(parts[1]),
+            int(parts[2]),
         )
-    ]
+    except (ValueError, IndexError):
+        return None
+
+    return parsed.isoformat()
+
+
+def _filter_history_events_by_period(
+    result: dict[str, Any],
+    arguments: dict[str, Any],
+) -> dict[str, Any]:
+
+    as_of_from = arguments.get("as_of_from")
+    as_of_to = arguments.get("as_of_to")
+
+    if not as_of_from and not as_of_to:
+        return result
+
+    items = result.get("items")
+    if not isinstance(items, list):
+        return result
+
+    filtered = []
+
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+
+        event_date = _history_event_effective_date(item)
+
+        if event_date is None:
+            filtered.append(item)
+            continue
+
+        if as_of_from and event_date < str(as_of_from):
+            continue
+
+        if as_of_to and event_date > str(as_of_to):
+            continue
+
+        filtered.append(item)
+
+    normalized = dict(result)
+    normalized["items"] = filtered
+    normalized["returned_count"] = len(filtered)
+
+    return normalized
 
 
 def _execute_semantic_search(
@@ -253,7 +488,11 @@ def _execute_semantic_search(
     raw_product_type = arguments.get("product_type")
 
     if not isinstance(raw_product_type, list):
-        return tool_executor("semantic_search", arguments)
+        result = tool_executor("semantic_search", arguments)
+        return _filter_history_events_by_period(
+            result,
+            arguments,
+        )
 
     allowed_domains = set(domains or [])
 
@@ -289,6 +528,10 @@ def _execute_semantic_search(
 
         result = tool_executor(
             "semantic_search",
+            scoped_arguments,
+        )
+        result = _filter_history_events_by_period(
+            result,
             scoped_arguments,
         )
         results.append(result)
@@ -561,7 +804,10 @@ class HCXAgentClient:
         if any(keyword in q for keyword in relation_keywords):
             allowed = {"federated_search"}
         elif any(keyword in q for keyword in semantic_keywords):
-            allowed = {"semantic_search", "federated_search"}
+            if _recent_period_bounds(question):
+                allowed = {"semantic_search"}
+            else:
+                allowed = {"semantic_search", "federated_search"}
         elif any(keyword in q for keyword in comparison_keywords):
             allowed = {"search_products", "compare_products", "get_product"}
         elif any(keyword in q for keyword in ranking_keywords):

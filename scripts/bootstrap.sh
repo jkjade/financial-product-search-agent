@@ -44,6 +44,18 @@ if [[ -f external_data/external_semantic_incremental_strict.jsonl ]]; then
   docker compose --profile tools run --rm etl python -m src.semantic.ingest /app/external_data/external_semantic_incremental_strict.jsonl
 fi
 
+
+if [[ -f external_data/external_corporate_relations.jsonl ]]; then
+  docker compose --profile tools run --rm etl python -m src.semantic.ingest_relations corporate /app/external_data/external_corporate_relations.jsonl
+fi
+
+for semantic_file in \
+  external_data/external_policy_documents.jsonl \
+  external_data/external_etf_documents.jsonl; do
+  [[ -f "$semantic_file" ]] || continue
+  docker compose --profile tools run --rm etl python -m src.semantic.ingest "/app/$semantic_file"
+done
+
 echo "[6/7] Start API"
 docker compose up -d --force-recreate api
 

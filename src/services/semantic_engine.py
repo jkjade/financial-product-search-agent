@@ -13,10 +13,11 @@ from ..api.models import (
     FederatedSearchRequest,
     GraphLookupRequest,
     ProductQueryRequest,
+    ProductRankRequest,
     SemanticSearchRequest,
 )
 from ..semantic.ontology import resolve_query_terms
-from .query_engine import search_products
+from .query_engine import rank_products, search_products
 
 
 def _dataset_evidence(snapshot_date: str, operation: str) -> dict[str, Any]:
@@ -270,6 +271,99 @@ def graph_lookup(
     }
 
 
+
+_SEMANTIC_GENERIC_TERMS = {
+    "etf",
+    "펀드",
+    "상품",
+    "투자",
+    "투자전략",
+    "전략",
+    "구조",
+    "동향",
+    "관련",
+    "문서",
+    "자료",
+    "정보",
+    "위험",
+    "위험요인",
+    "알려줘",
+    "찾아줘",
+    "찾아서",
+}
+
+
+def _semantic_distinctive_terms(query: str) -> list[str]:
+    """질문의 고유 엔티티·테마 후보만 추출한다."""
+
+    import re
+
+    tokens = re.findall(r"[0-9A-Za-z가-힣]+", query)
+
+    terms: list[str] = []
+
+    for token in tokens:
+        normalized = token.lower()
+
+        # 조사 제거: 국민성장펀드의 -> 국민성장펀드
+        for suffix in ("에서", "으로", "에게", "의", "을", "를", "은", "는", "이", "가"):
+            if normalized.endswith(suffix) and len(normalized) > len(suffix) + 1:
+                normalized = normalized[:-len(suffix)]
+                break
+
+        if normalized in _SEMANTIC_GENERIC_TERMS:
+            continue
+
+        if len(normalized) < 2:
+            continue
+
+        if normalized not in terms:
+            terms.append(normalized)
+
+    return terms
+
+
+def _filter_weak_semantic_matches(
+    query: str,
+    items: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """고유 키워드도 없고 점수도 낮은 비정형 오탐을 제거한다."""
+
+    terms = _semantic_distinctive_terms(query)
+
+    if not terms:
+        return items
+
+    filtered: list[dict[str, Any]] = []
+
+    for item in items:
+        haystack = " ".join(
+            str(value or "")
+            for value in (
+                item.get("title"),
+                item.get("text_content"),
+                item.get("publisher"),
+            )
+        ).lower()
+
+        has_distinctive_term = any(
+            term in haystack
+            for term in terms
+        )
+
+        try:
+            score = float(item.get("score") or 0)
+        except (TypeError, ValueError):
+            score = 0.0
+
+        # 정확한 고유 키워드가 있으면 낮은 lexical score라도 허용하고,
+        # 키워드가 없으면 충분한 의미 유사도가 있을 때만 허용한다.
+        if has_distinctive_term or score >= 0.15:
+            filtered.append(item)
+
+    return filtered
+
+
 def semantic_search_documents(
     pool: ConnectionPool,
     request: SemanticSearchRequest,
@@ -281,7 +375,9 @@ def semantic_search_documents(
         filters.append("LOWER(product_id) = LOWER(%s)")
         params.append(request.product_id)
     if request.product_type:
-        filters.append("product_type = %s")
+        # HOST 상품군에 연결된 문서와 함께,
+        # 특정 HOST 상품에 종속되지 않은 공식 정책/시장 문서도 검색한다.
+        filters.append("(product_type = %s OR product_type IS NULL)")
         params.append(request.product_type)
     if request.document_type:
         filters.append("document_type = %s")
@@ -418,6 +514,14 @@ def semantic_search_documents(
             )
             items = cursor.fetchall()
             retrieval_mode = "lexical_fallback"
+
+    items = _filter_weak_semantic_matches(
+        request.query,
+        list(items),
+    )
+
+    if not items:
+        retrieval_mode = "empty"
 
     return {
         "returned_count": len(items),
@@ -672,12 +776,367 @@ def _select_federated_route(query: str) -> str:
 
     return "rdb"
 
+
+def _is_corporate_etf_rank_risk_query(query: str) -> bool:
+    q = query.strip().lower()
+
+    corporate_words = (
+        "\uc790\ud68c\uc0ac",
+        "\uacc4\uc5f4\uc0ac",
+        "subsidiary",
+        "subsidiaries",
+    )
+    holding_words = (
+        "\ud3b8\uc785",
+        "\ubcf4\uc720",
+        "\ub2f4\uc740",
+        "\ub2f4\uace0",
+        "hold",
+        "holding",
+    )
+    rank_words = (
+        "\uc21c\uc790\uc0b0",
+        "\uc790\uc0b0\uaddc\ubaa8",
+        "aum",
+    )
+    risk_words = (
+        "\uc704\ud5d8",
+        "\ub9ac\uc2a4\ud06c",
+        "risk",
+    )
+
+    return (
+        ("etf" in q or "\uc0c1\uc7a5\uc9c0\uc218" in q)
+        and any(word in q for word in corporate_words)
+        and any(word in q for word in holding_words)
+        and any(word in q for word in rank_words)
+        and any(word in q for word in risk_words)
+    )
+
+
+def _extract_parent_company_term(query: str) -> str:
+    text = query.strip()
+
+    markers = (
+        "\uc758 \uc790\ud68c\uc0ac",
+        "\uc758\uc790\ud68c\uc0ac",
+        "\uc790\ud68c\uc0ac",
+        "\uc758 \uacc4\uc5f4\uc0ac",
+        "\uc758\uacc4\uc5f4\uc0ac",
+        "\uacc4\uc5f4\uc0ac",
+    )
+
+    for marker in markers:
+        index = text.find(marker)
+        if index > 0:
+            return _normalize_graph_entity_term(text[:index].strip())
+
+    lowered = text.lower()
+    for marker in (" subsidiaries", " subsidiary"):
+        index = lowered.find(marker)
+        if index > 0:
+            return _normalize_graph_entity_term(text[:index].strip())
+
+    return _normalize_graph_entity_term(text)
+
+
+def _empty_rank_result(snapshot_date: str) -> dict[str, Any]:
+    return {
+        "matched_product_count": 0,
+        "returned_count": 0,
+        "items": [],
+        "ranking_definition": {},
+        "evidence": _dataset_evidence(
+            snapshot_date,
+            "corporate_candidate_rank_empty",
+        ),
+    }
+
+
+
+def _semantic_product_id_from_rank_item(
+    product_type: str,
+    product: dict[str, Any],
+) -> str | None:
+    if product_type == "DOMESTIC_ETF":
+        ticker = product.get("pd_ticker")
+        if ticker not in (None, ""):
+            return str(ticker).strip()
+
+        code = product.get("etf_kr_product_code")
+        if code not in (None, ""):
+            value = str(code).strip()
+            if value.upper().startswith("A") and len(value) > 1:
+                value = value[1:]
+            return value
+
+    if product_type == "OVERSEAS_ETF":
+        ticker = product.get("pd_abrv_nm_overseas_etf")
+        if ticker not in (None, ""):
+            return str(ticker).strip()
+
+        item_no = product.get("pd_itm_no_ma_overseas_etf")
+        if item_no not in (None, ""):
+            value = str(item_no).strip()
+            if "." in value:
+                value = value.split(".", 1)[0]
+            return value
+
+    product_id = product.get("product_id")
+    if product_id in (None, ""):
+        return None
+
+    return str(product_id).strip()
+
+
+def _corporate_etf_rank_risk_search(
+    pool: ConnectionPool,
+    request: FederatedSearchRequest,
+    snapshot_date: str,
+    ontology: dict[str, Any],
+) -> dict[str, Any]:
+    parent_term = _extract_parent_company_term(request.query)
+
+    subsidiary_graph = graph_lookup(
+        pool,
+        GraphLookupRequest(
+            term=parent_term,
+            entity_type="COMPANY",
+            predicate="hasSubsidiary",
+            direction="out",
+            limit=100,
+        ),
+        snapshot_date,
+    )
+
+    subsidiary_relations = [
+        item
+        for item in subsidiary_graph.get("items", [])
+        if item.get("predicate") == "hasSubsidiary"
+    ]
+
+    subsidiary_ids = sorted({
+        str(item["object_id"])
+        for item in subsidiary_relations
+        if item.get("object_id")
+    })
+
+    holding_relations: list[dict[str, Any]] = []
+
+    if subsidiary_ids:
+        with pool.connection() as connection, connection.cursor(
+            row_factory=dict_row
+        ) as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    r.predicate,
+                    r.subject_id,
+                    s.entity_type AS subject_type,
+                    s.canonical_name AS subject_name,
+                    r.object_id,
+                    o.entity_type AS object_type,
+                    o.canonical_name AS object_name,
+                    r.source_table,
+                    r.source_row_number,
+                    r.data_base_date,
+                    r.properties,
+                    o.source_table AS product_source_table,
+                    o.source_row_number AS product_source_row_number
+                FROM semantic.relation r
+                JOIN semantic.entity s
+                  ON s.entity_id = r.subject_id
+                JOIN semantic.entity o
+                  ON o.entity_id = r.object_id
+                WHERE r.subject_id = ANY(%s)
+                  AND r.predicate = 'heldBy'
+                ORDER BY
+                    o.source_table,
+                    o.source_row_number,
+                    s.canonical_name
+                LIMIT 500
+                """,
+                (subsidiary_ids,),
+            )
+            holding_relations = cursor.fetchall()
+
+    domestic_names = sorted({
+        str(item["object_name"])
+        for item in holding_relations
+        if item.get("product_source_table") == "PREF01N001"
+        and item.get("object_name")
+    })
+
+    overseas_names = sorted({
+        str(item["object_name"])
+        for item in holding_relations
+        if item.get("product_source_table") == "PREF02N001"
+        and item.get("object_name")
+    })
+
+    domestic_rank = _empty_rank_result(snapshot_date)
+    overseas_rank = _empty_rank_result(snapshot_date)
+
+    if domestic_names:
+        domestic_rank = rank_products(
+            pool,
+            ProductRankRequest(
+                filters=[
+                    {
+                        "field": "pd_nm_domestic_etf",
+                        "operator": "in",
+                        "values": domestic_names[:100],
+                    }
+                ],
+                metric="du_last_aum_domestic_etf",
+                order="desc",
+                method="dense_rank",
+                top_n=1,
+                result_limit=10,
+            ),
+            snapshot_date,
+            ["DOMESTIC_ETF"],
+        )
+
+    if overseas_names:
+        overseas_rank = rank_products(
+            pool,
+            ProductRankRequest(
+                filters=[
+                    {
+                        "field": "pd_nm_overseas_etf",
+                        "operator": "in",
+                        "values": overseas_names[:100],
+                    }
+                ],
+                metric="du_last_aum_overseas_etf",
+                order="desc",
+                method="dense_rank",
+                top_n=1,
+                result_limit=10,
+            ),
+            snapshot_date,
+            ["OVERSEAS_ETF"],
+        )
+
+    risk_results: dict[str, Any] = {}
+    risk_items: list[dict[str, Any]] = []
+
+    for product_type, rank_result in (
+        ("DOMESTIC_ETF", domestic_rank),
+        ("OVERSEAS_ETF", overseas_rank),
+    ):
+        for product in rank_result.get("items", []):
+            master_product_id = product.get("product_id")
+            semantic_product_id = _semantic_product_id_from_rank_item(
+                product_type,
+                product,
+            )
+
+            if not semantic_product_id:
+                continue
+
+            if product_type == "DOMESTIC_ETF":
+                product_name = product.get("pd_nm_domestic_etf")
+            else:
+                product_name = product.get("pd_nm_overseas_etf")
+
+            semantic_result = semantic_search_documents(
+                pool,
+                SemanticSearchRequest(
+                    query=(
+                        f"{product_name or semantic_product_id} "
+                        "\uc704\ud5d8\uc694\uc778 \ub9ac\uc2a4\ud06c"
+                    ),
+                    product_id=semantic_product_id,
+                    product_type=product_type,
+                    document_type="RISK_FACTORS",
+                    limit=request.document_limit,
+                ),
+                snapshot_date,
+            )
+
+            semantic_result["master_product_id"] = master_product_id
+            semantic_result["semantic_product_id"] = semantic_product_id
+
+            risk_results[str(master_product_id or semantic_product_id)] = (
+                semantic_result
+            )
+            risk_items.extend(semantic_result.get("items", []))
+
+    rank_items = [
+        *domestic_rank.get("items", []),
+        *overseas_rank.get("items", []),
+    ]
+
+    return {
+        "query": request.query,
+        "route": {
+            "selected": "corporate_graph_rank_semantic",
+            "ontology": True,
+            "rdb": True,
+            "graph": True,
+            "external_semantic": request.include_external_documents,
+            "product_mode": "graph_candidates_ranked_by_market",
+        },
+        "ontology": ontology,
+        "products": {
+            "returned_count": len(rank_items),
+            "items": rank_items,
+            "mode": "market_specific_aum_winners",
+        },
+        "graph": {
+            "returned_count": (
+                len(subsidiary_relations)
+                + len(holding_relations)
+            ),
+            "seed_entities": subsidiary_graph.get(
+                "seed_entities",
+                [],
+            ),
+            "subsidiary_relations": subsidiary_relations,
+            "items": holding_relations,
+        },
+        "rankings": {
+            "DOMESTIC_ETF": domestic_rank,
+            "OVERSEAS_ETF": overseas_rank,
+            "comparison_policy": (
+                "Domestic ETF and overseas ETF AUM metrics use "
+                "different market/currency scopes. Rank each market "
+                "separately unless currency-conversion evidence exists."
+            ),
+        },
+        "documents": {
+            "returned_count": len(risk_items),
+            "items": risk_items,
+            "by_product": risk_results,
+        },
+        "evidence": {
+            "data_base_date": snapshot_date,
+            "rule": (
+                "Corporate relation -> subsidiary holding relation -> "
+                "market-specific HOST AUM ranking -> RISK_FACTORS. "
+                "Provided master data has priority."
+            ),
+        },
+    }
+
+
 def federated_search(
     pool: ConnectionPool,
     request: FederatedSearchRequest,
     snapshot_date: str,
 ) -> dict[str, Any]:
     ontology = resolve_query_terms(request.query)
+
+    if _is_corporate_etf_rank_risk_query(request.query):
+        return _corporate_etf_rank_risk_search(
+            pool,
+            request,
+            snapshot_date,
+            ontology,
+        )
+
     search_route = _select_federated_route(request.query)
 
     if request.structured_query is not None:
