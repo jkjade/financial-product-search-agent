@@ -26,14 +26,14 @@ AI Festival 2026 - 미래셋터
 
 HyperCLOVA X가 실제로 연결된 인스턴스가 서버에 배포되어 있어, 로컬 설치 없이 바로 확인할 수 있습니다.
 
+**[Swagger에서 /answer 바로 열기 →](http://101.79.17.204/docs#/default/answer_answer_get)**
+
 ```text
-Swagger 문서:  http://101.79.17.204/docs
 상태 확인:     http://101.79.17.204/health
 Agent 준비 상태: http://101.79.17.204/agent/health
 ```
 
-질문에 대한 답변은 `GET /answer`(Swagger 문서의 `answer_answer_get`)로 받습니다.  
-Swagger 문서 페이지에서 `answer` 항목을 펼치고 **Try it out**에 `question_id`(임의 문자열)와 `question`(질문)을 입력해 바로 호출해볼 수 있고, 아래처럼 직접 호출할 수도 있습니다.
+위 링크를 누르면 Swagger 문서의 `answer` 항목으로 바로 이동합니다. 거기서 **Try it out**에 `question_id`(임의 문자열)와 `question`(질문)을 입력해 바로 호출해볼 수 있고, 아래처럼 직접 호출할 수도 있습니다.
 
 ```bash
 curl -sG "http://101.79.17.204/answer" \
@@ -209,6 +209,7 @@ HyperCLOVA X — Function Calling 루프 (최대 N라운드)
 financial-product-agent/
 │
 ├─ README.md                      # 지금 보고 있는 전체 안내 문서
+├─ 기술제안서.pdf                    # 필수 제출물 기술제안서 pdf 파일
 ├─ Makefile                       # 주요 명령 단축 실행(bootstrap/check/test 등)
 ├─ VERSION                        # 릴리스 버전
 ├─ docker-compose.yml             # PostgreSQL / API / ETL(tools 프로필) 컨테이너 구성
