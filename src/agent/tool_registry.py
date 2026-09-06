@@ -246,10 +246,12 @@ def translate_field_labels(tool_name: str, arguments: Any, domains: list[str] | 
                     ">": "gt",
                     "gt": "gt",
                     ">=": "gte",
+                    "ge": "gte",
                     "gte": "gte",
                     "<": "lt",
                     "lt": "lt",
                     "<=": "lte",
+                    "le": "lte",
                     "lte": "lte",
                     "in": "in",
                     "not in": "not_in",
@@ -267,6 +269,20 @@ def translate_field_labels(tool_name: str, arguments: Any, domains: list[str] | 
                 normalized_clause["operator"] = operator_aliases.get(
                     key,
                     raw_operator,
+                )
+
+            # HCX occasionally emits:
+            # {"operator": "in", "value": ["..."]}
+            # although FilterClause expects "values".
+            operator = normalized_clause.get("operator")
+            if (
+                operator in {"in", "not_in"}
+                and "values" not in normalized_clause
+                and "value" in normalized_clause
+            ):
+                value = normalized_clause.pop("value")
+                normalized_clause["values"] = (
+                    value if isinstance(value, list) else [value]
                 )
 
             return [normalized_clause]
@@ -372,10 +388,26 @@ def translate_field_labels(tool_name: str, arguments: Any, domains: list[str] | 
                     isinstance(normalized_clause, dict)
                     and isinstance(normalized_clause.get("field"), str)
                 ):
+                    raw_field = normalized_clause["field"]
+
+                    # Common model-facing aliases that are unambiguous
+                    # inside a single routed domain.
+                    domain_field_aliases = {
+                        "DOMESTIC_BOND": {
+                            "credit_rating": "crd_grd_domestic_bond",
+                        },
+                    }
+
+                    if primary_domain in domain_field_aliases:
+                        raw_field = domain_field_aliases[primary_domain].get(
+                            raw_field,
+                            raw_field,
+                        )
+
                     normalized_clause = {
                         **normalized_clause,
                         "field": _resolve(
-                            normalized_clause["field"],
+                            raw_field,
                             filter_pool,
                         ),
                     }

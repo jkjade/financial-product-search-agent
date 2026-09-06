@@ -109,6 +109,28 @@ if (Test-Path $semanticFile) {
     Write-Host "[외부근거] semantic strict 적재 완료 (embedding은 별도 --embed 실행)"
 }
 
+
+$corporateFile = ".\external_data\external_corporate_relations.jsonl"
+if (Test-Path $corporateFile) {
+    docker compose --profile tools run --rm etl python -m src.semantic.ingest_relations corporate /app/external_data/external_corporate_relations.jsonl
+    Assert-LastExitCode "Corporate relation external data ingest failed."
+    Write-Host "[external] corporate relations loaded"
+}
+
+$additionalSemanticFiles = @(
+    ".\external_data\external_policy_documents.jsonl",
+    ".\external_data\external_etf_documents.jsonl"
+)
+
+foreach ($semanticDocumentFile in $additionalSemanticFiles) {
+    if (Test-Path $semanticDocumentFile) {
+        $containerPath = "/app/external_data/$([System.IO.Path]::GetFileName($semanticDocumentFile))"
+        docker compose --profile tools run --rm etl python -m src.semantic.ingest $containerPath
+        Assert-LastExitCode "Additional semantic external data ingest failed: $semanticDocumentFile"
+        Write-Host "[external] semantic document loaded: $semanticDocumentFile"
+    }
+}
+
 Write-Host "[6/7] API 실행"
 docker compose up -d --force-recreate api
 Assert-LastExitCode "API 실행에 실패했습니다."

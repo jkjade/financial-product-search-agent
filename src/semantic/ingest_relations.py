@@ -227,12 +227,260 @@ def ingest_commodity(path: Path) -> dict[str, Any]:
     return {"file": str(path), "kind": "commodity", "graph_relations_inserted": inserted, "cutoff": str(cutoff)}
 
 
+
+def _resolve_existing_security_ids(
+    cursor: Any,
+    raw: dict[str, Any],
+) -> list[str]:
+    identifiers = [
+        str(value).strip()
+        for value in (
+            raw.get("subsidiary_isin"),
+            raw.get("subsidiary_ticker"),
+            raw.get("subsidiary_security_id"),
+            raw.get("subsidiary_code"),
+        )
+        if value not in (None, "")
+    ]
+
+    subsidiary_name = str(raw.get("subsidiary_name") or "").strip()
+
+    clauses: list[str] = []
+    params: list[Any] = []
+
+    for value in identifiers:
+        clauses.append(
+            """(
+                %s = ANY(COALESCE(aliases, ARRAY[]::text[]))
+                OR properties->>'isin' = %s
+                OR properties->>'ticker' = %s
+                OR properties->>'security_id' = %s
+                OR properties->>'holding_code' = %s
+            )"""
+        )
+        params.extend([value, value, value, value, value])
+
+    if subsidiary_name:
+        clauses.append("lower(btrim(canonical_name)) = lower(btrim(%s))")
+        params.append(subsidiary_name)
+
+    if not clauses:
+        raise ValueError(
+            "Corporate row must provide subsidiary identifier or subsidiary_name"
+        )
+
+    cursor.execute(
+        f"""
+        SELECT entity_id
+        FROM semantic.entity
+        WHERE entity_type = 'CONSTITUENT_SECURITY'
+          AND ({' OR '.join(clauses)})
+        ORDER BY entity_id
+        """,
+        params,
+    )
+
+    return [str(row["entity_id"]) for row in cursor.fetchall()]
+
+
+def ingest_corporate(path: Path) -> dict[str, Any]:
+    cutoff = date.fromisoformat(
+        load_business_rules()["external_evidence_cutoff"]
+    )
+    inserted = 0
+    matched_security_entities = 0
+
+    with psycopg.connect(database_url()) as connection, connection.cursor(
+        row_factory=dict_row
+    ) as cursor:
+        for raw in _iter_jsonl(path):
+            _require_official(raw)
+
+            required = [
+                "parent_name",
+                "subsidiary_name",
+                "as_of_date",
+                "source_url",
+            ]
+            missing = [
+                key for key in required
+                if raw.get(key) in (None, "")
+            ]
+            if missing:
+                raise ValueError(
+                    f"Corporate row missing fields: {missing}"
+                )
+
+            as_of_date = _date(raw, cutoff)
+
+            parent_name = str(raw["parent_name"]).strip()
+            parent_id = concept_entity_id("company", parent_name)
+
+            parent_aliases = [
+                str(value).strip()
+                for value in raw.get("parent_aliases", [])
+                if value not in (None, "")
+            ]
+
+            cursor.execute(
+                """
+                INSERT INTO semantic.entity (
+                    entity_id,
+                    entity_type,
+                    canonical_name,
+                    normalized_name,
+                    aliases,
+                    properties,
+                    data_base_date
+                )
+                VALUES (
+                    %s,
+                    'COMPANY',
+                    %s,
+                    lower(btrim(%s)),
+                    %s,
+                    %s,
+                    %s
+                )
+                ON CONFLICT (entity_id) DO UPDATE SET
+                    aliases = ARRAY(
+                        SELECT DISTINCT x
+                        FROM unnest(
+                            semantic.entity.aliases || EXCLUDED.aliases
+                        ) AS t(x)
+                        WHERE x IS NOT NULL AND btrim(x) <> ''
+                    ),
+                    properties = (
+                        semantic.entity.properties
+                        || EXCLUDED.properties
+                    ),
+                    data_base_date = GREATEST(
+                        semantic.entity.data_base_date,
+                        EXCLUDED.data_base_date
+                    )
+                """,
+                (
+                    parent_id,
+                    parent_name,
+                    parent_name,
+                    parent_aliases,
+                    Jsonb({
+                        "source_name": raw.get("source_name"),
+                        "source_url": raw.get("source_url"),
+                        "source_authority": raw.get("source_authority"),
+                    }),
+                    as_of_date,
+                ),
+            )
+
+            security_ids = _resolve_existing_security_ids(
+                cursor,
+                raw,
+            )
+
+            if not security_ids:
+                raise ValueError(
+                    "No existing CONSTITUENT_SECURITY matched "
+                    f"subsidiary={raw.get('subsidiary_name')!r}"
+                )
+
+            matched_security_entities += len(security_ids)
+
+            props = Jsonb({
+                "parent_name": parent_name,
+                "subsidiary_name": raw.get("subsidiary_name"),
+                "subsidiary_isin": raw.get("subsidiary_isin"),
+                "subsidiary_ticker": raw.get("subsidiary_ticker"),
+                "source_name": raw.get("source_name"),
+                "source_url": raw.get("source_url"),
+                "source_authority": raw.get("source_authority"),
+                "relationship_type": "subsidiary",
+            })
+
+            for security_id in security_ids:
+                for subject_id, predicate, object_id in (
+                    (
+                        parent_id,
+                        "hasSubsidiary",
+                        security_id,
+                    ),
+                    (
+                        security_id,
+                        "subsidiaryOf",
+                        parent_id,
+                    ),
+                ):
+                    # Keep external corporate relations idempotent.
+                    # Re-running bootstrap must refresh the same relation
+                    # instead of accumulating duplicate graph edges.
+                    cursor.execute(
+                        """
+                        DELETE FROM semantic.relation
+                        WHERE subject_id = %s
+                          AND predicate = %s
+                          AND object_id = %s
+                          AND source_table = 'EXTERNAL_CORPORATE'
+                        """,
+                        (
+                            subject_id,
+                            predicate,
+                            object_id,
+                        ),
+                    )
+
+                    cursor.execute(
+                        """
+                        INSERT INTO semantic.relation (
+                            subject_id,
+                            predicate,
+                            object_id,
+                            source_table,
+                            source_row_number,
+                            data_base_date,
+                            properties
+                        )
+                        VALUES (
+                            %s,
+                            %s,
+                            %s,
+                            'EXTERNAL_CORPORATE',
+                            NULL,
+                            %s,
+                            %s
+                        )
+                        """,
+                        (
+                            subject_id,
+                            predicate,
+                            object_id,
+                            as_of_date,
+                            props,
+                        ),
+                    )
+                    inserted += 1
+
+        connection.commit()
+
+    return {
+        "file": str(path),
+        "kind": "corporate",
+        "graph_relations_inserted": inserted,
+        "matched_security_entities": matched_security_entities,
+        "cutoff": str(cutoff),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Import strict external graph relations")
-    parser.add_argument("kind", choices=["sector", "commodity"])
+    parser.add_argument("kind", choices=["sector", "commodity", "corporate"])
     parser.add_argument("file", type=Path)
     args = parser.parse_args()
-    result = ingest_sector(args.file) if args.kind == "sector" else ingest_commodity(args.file)
+    if args.kind == "sector":
+        result = ingest_sector(args.file)
+    elif args.kind == "commodity":
+        result = ingest_commodity(args.file)
+    else:
+        result = ingest_corporate(args.file)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
